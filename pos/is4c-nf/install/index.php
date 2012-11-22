@@ -39,30 +39,16 @@ body {
 </style>
 </head>
 <body>
-
-Necessities
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="extra_config.php">Additional Configuration</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="scanning.php">Scanning Options</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="security.php">Security</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="upgrade-ini.php">Upgrade ini.php via server</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="debug.php">Debug</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="plugins.php">Plugins</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="extra_data.php">Sample Data</a>
-
+<?php include('tabs.php'); ?>
+<div id="wrapper">
 <h2>IT CORE Lane Installation: Necessities</h2>
 
 <form action=index.php method=post>
-<?php
-check_writeable('../ini.php');
-check_writeable('../ini-local.php');
 
+<div class="alert"><?php check_writeable('../ini.php'); ?></div>
+<div class="alert"><?php check_writeable('../ini-local.php'); ?></div>
+
+<?php
 if (function_exists('posix_getpwuid')){
 	$chk = posix_getpwuid(posix_getuid());
 	echo "PHP is running as: ".$chk['name']."<br />";
@@ -75,7 +61,9 @@ if (!function_exists("socket_create")){
 }
 ?>
 <br />
-OS: <select name=OS>
+<table id="install" border=0 cellspacing=0 cellpadding=4>
+<tr>
+<td style="width: 30%;">OS: </td><td><select name=OS>
 <?php
 if (isset($_REQUEST['OS'])) $CORE_LOCAL->set('OS',$_REQUEST['OS']);
 if ($CORE_LOCAL->get('OS') == 'win32'){
@@ -88,27 +76,27 @@ else {
 }
 confsave('OS',"'".$CORE_LOCAL->get('OS')."'");
 ?>
-</select><br />
-Lane number:
+</select></td></tr>
+<tr><td>Lane number:</td><td>
 <?php
 if (isset($_REQUEST['LANE_NO']) && is_numeric($_REQUEST['LANE_NO'])) $CORE_LOCAL->set('laneno',$_REQUEST['LANE_NO']);
 printf("<input type=text name=LANE_NO value=\"%d\" />",
 	$CORE_LOCAL->get('laneno'));
 confsave('laneno',$CORE_LOCAL->get('laneno'));
 ?>
-<br />
-<hr />
-<h3>Database set up</h3>
-Lane database host: 
+</td></tr><tr><td colspan=2 class="tblheader">
+<h3>Database set up</h3></td></tr>
+<tr><td>
+Lane database host: </td><td>
 <?php
 if (isset($_REQUEST['LANE_HOST'])) $CORE_LOCAL->set('localhost',$_REQUEST['LANE_HOST']);
 printf("<input type=text name=LANE_HOST value=\"%s\" />",
 	$CORE_LOCAL->get('localhost'));
 confsave('localhost',"'".$CORE_LOCAL->get('localhost')."'");
 ?>
-<br />
-Lane database type:
-<select name=LANE_DBMS>
+</td></tr><tr><td>
+Lane database type:</td>
+<td><select name=LANE_DBMS>
 <?php
 if(isset($_REQUEST['LANE_DBMS'])) $CORE_LOCAL->set('DBMS',$_REQUEST['LANE_DBMS']);
 if ($CORE_LOCAL->get('DBMS') == 'mssql'){
@@ -121,32 +109,32 @@ else {
 }
 confsave('DBMS',"'".$CORE_LOCAL->get('DBMS')."'");
 ?>
-</select><br />
-Lane user name:
+</select></td></tr>
+<tr><td>Lane user name:</td><td>
 <?php
 if (isset($_REQUEST['LANE_USER'])) $CORE_LOCAL->set('localUser',$_REQUEST['LANE_USER']);
 printf("<input type=text name=LANE_USER value=\"%s\" />",
 	$CORE_LOCAL->get('localUser'));
 confsave('localUser',"'".$CORE_LOCAL->get('localUser')."'");
 ?>
-<br />
-Lane password:
+</td></tr><tr><td>
+Lane password:</td><td>
 <?php
 if (isset($_REQUEST['LANE_PASS'])) $CORE_LOCAL->set('localPass',$_REQUEST['LANE_PASS']);
 printf("<input type=password name=LANE_PASS value=\"%s\" />",
 	$CORE_LOCAL->get('localPass'));
 confsave('localPass',"'".$CORE_LOCAL->get('localPass')."'");
 ?>
-<br />
-Lane operational DB:
+</td></tr><tr><td>
+Lane operational DB:</td><td>
 <?php
 if (isset($_REQUEST['LANE_OP_DB'])) $CORE_LOCAL->set('pDatabase',$_REQUEST['LANE_OP_DB']);
 printf("<input type=text name=LANE_OP_DB value=\"%s\" />",
 	$CORE_LOCAL->get('pDatabase'));
 confsave('pDatabase',"'".$CORE_LOCAL->get('pDatabase')."'");
 ?>
-<br />
-Testing Operation DB Connection:
+</td></tr><tr><td>
+Testing Operation DB Connection:</td><td>
 <?php
 $gotDBs = 0;
 if ($CORE_LOCAL->get("DBMS") == "mysql")
@@ -159,23 +147,54 @@ $sql = db_test_connect($CORE_LOCAL->get('localhost'),
 		$CORE_LOCAL->get('localPass'));
 if ($sql === False){
 	echo "<span style=\"color:red;\">Failed</span>";
+	echo '<div class="db_hints" style="margin-left:25px;">';
+	if (!function_exists('socket_create')){
+		echo '<i>Try enabling PHP\'s socket extension in php.ini for better diagnostics</i>';
+	}
+	elseif (@MiscLib::pingport($CORE_LOCAL->get('localhost'),$CORE_LOCAL->get('DBMS'))){
+		echo '<i>Database found at '.$CORE_LOCAL->get('localhost').'. Verify username and password
+			and/or database account permissions.</i>';
+	}
+	else {
+		echo '<i>Database does not appear to be listening for connections on '
+			.$CORE_LOCAL->get('localhost').'. Verify host is correct, database is running and
+			firewall is allowing connections.</i>';
+	}
+	echo '</div>';
 }
 else {
 	echo "<span style=\"color:green;\">Succeeded</span>";
-	create_op_dbs($sql,$CORE_LOCAL->get('DBMS'));
+	$opErrors = create_op_dbs($sql,$CORE_LOCAL->get('DBMS'));
 	$gotDBs++;
+	if (!empty($opErrors)){
+		echo '<div class="db_create_errors" style="border: solid 1px red;padding:5px;">';
+		echo 'There were some errors creating operational DB structure';
+		echo '<ul style="margin-top:2px;">';
+		foreach($opErrors as $error){
+			echo '<li>';	
+			echo 'Error on structure <b>'.$error['struct'].'</b>. ';
+			printf('<a href="" onclick="$(\'#eDetails%s\').toggle();return false;">Details</a>',
+				$error['struct']);
+			printf('<ul style="display:none;" id="eDetails%s">',$error['struct']);
+			echo '<li>Query: <pre>'.$error['query'].'</pre></li>';
+			echo '<li>Error Message: '.$error['details'].'</li>';
+			echo '</ul>';
+			echo '</li>';
+		}
+		echo '</div>';
+	}
 }
 ?>
-<br />
-Lane transaction DB:
+</td></tr><tr><td>
+Lane transaction DB:</td><td>
 <?php
 if (isset($_REQUEST['LANE_TRANS_DB'])) $CORE_LOCAL->set('tDatabase',$_REQUEST['LANE_TRANS_DB']);
 printf("<input type=text name=LANE_TRANS_DB value=\"%s\" />",
 	$CORE_LOCAL->get('tDatabase'));
 confsave('tDatabase',"'".$CORE_LOCAL->get('tDatabase')."'");
 ?>
-<br />
-Testing transational DB connection:
+</td></tr><tr><td>
+Testing transactional DB connection:</td><td>
 <?php
 $sql = db_test_connect($CORE_LOCAL->get('localhost'),
 		$CORE_LOCAL->get('DBMS'),
@@ -184,6 +203,11 @@ $sql = db_test_connect($CORE_LOCAL->get('localhost'),
 		$CORE_LOCAL->get('localPass'));
 if ($sql === False ){
 	echo "<span style=\"color:red;\">Failed</span>";
+	echo '<div class="db_hints" style="margin-left:25px;">';
+	echo '<i>If both connections failed, see above. If just this one
+		is failing, it\'s probably an issue of database user 
+		permissions.</i>';
+	echo '</div>';
 }
 else {
 	echo "<span style=\"color:green;\">Succeeded</span>";
@@ -212,20 +236,37 @@ else {
 		}
 	}
 
-	create_trans_dbs($sql,$CORE_LOCAL->get('DBMS'));
+	$transErrors = create_trans_dbs($sql,$CORE_LOCAL->get('DBMS'));
 	$gotDBs++;
+	if (!empty($transErrors)){
+		echo '<div class="db_create_errors" style="border: solid 1px red;padding:5px;">';
+		echo 'There were some errors creating transactional DB structure';
+		echo '<ul style="margin-top:2px;">';
+		foreach($transErrors as $error){
+			echo '<li>';	
+			echo 'Error on structure <b>'.$error['struct'].'</b>. ';
+			printf('<a href="" onclick="$(\'#eDetails%s\').toggle();return false;">Details</a>',
+				$error['struct']);
+			printf('<ul style="display:none;" id="eDetails%s">',$error['struct']);
+			echo '<li>Query: <pre>'.$error['query'].'</pre></li>';
+			echo '<li>Error Message: '.$error['details'].'</li>';
+			echo '</ul>';
+			echo '</li>';
+		}
+		echo '</div>';
+	}
 }
 ?>
-<br /><br />
-Server database host: 
+</td></tr><tr><td>
+Server database host: </td><td>
 <?php
 if (isset($_REQUEST['SERVER_HOST'])) $CORE_LOCAL->set('mServer',$_REQUEST['SERVER_HOST']);
 printf("<input type=text name=SERVER_HOST value=\"%s\" />",
 	$CORE_LOCAL->get('mServer'));
 confsave('mServer',"'".$CORE_LOCAL->get('mServer')."'");
 ?>
-<br />
-Server database type:
+</td></tr><tr><td>
+Server database type:</td><td>
 <select name=SERVER_TYPE>
 <?php
 if (isset($_REQUEST['SERVER_TYPE'])) $CORE_LOCAL->set('mDBMS',$_REQUEST['SERVER_TYPE']);
@@ -239,32 +280,32 @@ else {
 }
 confsave('mDBMS',"'".$CORE_LOCAL->get('mDBMS')."'");
 ?>
-</select><br />
-Server user name:
+</select></td></tr><tr><td>
+Server user name:</td><td>
 <?php
 if (isset($_REQUEST['SERVER_USER'])) $CORE_LOCAL->set('mUser',$_REQUEST['SERVER_USER']);
 printf("<input type=text name=SERVER_USER value=\"%s\" />",
 	$CORE_LOCAL->get('mUser'));
 confsave('mUser',"'".$CORE_LOCAL->get('mUser')."'");
 ?>
-<br />
-Server password:
+</td></tr><tr><td>
+Server password:</td><td>
 <?php
 if (isset($_REQUEST['SERVER_PASS'])) $CORE_LOCAL->set('mPass',$_REQUEST['SERVER_PASS']);
 printf("<input type=password name=SERVER_PASS value=\"%s\" />",
 	$CORE_LOCAL->get('mPass'));
 confsave('mPass',"'".$CORE_LOCAL->get('mPass')."'");
 ?>
-<br />
-Server database name:
+</td></tr><tr><td>
+Server database name:</td><td>
 <?php
 if (isset($_REQUEST['SERVER_DB'])) $CORE_LOCAL->set('mDatabase',$_REQUEST['SERVER_DB']);
 printf("<input type=text name=SERVER_DB value=\"%s\" />",
 	$CORE_LOCAL->get('mDatabase'));
 confsave('mDatabase',"'".$CORE_LOCAL->get('mDatabase')."'");
 ?>
-<br />
-Testing server connection:
+</td></tr><tr><td>
+Testing server connection:</td><td>
 <?php
 $sql = db_test_connect($CORE_LOCAL->get('mServer'),
 		$CORE_LOCAL->get('mDBMS'),
@@ -273,18 +314,51 @@ $sql = db_test_connect($CORE_LOCAL->get('mServer'),
 		$CORE_LOCAL->get('mPass'));
 if ($sql === False){
 	echo "<span style=\"color:red;\">Failed</span>";
+	echo '<div class="db_hints" style="margin-left:25px;">';
+	if (!function_exists('socket_create')){
+		echo '<i>Try enabling PHP\'s socket extension in php.ini for better diagnostics</i>';
+	}
+	elseif (@MiscLib::pingport($CORE_LOCAL->get('localhost'),$CORE_LOCAL->get('DBMS'))){
+		echo '<i>Database found at '.$CORE_LOCAL->get('localhost').'. Verify username and password
+			and/or database account permissions.</i>';
+	}
+	else {
+		echo '<i>Database does not appear to be listening for connections on '
+			.$CORE_LOCAL->get('localhost').'. Verify host is correct, database is running and
+			firewall is allowing connections.</i>';
+	}
+	echo '</div>';
 }
 else {
 	echo "<span style=\"color:green;\">Succeeded</span>";
-	create_min_server($sql,$CORE_LOCAL->get('mDBMS'));
+	$sErrors = create_min_server($sql,$CORE_LOCAL->get('mDBMS'));
+	if (!empty($sErrors)){
+		echo '<div class="db_create_errors" style="border: solid 1px red;padding:5px;">';
+		echo 'There were some errors creating transactional DB structure';
+		echo '<ul style="margin-top:2px;">';
+		foreach($sErrors as $error){
+			echo '<li>';	
+			echo 'Error on structure <b>'.$error['struct'].'</b>. ';
+			printf('<a href="" onclick="$(\'#eDetails%s\').toggle();return false;">Details</a>',
+				$error['struct']);
+			printf('<ul style="display:none;" id="eDetails%s">',$error['struct']);
+			echo '<li>Query: <pre>'.$error['query'].'</pre></li>';
+			echo '<li>Error Message: '.$error['details'].'</li>';
+			echo '</ul>';
+			echo '</li>';
+		}
+		echo '</div>';
+	}
 }
 ?>
-<hr />
-<h3>Tax</h3>
-<i>Provided tax rates are used to create database views. As such,
+</td></tr><tr><td colspan=2 class="tblHeader">
+<h3>Tax</h3></td></tr>
+<tr><td colspan=2>
+<p><i>Provided tax rates are used to create database views. As such,
 descriptions should be DB-legal syntax (e.g., no spaces). A rate of
 0% with ID 0 is automatically included. Enter exact values - e.g.,
-0.05 to represent 5%.</i>
+0.05 to represent 5%.</i></p></td></tr>
+<tr><td colspan=2>
 <?php
 $rates = array();
 if($gotDBs == 2){
@@ -306,9 +380,12 @@ foreach($rates as $rate){
 printf("<tr><td>(Add)</td><td><input type=text name=TAX_RATE[] value=\"\" /></td>
 	<td><input type=text name=TAX_DESC[] value=\"\" /></td></tr></table>");
 ?>
+</td></tr><tr><td colspan=2 class="submitBtn">
 <input type=submit value="Save &amp; Re-run installation checks" />
 </form>
-
+</td></tr>
+</table>
+</div> <!--	wrapper -->
 <?php
 
 function create_op_dbs($db,$type){

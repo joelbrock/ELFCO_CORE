@@ -909,9 +909,6 @@ function create_trans_dbs($con){
 			'AR_EOM_Summary','trans');
 
 	create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
-			'AR_EOM_Summary_cache','trans');
-
-	create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
 			'lane_config','trans');
 
 }
@@ -974,13 +971,7 @@ function create_dlogs($con){
 			'rp_receipt_header_90','trans');
 
 	create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
-			'memIouToday','trans');
-
-	create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
 			'ar_live_balance','trans');
-
-	create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
-			'newBalanceToday_cust','trans');
 
 	create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
 			'ar_history','trans');
