@@ -2,25 +2,21 @@
 
 $my_keys = array(
 	new quickkey("Cash","CA"),
-	new quickkey("Check\nPaper","PE"),
-	new quickkey("Check\nBusiness","BU"),
-	new quickkey("ACH","EL"),
+	new quickkey("Check","CK"),
+	new quickkey("Credit\nCard","CC"),
 	new quickkey("Debit","DB"),
-	new quickkey("Store\nCharge","SC"),
-	new quickkey("Gift\nCert.","GI"),
-	new quickkey("Food\nStamp","FS"),
-	new quickkey("Instore\nCoupon","SU"),
-	new quickkey("Manuf.\nCoupon","MU"),
-	new quickkey("EBT","EB"),
+	// new quickkey("Debit\nCashback","XB"),
+	new quickkey("SNAP","FS"),
+	new quickkey("SNAP\nCash","EC"),
+	new quickkey("Store\nCharge","MI"),
+	new quickkey("Gift\nCert.","TC"),
+	new quickkey("Instore\nCoupon","IC"),
+	new quickkey("Manuf.\nCoupon","CP"),
 	new quickkey("Gift\nCard","GD"),
-	new quickkey("Check\nPayroll","PY"),
+	new quickkey("WIC","WT"),
 	new quickkey("Check\nTraveler","TV"),
-	new quickkey("Tech\nCash","TE"),
-	new quickkey("Dept.\nTransfer","TR"),
-	new quickkey("External","XT"),
-	new quickkey("Crimson\nCash","CR"),
-	new quickkey("External\nEBT","XE"),
-	new quickkey("Ext. Cash\nBack","XB")
+	new quickkey("ELFCO\nBucks","EL")
+	
 );
 
 ?>
