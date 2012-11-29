@@ -1,7 +1,7 @@
 <?php
 
 $my_keys = array(
-	new quickkey("Products","QK3"),
+	// new quickkey("Products","QK3"),
 	new quickkey("Depart-\nments","QK1"),
 	new quickkey("Item\nSearch","PV"),
 	new quickkey("Tare","TW"),
