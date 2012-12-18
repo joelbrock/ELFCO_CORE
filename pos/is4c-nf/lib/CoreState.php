@@ -199,7 +199,7 @@ static public function memberReset() {
   Just define blueLine in custdata.
 */
 static public function blueLine($row) {
-	$status = array('Co-op', 'Student', 'Donated', 'LAPSED', 'Life', 'Life', 'Life', 'Life', 'LI', 'LI', 'REFUND', 'Single', 'LAPSED');
+	$status = array('Non-Mem', 'Shareholder', 'Subscriber', 'ON HOLD', 'REFUND', 'INACTIVE', 'Other Co-op');
 	if ($row["blueLine"]) {			// custom blueLine as defined by db
 		return $row["blueLine"];
 	} elseif (isset($row["blueLine"])) {	// 0 - default blueLine with out name
