@@ -205,7 +205,7 @@ static public function blueLine($row) {
 	} elseif (isset($row["blueLine"])) {	// 0 - default blueLine with out name
 		return '#'.$row['CardNo'].' - '.$row['Discount'].'% - '.$status[$row['memType']];
 	} else {				// NULL - default blueLine including name
-		return '#'.$row['CardNo'].' - '.$status[$row['memType']].': '.$row['FirstName'].' '.$row['LastName'];
+		return '#'.$row['CardNo'].' - '.$status[$row['memType']].': '.ucwords($row['FirstName']).' '.ucwords(substr($row['LastName'],0,1));
 	}
 }
 
