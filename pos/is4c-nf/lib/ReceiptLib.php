@@ -100,7 +100,6 @@ static public function printReceiptHeader($dateTimeStamp, $ref) {
 		if ($CORE_LOCAL->get("ReceiptHeaderImage") != ""){
 			$img = self::$PRINT_OBJ->RenderBitmapFromFile(MiscLib::base_url()."graphics/" . $CORE_LOCAL->get("ReceiptHeaderImage"));
 			$receipt .= $img."\n";
-			$i=4;
 			$receipt .= "\n";
 		} 
 		else {
