@@ -10,16 +10,16 @@ $my_menu = array(
 	"Bulk Spice & Tea ND" => "DP470",
 	"Bread ND" => "DP480",
 	"Deli & Prepared Food ND" => "DP490",
-	"Beer ND" => "DP4100",
-	"Wine ND" => "DP4110",
-	"Cheese ND" => "DP4120",
-	"Meat & Seafood ND" => "DP4130",
-	"Vitamins & Supplements ND" => "DP4140",
-	"Body Care & Beauty ND" => "DP4150",
-	"General Merchandise ND" => "DP4160",
-	"Garden Supply ND" => "DP4190",
-	"Pre-Order ND" => "DP4170",
-	"Taxable Pre-Order ND" => "DP4180"
+	"Beer ND" => "DP500",
+	"Wine ND" => "DP510",
+	"Cheese ND" => "DP520",
+	"Meat & Seafood ND" => "DP530",
+	"Vitamins & Supplements ND" => "DP540",
+	"Body Care & Beauty ND" => "DP550",
+	"General Merchandise ND" => "DP560",
+	"Garden Supply ND" => "DP590",
+	"Pre-Order ND" => "DP570",
+	"Taxable Pre-Order ND" => "DP580"
 );
 
 ?>

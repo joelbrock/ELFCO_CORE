@@ -10,15 +10,12 @@ $my_menu = array(
 	"Bulk Spice & Tea" => "DP70",
 	"Bread" => "DP80",
 	"Deli & Prepared Food" => "DP90",
-	"Beer" => "DP100",
-	"Wine" => "DP110",
 	"Cheese" => "DP120",
 	"Meat & Seafood" => "DP130",
 	"Vitamins & Supplements" => "DP140",
 	"Body Care & Beauty" => "DP150",
 	"General Merchandise" => "DP160",
 	"Garden Supply" => "DP190",
-	"Pre-Order" => "DP170",
 	"Taxable Pre-Order" => "DP180"
 );
 
