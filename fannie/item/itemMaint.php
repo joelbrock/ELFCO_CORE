@@ -85,3 +85,10 @@ echo "</form>";
 include ('../src/footer.html');
 
 ?>
+
+<script src="../src/jquery/jquery.chained.js" type="text/javascript"></script>
+<script type="text/javascript"> 
+    $(function(){
+        $("#subdept_list").chained("#dept_list"); 
+    });
+</script>

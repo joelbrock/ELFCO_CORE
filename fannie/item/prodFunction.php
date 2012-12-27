@@ -139,72 +139,31 @@ function itemParse($upc){
 	echo "</tr>";
         echo "<tr align=top>";
     	echo "<td align=left width=5px>";	
-		/**
-			**	BEGIN CHAINEDSELECTOR CLASS
-			**/
-				require('../src/chainedSelectors.php');
 
-				//prepare names
-				$selectorNames = array(
-					CS_FORM=>"pickSubDepartment", 
-					CS_FIRST_SELECTOR=>"department", 
-					CS_SECOND_SELECTOR=>"subdepartment");
+		$dresult = mysql_query("SELECT * FROM departments");
+		echo "<select id=\"dept_list\" name=\"department\">\n";
+		echo "<option value=\"\">----------------</option>\n";
+		while($drow = mysql_fetch_array($dresult)) {
+			echo "<option value=" . $drow['dept_no'];
+			if ($new != 1) {
+				if ($drow['dept_no'] == $rowItem['department']) { echo " selected=\"selected\"";}
+			}
+			echo ">" . $drow['dept_no'] . " - " . $drow['dept_name'] . "</option>\n";
+		}
+		echo "</select>\n\n";
 
-				//		$department = $rowItem[12];
-				//		$subdepartment = $rowItem[27];
+		$sresult = mysql_query("SELECT * FROM subdepts ORDER BY subdept_name");
+		echo "<select id=\"subdept_list\" name=\"subdepartment\">\n";
+		echo "<option value=\"\">----------------</option>\n";
+		while($srow = mysql_fetch_array($sresult)) {
+			echo "<option value=" . $srow['subdept_no'] . " class=" . $srow['dept_ID'];
+			if ($new != 1) {
+				if ($srow['subdept_no'] == $rowItem['subdept']) { echo " selected=\"selected\"";}
+			}
+			echo ">" . $srow['subdept_name'] . "</option>\n";
+		}
+		echo "</select>\n\n";
 
-				//query database, assemble data for selectors
-				$Query = "SELECT d.dept_no AS dept_no, d.dept_name AS dept_name,
-					CASE WHEN s.subdept_no IS NULL THEN 0 ELSE s.subdept_no END as subdept_no,
-					CASE WHEN s.subdept_name IS NULL THEN 'None' ELSE s.subdept_name END AS subdept_name
-					FROM departments AS d LEFT JOIN
-					subdepts AS s ON d.dept_no=s.dept_ID
-					ORDER BY d.dept_no,s.subdept_no";
-			    if(!($DatabaseResult = $dbc->query($Query)))
-			    {
-			        print("The query failed!<br>\n");
-			        exit();
-			    }
-
-			    while($row = $dbc->fetch_object($DatabaseResult))
-			    {
-			    	$selectorData[] = array(
-						CS_SOURCE_ID=>$row->dept_no, 
-					    CS_SOURCE_LABEL=>$row->dept_name, 
-					    CS_TARGET_ID=>$row->subdept_no, 
-						CS_TARGET_LABEL=>$row->subdept_name);
-			    }            
-
-				//instantiate class
-				$subdept = new chainedSelectors(
-					$selectorNames, 
-			        $selectorData);
-				?>
-					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html40/loose.dtd">
-					<html>
-					<head>
-					<script type="text/javascript" language="JavaScript">
-					<?php
-					    $subdept->printUpdateFunction($row); //rowItem
-					?>
-					</script>
-					</head>
-					<body>
-					<!-- <form name="pickSubDepartment" action="insertItem.php"> -->
-					<?php
-					    $subdept->printSelectors($row); //rowItem
-					?>
-					<script type="text/javascript" language="JavaScript">
-					<?php
-					    $subdept->initialize();
-					?>
-					</script>
-					</body>
-					</html>
-				<?php
-		   	   /**
-				**	CHAINEDSELECTOR CLASS ENDS . . . . . . . NOW
-				**/
 		echo "</td><td align=left>";
 		$taxQ = "SELECT id,description FROM taxrates ORDER BY id";
 		$taxR = $dbc->query($taxQ);
@@ -418,68 +377,27 @@ function itemParse($upc){
         echo "</tr>";
         echo "<tr align=top>";
     	echo "<td align=left>";	
-	   /**
-		**	BEGIN CHAINEDSELECTOR CLASS
-		**/
-			require('../src/chainedSelectors.php');
 
-			$selectorNames = array(
-				CS_FORM=>"pickSubDepartment", 
-				CS_FIRST_SELECTOR=>"department", 
-				CS_SECOND_SELECTOR=>"subdepartment");
+		$dresult = mysql_query("SELECT * FROM departments");
+		echo "<select id=\"dept_list\" name=\"department\">\n";
+		echo "<option value=\"\">----------------</option>\n";
+		while($drow = mysql_fetch_array($dresult)) {
+			echo "<option value=" . $drow['dept_no'];
+			if ($drow['dept_no'] == $rowItem['department']) { echo " selected=\"selected\"";}
+			echo ">" . $drow['dept_no'] . " - " . $drow['dept_name'] . "</option>\n";
+		}
+		echo "</select>\n\n";
 
-			$Query = "SELECT d.dept_no AS dept_no, d.dept_name AS dept_name,
-				CASE WHEN s.subdept_no IS NULL THEN 0 ELSE s.subdept_no END as subdept_no,
-				CASE WHEN s.subdept_name IS NULL THEN 'None' ELSE s.subdept_name END AS subdept_name
-				FROM departments AS d LEFT JOIN
-				subdepts AS s ON d.dept_no=s.dept_ID
-				ORDER BY d.dept_no,s.subdept_no";
+		$sresult = mysql_query("SELECT * FROM subdepts ORDER BY subdept_name");
+		echo "<select id=\"subdept_list\" name=\"subdepartment\">\n";
+		echo "<option value=\"\">----------------</option>\n";
+		while($srow = mysql_fetch_array($sresult)) {
+			echo "<option value=" . $srow['subdept_no'] . " class=" . $srow['dept_ID'];
+			if ($srow['subdept_no'] == $rowItem['subdept']) { echo " selected=\"selected\"";}
+			echo ">" . $srow['subdept_name'] . "</option>\n";
+		}
+		echo "</select>\n\n";
 
-		    $DatabaseResult = False;
-		    if(!($DatabaseResult = $dbc->query($Query)))
-		    {
-		        print("The query failed!<br>\n");
-		        exit();
-		    }
-		    while($row = $dbc->fetch_object($DatabaseResult))
-		    {
-		    	$selectorData[] = array(
-					CS_SOURCE_ID=>$row->dept_no, 
-				    CS_SOURCE_LABEL=>$row->dept_no." - ".$row->dept_name, 
-				    CS_TARGET_ID=>$row->subdept_no, 
-					CS_TARGET_LABEL=>$row->subdept_name);
-			}            
-
-			$subdept = new chainedSelectors(
-				$selectorNames, 
-		        $selectorData);
-			?>
-				<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html40/loose.dtd">
-				<html>
-				<head>
-				<script type="text/javascript" language="JavaScript">
-				<?php
-				    $subdept->printUpdateFunction($rowItem);
-				?>
-				</script>
-				</head>
-				<body>
-				<!-- <form name="pickSubDepartment" action="updateItems.php"> -->
-				<?php
-				    $subdept->printSelectors($rowItem);
-				?>
-				<script type="text/javascript" language="JavaScript">
-				<?php
-				    $subdept->initialize();
-				?>
-				</script>
-				</body>
-				</html>
-			<?php			
-	   	   /**
-			**	CHAINEDSELECTOR CLASS ENDS . . . . . . . NOW
-			**/
-//                echo " </td>";
 		echo "</td><td align=left>";
 		$taxQ = "SELECT id,description FROM taxrates ORDER BY id";
 		$taxR = $dbc->query($taxQ);
