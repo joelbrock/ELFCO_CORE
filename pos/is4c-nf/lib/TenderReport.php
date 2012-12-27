@@ -60,7 +60,7 @@ static public function get(){
 
 	foreach(array_keys($DESIRED_TENDERS) as $tender_code){ 
 		$query = "select tdate from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
-			" and tender_code = '".$tender_code."' order by tdate";
+			" and trans_subtype = '".$tender_code."' order by tdate";
 		$result = $db_a->query($query);
 		$num_rows = $db_a->num_rows($result);
 		if ($num_rows <= 0) continue;
@@ -78,7 +78,7 @@ static public function get(){
 
 		$query = "select tdate,register_no,trans_no,tender
 		       	from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
-			" and tender_code = '".$tender_code."' order by tdate";
+			" and trans_subtype = '".$tender_code."' order by tdate";
 		$result = $db_a->query($query);
 		$num_rows = $db_a->num_rows($result);
 		
@@ -86,7 +86,7 @@ static public function get(){
 		$sum = 0;
 
 		for ($i = 0; $i < $num_rows; $i++) {
-			if (($CORE_LOCAL->get("store") == "harvest-cb") && ($tender_code == "PE" || $tender_code == "BU" || $tender_code == "EL" || $tender_code == "PY" || $tender_code == "TV")) $itemize = 1;
+			if (($CORE_LOCAL->get("store") == "elfco") && ($tender_code == "CC" || $tender_code == "DC" || $tender_code == "CK" || $tender_code == "TV")) $itemize = 1;
 			else $itemize = 0;
 			$row = $db_a->fetch_array($result);
 			$timeStamp = self::timeStamp($row["tdate"]);
