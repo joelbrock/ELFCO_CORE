@@ -105,7 +105,7 @@ class QMDisplay extends NoInputPage {
 			.$CORE_LOCAL->get("qmNumber").".php"));
 
 		echo '<br /><br />';
-		echo '<select name="ddQKselect" id="ddQKselect" style="width:200px;" size="10"
+		echo '<select name="ddQKselect" id="ddQKselect" style="width:350px;" size="10"
 			onblur="$(\'#ddQKselect\').focus();" >';
 		$i=1;
 		foreach($my_menu as $label => $value){
