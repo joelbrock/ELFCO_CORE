@@ -208,9 +208,9 @@ class UPC extends Parser {
 			if ($age < $row['idEnforced']){
 				$ret['udpmsg'] = 'twoPairs';
 				// $current = date("m/d/y",strtotime($CORE_LOCAL->get("memAge")));
-				$current = date("Ymd",strtotime($CORE_LOCAL->get("memAge") - 210000));
+				$current = date("Ymd",strtotime(date('Ymd') - 210000));
 				$CORE_LOCAL->set("requestType","customer age");
-				$CORE_LOCAL->set("requestMsg","Type customer birthdate YYYYMMDD<br />(must be born after $current)");
+				$CORE_LOCAL->set("requestMsg","Type customer birthdate YYYYMMDD<br />(born after $current)");
 				$ret['main_frame'] = $my_url.'gui-modules/requestInfo.php';
 				return $ret;
 			}

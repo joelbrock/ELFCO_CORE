@@ -15,8 +15,7 @@ $my_menu = array(
 	"Vitamins & Supplements" => "DP140",
 	"Body Care & Beauty" => "DP150",
 	"General Merchandise" => "DP160",
-	"Garden Supply" => "DP190",
-	"Taxable Pre-Order" => "DP180"
+	"Garden Supply" => "DP190"
 );
 
 ?>
