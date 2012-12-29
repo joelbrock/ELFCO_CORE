@@ -1,7 +1,7 @@
 <?php
 /*******************************************************************************
 
-    Copyright 2001, 2004 Wedge Community Co-op
+    Copyright 2012 Whole Foods Co-op
 
     This file is part of IT CORE.
 
@@ -20,23 +20,28 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
-$CORE_PATH = isset($CORE_PATH)?$CORE_PATH:"";
-if (empty($CORE_PATH)){ while(!file_exists($CORE_PATH."pos.css")) $CORE_PATH .= "../"; }
- 
-if (!isset($CORE_LOCAL)) include($CORE_PATH."lib/LocalStorage/conf.php");
 
-function boxMsgscreen() {
-	global $CORE_PATH;
-	changeCurrentPageJS("{$CORE_PATH}gui-modules/boxMsg2.php");
-}
+/**
+  @class WFC_Kicker
+  Opens drawer for cash, credit card over $25,
+  credit card refunds, and stamp sales
+*/
+class ELFCO_Kicker extends Kicker {
 
+    function doKick(){
+        $db = Database::tDataConnect();
 
-function receipt($arg) {
-	global $CORE_LOCAL,$CORE_PATH;
-	$CORE_LOCAL->set("receiptType",$arg);
-	echo "<script type=\"text/javascript\">\n";
-	echo "window.top.end.location  = '{$CORE_PATH}end.php';\n";
-	echo "</script>\n";
+        $query = "select trans_id from localtemptrans where 
+            (trans_subtype = 'CA' and total <> 0) or 
+            (trans_subtype = 'DCCB' AND total <> 0) or
+            (trans_subtype = 'CKCB' AND total <> 0)";
+
+        $result = $db->query($query);
+        $num_rows = $db->num_rows($result);
+        $db->close();
+
+        return ($num_rows > 0) ? True : False;
+    }
 }
 
 ?>

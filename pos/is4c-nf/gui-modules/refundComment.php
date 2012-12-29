@@ -34,7 +34,7 @@ class RefundComment extends NoInputPage {
 				$CORE_LOCAL->set("strRemembered","");
 				$CORE_LOCAL->set("refundComment","");
 			}
-			else if ($input == "Other"){
+			else if (($input == "Other") || ($input == "Rcvd / Acct.")){
 				return True;
 			}
 			else {
@@ -101,6 +101,7 @@ class RefundComment extends NoInputPage {
 			<option>Spoiled</option>
 			<option>Did not Need</option>
 			<option>Did not Like</option>
+			<option>Rcvd / Acct.</option>
 			<option>Other</option>
 			</select>
 		<?php
