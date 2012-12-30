@@ -53,11 +53,10 @@ echo cron_msg("Create / Truncate table TempVirtCoupon<br />");
 // the applicable period
 $insQ = "INSERT INTO TempVirtCoupon
 	select d.card_no, h.coupID, sum(quantity) as quantity
-	from {$TRANS}dlog_90_view as d
-	INNER JOIN houseVirtualCoupons as h
-	ON d.upc=".$sql->concat("'00499999'",'RIGHT('.$sql->concat("'00000'",$sql->convert('h.coupID','CHAR'),'').',5)','')."
+	from {$TRANS}dlog_90_view as d, houseVirtualCoupons as h
+	WHERE d.upc=11111
 	AND d.card_no=h.card_no
-	where d.tdate >= h.start_date and d.tdate <= h.end_date";
+	AND d.tdate BETWEEN h.start_date AND h.end_date";
 $insR = $sql->query($insQ,$FANNIE_OP_DB);
 
 // remove expired or already-used coupons
@@ -117,6 +116,6 @@ if ($blR === false)
 else
 	echo cron_msg("Successfully updated custdata field: blueLine<br />");
 
-$sql->query("DROP TABLE TempVirtCoupon");
+//$sql->query("DROP TABLE TempVirtCoupon");
 
 ?>
