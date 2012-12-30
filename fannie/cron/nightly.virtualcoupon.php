@@ -54,7 +54,7 @@ echo cron_msg("Create / Truncate table TempVirtCoupon<br />");
 $insQ = "INSERT INTO TempVirtCoupon
 	select d.card_no, h.coupID, sum(quantity) as quantity
 	from {$TRANS}dlog_90_view as d, houseVirtualCoupons as h
-	WHERE d.upc=11111
+	WHERE d.upc=0049999911111
 	AND d.card_no=h.card_no
 	AND d.tdate BETWEEN h.start_date AND h.end_date";
 $insR = $sql->query($insQ,$FANNIE_OP_DB);
