@@ -82,6 +82,8 @@ else
 
 // set custdata.memcoupons equal to the number
 // of available coupons (in theory)
+$sql->query("UPDATE custdata SET memCoupons = 0");  // set memCoupons = 0 first
+
 $upQ = "UPDATE custdata AS c, houseVirtualCoupons AS h
 	SET c.memCoupons=1
 	WHERE c.CardNo=h.card_no 
@@ -97,7 +99,7 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 		AND ".$sql->now()."<= h.end_date
 		GROUP BY c.CardNo";
 }
-$upR = $sql->query($upQ,$FANNIE_OP_DB);
+$upR = $sql->query($upQ);
 
 if ($upR === false)
 	echo cron_msg("Failed to update custdata field: memCoupons<br />");
@@ -108,7 +110,7 @@ else
 $blueLineQ = "UPDATE custdata SET blueLine="
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
 		$sql->convert('memCoupons','CHAR'),"')'",'');
-$blR = $sql->query($blueLineQ,$FANNIE_OP_DB);
+$blR = $sql->query($blueLineQ);
 
 if ($blR === false)
 	echo cron_msg("Failed to update custdata field: blueLine<br />");
