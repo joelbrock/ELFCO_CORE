@@ -47,6 +47,8 @@ if (!$sql->table_exists("TempVirtCoupon")){
 else
 	$sql->query("TRUNCATE TABLE TempVirtCoupon");
 
+echo cron_msg("Create / Truncate table TempVirtCoupon");
+
 // select number of coupons used by each member in
 // the applicable period
 $insQ = "INSERT INTO TempVirtCoupon
@@ -72,6 +74,11 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 		WHERE ".$sql->now()." > h.end_date
 		OR (t.card_no IS NOT NULL AND t.coupID IS NOT NULL)";
 }
+$delR = $sql->query($sqlQ);
+if ($delR === false) 
+	echo cron_msg("DELETE query failed");
+else
+	echo cron_msg("Successfully removed redeemed houseVirtualCoupons (" . num_rows($sqlR) . ")");
 
 // set custdata.memcoupons equal to the number
 // of available coupons (in theory)
@@ -90,13 +97,23 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 		AND ".$sql->now()."<= h.end_date
 		GROUP BY c.CardNo";
 }
-$sql->query($upQ);
+$upR = $sql->query($upQ);
+
+if ($upR === false)
+	echo cron_msg("Failed to update custdata field: memCoupons");
+else
+	echo cron_msg("Successfully updated custdata field: memCoupons");
 
 // update blueline to match memcoupons
 $blueLineQ = "UPDATE $FANNIE_OP_DB.custdata SET blueLine="
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
 		$sql->convert('memCoupons','CHAR'),"')'",'');
-$sql->query($blueLineQ);
+$blR = $sql->query($blueLineQ);
+
+if ($blR === false)
+	echo cron_msg("Failed to update custdata field: blueLine");
+else
+	echo cron_msg("Successfully updated custdata field: blueLine");
 
 $sql->query("DROP TABLE TempVirtCoupon");
 
