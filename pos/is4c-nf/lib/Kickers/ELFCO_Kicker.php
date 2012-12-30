@@ -22,13 +22,14 @@
 *********************************************************************************/
 
 /**
-  @class WFC_Kicker
-  Opens drawer for cash, credit card over $25,
-  credit card refunds, and stamp sales
+  @class ELFCO_Kicker
+  Opens drawer for cash, debit w/ cashback, and 
+  checks w/ cashback
 */
 class ELFCO_Kicker extends Kicker {
 
     function doKick(){
+        global $CORE_LOCAL;
         $db = Database::tDataConnect();
 
         $query = "select trans_id from localtemptrans where 

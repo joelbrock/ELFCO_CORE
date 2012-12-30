@@ -62,6 +62,9 @@ else {
 Filename: <input type="file" id="file" name="upload" />
 <input type="submit" value="Upload File" />
 </form>
+<p>NOTE: Save co+op deals files as a .csv (<i>M$ Excel won't work</i>, use 
+	OpenOffice or GoogleDocs). Then upload the .csv file, NOT the .xls file.</p>
+
 <?php
 	/* html footer */
 	include($FANNIE_ROOT."src/footer.html");

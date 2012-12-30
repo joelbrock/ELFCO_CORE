@@ -75,12 +75,12 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 
 // set custdata.memcoupons equal to the number
 // of available coupons (in theory)
-$upQ = "UPDATE custdata AS c LEFT JOIN
-	houseVirtualCoupons AS h ON c.CardNo=h.card_no
-	c.memCoupons=SUM(CASE WHEN c.personNum=1 THEN 1 ELSE 0)
-	WHERE ".$sql->now()." >= h.start_date 
-	AND ".$sql->now()."<= h.end_date
-	GROUP BY c.CardNo";
+$upQ = "UPDATE custdata AS c, houseVirtualCoupons AS h
+	SET c.memCoupons=1
+	WHERE c.CardNo=h.card_no 
+	AND ".$sql->now()." >= h.start_date 
+	AND ".$sql->now()."<= h.end_date";
+
 if ($FANNIE_SERVER_DBMS == "MSSQL"){
 	$upQ = "UPDATE custdata SET 
 		c.memCoupons=SUM(CASE WHEN c.personNum=1 THEN 1 ELSE 0)
@@ -93,7 +93,7 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 $sql->query($upQ);
 
 // update blueline to match memcoupons
-$blueLineQ = "UPDATE custdata SET memCoupons="
+$blueLineQ = "UPDATE custdata SET blueLine="
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
 		$sql->convert('memCoupons','CHAR'),"')'",'');
 $sql->query($blueLineQ);
