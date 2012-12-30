@@ -87,7 +87,8 @@ $upQ = "UPDATE custdata AS c, houseVirtualCoupons AS h
 	SET c.memCoupons=1
 	WHERE c.CardNo=h.card_no 
 	AND ".$sql->now()." >= h.start_date 
-	AND ".$sql->now()."<= h.end_date";
+	AND ".$sql->now()."<= h.end_date
+	AND c.memType <> 0";
 
 if ($FANNIE_SERVER_DBMS == "MSSQL"){
 	$upQ = "UPDATE custdata SET 
@@ -108,7 +109,8 @@ $sql->query($upQ);
 // update blueline to match memcoupons
 $blueLineQ = "UPDATE custdata SET blueLine="
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
-		$sql->convert('memCoupons','CHAR'),"')'",'');
+		$sql->convert('memCoupons','CHAR'),"')'",'')
+	. "WHERE memType <> 0";
 $sql->query($blueLineQ);
 
 // if ($blR === false)
