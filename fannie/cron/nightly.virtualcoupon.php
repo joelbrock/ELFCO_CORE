@@ -75,7 +75,7 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 
 // set custdata.memcoupons equal to the number
 // of available coupons (in theory)
-$upQ = "UPDATE custdata AS c, houseVirtualCoupons AS h
+$upQ = "UPDATE $FANNIE_OP_DB.custdata AS c, houseVirtualCoupons AS h
 	SET c.memCoupons=1
 	WHERE c.CardNo=h.card_no 
 	AND ".$sql->now()." >= h.start_date 
@@ -93,7 +93,7 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 $sql->query($upQ);
 
 // update blueline to match memcoupons
-$blueLineQ = "UPDATE custdata SET blueLine="
+$blueLineQ = "UPDATE $FANNIE_OP_DB.custdata SET blueLine="
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
 		$sql->convert('memCoupons','CHAR'),"')'",'');
 $sql->query($blueLineQ);
