@@ -126,7 +126,7 @@ static public function get(){
 			$receipt .= "  ".substr($timeStamp.$blank, 0, 12)
 			.substr($eq["register_no"].$blank, 0, 4)
 			.substr($eq["trans_no"].$blank, 0, 4)
-			.substr($eq["description"].$blank, 0, 28)
+			.substr($eq["description"].$blank, 0, 24)
 			.substr($blank.number_format($eq["total"], 2), -8)."\n";
 			$eq_sum += $eq["total"];
 		}
