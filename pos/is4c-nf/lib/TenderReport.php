@@ -107,13 +107,16 @@ static public function get(){
 //		$receipt .= chr(27).chr(105);
 	}
 	//	Print itemized equity sales
-	$titleStr = substr($titleStr,0,strlen("Owner Equity")-1);
-	$receipt .= ReceiptLib::centerString($titleStr)."\n";
-	$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
-	$receipt .= $ref;
-	$receipt .=	ReceiptLib::centerString("------------------------------------------------------");
-
 	if ($CORE_LOCAL->get("store") == "elfco") {
+		$titleStr = "";
+		for ($i = 0; $i < strlen("Owner Equity"); $i++)
+			$titleStr .= $DESIRED_TENDERS[$tender_code][$i]." ";
+		$titleStr = substr($titleStr,0,strlen($titleStr)-1);
+		$receipt .= ReceiptLib::centerString($titleStr)."\n";
+		$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
+		$receipt .= $ref;
+		$receipt .=	ReceiptLib::centerString("------------------------------------------------------");
+
 		$eqQ = "SELECT datetime, register_no, trans_no, description, total
 			FROM dtransactions WHERE emp_no=".$CORE_LOCAL->get("CashierNo")."
 			AND department IN (83,84)";
