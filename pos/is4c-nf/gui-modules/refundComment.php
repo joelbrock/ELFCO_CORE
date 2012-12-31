@@ -34,7 +34,7 @@ class RefundComment extends NoInputPage {
 				$CORE_LOCAL->set("strRemembered","");
 				$CORE_LOCAL->set("refundComment","");
 			}
-			else if (($input == "Other") || ($input == "Rcvd / Acct.")){
+			else if (($input == "Other") || ($input == "PAYOUT")){
 				return True;
 			}
 			else {
@@ -87,7 +87,8 @@ class RefundComment extends NoInputPage {
 		<form name="selectform" method="post" 
 			id="selectform" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 		<?php
-		if (isset($_POST['selectlist']) && $_POST['selectlist'] == 'Other') {
+		if (isset($_POST['selectlist']) && 
+			($_POST['selectlist'] == 'Other' || $_POST['selectlist'] == 'PAYOUT')) {
 		?>
 			<input type="text" id="selectlist" name="selectlist" 
 				onblur="$('#selectlist').focus();" />
@@ -101,7 +102,7 @@ class RefundComment extends NoInputPage {
 			<option>Spoiled</option>
 			<option>Did not Need</option>
 			<option>Did not Like</option>
-			<option>Rcvd / Acct.</option>
+			<option>PAYOUT</option>
 			<option>Other</option>
 			</select>
 		<?php
