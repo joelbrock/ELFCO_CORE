@@ -110,7 +110,7 @@ static public function get(){
 	if ($CORE_LOCAL->get("store") == "elfco") {
 		$titleStr = "";
 		for ($i = 0; $i < strlen("Owner Equity"); $i++)
-			$titleStr .= $DESIRED_TENDERS[$tender_code][$i]." ";
+			$titleStr .= "Owner Equity"." ";
 		$titleStr = substr($titleStr,0,strlen($titleStr)-1);
 		$receipt .= ReceiptLib::centerString($titleStr)."\n";
 		$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
