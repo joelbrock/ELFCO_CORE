@@ -96,7 +96,7 @@ function itemParse($upc){
 		$dataQ = "SELECT description,brand,cost/units as cost,vendorName,margin,i.vendorID
 			FROM vendorItems AS i LEFT JOIN vendors AS v ON i.vendorID=v.vendorID
 			LEFT JOIN vendorDepartments AS d ON i.vendorDept=d.deptID
-			WHERE upc='$upc'";
+			WHERE upc LIKE '%$upc'";
 		if (isset($_REQUEST['vid'])) $dataQ .= " AND i.vendorID=".((int)$_REQUEST['vid']);
 		$dataR = $dbc->query($dataQ);
 		if ($dbc->num_rows($dataR) > 0){
