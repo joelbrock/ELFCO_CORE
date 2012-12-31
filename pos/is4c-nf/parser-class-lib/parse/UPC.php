@@ -158,7 +158,7 @@ class UPC extends Parser {
 			}
 		}
 
-		if ($row["idEnforced"] > 0){
+		if (($row["idEnforced"] > 0) || (substr($upc,-3) == "500") || (substr($upc,-3) == "510")){
 
 			$restrictQ = "SELECT upc,dept_ID FROM dateRestrict WHERE
 				( upc='{$row['upc']}' AND
