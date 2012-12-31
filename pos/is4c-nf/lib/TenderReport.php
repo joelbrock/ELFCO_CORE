@@ -108,10 +108,7 @@ static public function get(){
 	}
 	//	Print itemized equity sales
 	if ($CORE_LOCAL->get("store") == "elfco") {
-		$titleStr = "";
-		for ($i = 0; $i < strlen("Owner Equity"); $i++)
-			$titleStr .= "Owner Equity"." ";
-		$titleStr = substr($titleStr,0,strlen($titleStr)-1);
+		$titleStr = "O w n e r   E q u i t y";
 		$receipt .= ReceiptLib::centerString($titleStr)."\n";
 		$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
 		$receipt .= $ref;
