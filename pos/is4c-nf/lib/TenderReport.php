@@ -110,7 +110,7 @@ static public function get(){
 	if ($CORE_LOCAL->get("store") == "elfco") {
 		$titleStr = "O w n e r   E q u i t y";
 		$receipt .= ReceiptLib::centerString($titleStr)."\n";
-		$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
+		$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n";
 		$receipt .= $ref;
 		$receipt .=	ReceiptLib::centerString("------------------------------------------------------");
 
@@ -118,15 +118,15 @@ static public function get(){
 			FROM dtransactions WHERE emp_no=".$CORE_LOCAL->get("CashierNo")."
 			AND department IN (83,84)";
 		$eqR = $db_a->query($eqQ);
-		$eq_num = $db_a->num_rows($eqQ);
+		$eq_num = $db_a->num_rows($eqR);
 
-		for ($i = 0;$i < $eq_num; $i++) {
+		for ($i = 0; $i < $eq_num; $i++) {
 			$eq = $db_a->fetch_array($eqR);
 			$timeStamp = self::timeStamp($eq["datetime"]);
 			$receipt .= "  ".substr($timeStamp.$blank, 0, 13)
-			.substr($eq["register_no"].$blank, 0, 9)
+			.substr($eq["register_no"].$blank, 0, 4)
 			.substr($eq["trans_no"].$blank, 0, 8)
-			.substr($eq["description"].$blank, 0, 2)
+			.substr($eq["description"].$blank, 0, 20)
 			.substr($blank.number_format($eq["total"], 2), -14)."\n";
 			$eq_sum += $eq["total"];
 		}
