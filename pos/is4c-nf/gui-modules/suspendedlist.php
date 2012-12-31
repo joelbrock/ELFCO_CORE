@@ -121,7 +121,7 @@ class suspendedlist extends NoInputPage {
 			$row = $db->fetch_array($result);
 			echo "<option value='".$row["register_no"]."::".$row["emp_no"]."::".$row["trans_no"]."' ".$selected
 				."> lane ".substr(100 + $row["register_no"], -2)." Cashier ".substr(100 + $row["emp_no"], -2)
-				." #".$row["trans_no"]." -- $".$row["total"]."\n";
+				." #".$row["trans_no"]." -- $".round($row["total"],2)."\n";
 			$selected = "";
 		}
 
