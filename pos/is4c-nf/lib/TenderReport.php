@@ -123,11 +123,11 @@ static public function get(){
 		for ($i = 0; $i < $eq_num; $i++) {
 			$eq = $db_a->fetch_array($eqR);
 			$timeStamp = self::timeStamp($eq["datetime"]);
-			$receipt .= "  ".substr($timeStamp.$blank, 0, 13)
+			$receipt .= "  ".substr($timeStamp.$blank, 0, 9)
 			.substr($eq["register_no"].$blank, 0, 4)
-			.substr($eq["trans_no"].$blank, 0, 8)
+			.substr($eq["trans_no"].$blank, 0, 4)
 			.substr($eq["description"].$blank, 0, 20)
-			.substr($blank.number_format($eq["total"], 2), -14)."\n";
+			.substr($blank.number_format($eq["total"], 2), -8)."\n";
 			$eq_sum += $eq["total"];
 		}
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
