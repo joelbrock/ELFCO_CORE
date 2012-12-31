@@ -106,6 +106,7 @@ static public function get(){
 		$receipt .= str_repeat("\n", 2);
 //		$receipt .= chr(27).chr(105);
 	}
+	$receipt .= str_repeat("\n", 2);
 
 	ReceiptLib::writeLine($receipt.chr(27).chr(105));
 	$db_a->close();
