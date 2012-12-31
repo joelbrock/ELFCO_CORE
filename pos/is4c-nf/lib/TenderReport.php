@@ -85,25 +85,25 @@ static public function get(){
 		if ($itemize == 1) $receipt .= $fieldNames;
 		$sum = 0;
 
-		// for ($i = 0; $i < $num_rows; $i++) {
-		// 	if (($CORE_LOCAL->get("store") == "elfco") && ($tender_code == "CC" || $tender_code == "DC" || $tender_code == "CK" || $tender_code == "TV")) $itemize = 1;
-		// 	else $itemize = 0;
-		// 	$row = $db_a->fetch_array($result);
-		// 	$timeStamp = self::timeStamp($row["tdate"]);
-		// 	if ($itemize == 1) {
-		// 		$receipt .= "  ".substr($timeStamp.$blank, 0, 13)
-		// 		.substr($row["register_no"].$blank, 0, 9)
-		// 		.substr($row["trans_no"].$blank, 0, 8)
-		// 		.substr($blank.number_format("0", 2), -10)
-		// 		.substr($blank.number_format($row["tender"], 2), -14)."\n";
-		// 	}
-		// 	$sum += $row["tender"];
-		// }
+		for ($i = 0; $i < $num_rows; $i++) {
+			if (($CORE_LOCAL->get("store") == "harvest") && ($tender_code == "CC" || $tender_code == "DC" || $tender_code == "CK" || $tender_code == "TV")) $itemize = 1;
+			else $itemize = 0;
+			$row = $db_a->fetch_array($result);
+			$timeStamp = self::timeStamp($row["tdate"]);
+			if ($itemize == 1) {
+				$receipt .= "  ".substr($timeStamp.$blank, 0, 13)
+				.substr($row["register_no"].$blank, 0, 9)
+				.substr($row["trans_no"].$blank, 0, 8)
+				.substr($blank.number_format("0", 2), -10)
+				.substr($blank.number_format($row["tender"], 2), -14)."\n";
+			}
+			$sum += $row["tender"];
+		}
 		
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
 
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($sum,2), -56)."\n";
-		$receipt .= str_repeat("\n", 4);
+		$receipt .= str_repeat("\n", 2);
 //		$receipt .= chr(27).chr(105);
 	}
 
