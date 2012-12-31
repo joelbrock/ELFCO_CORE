@@ -106,6 +106,37 @@ static public function get(){
 		$receipt .= str_repeat("\n", 2);
 //		$receipt .= chr(27).chr(105);
 	}
+	//	Print itemized equity sales
+	$titleStr = substr($titleStr,0,strlen("Owner Equity")-1);
+	$receipt .= ReceiptLib::centerString($titleStr)."\n";
+	$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
+	$receipt .= $ref;
+	$receipt .=	ReceiptLib::centerString("------------------------------------------------------");
+
+	if ($CORE_LOCAL->get("store") == "elfco") {
+		$eqQ = "SELECT datetime, register_no, trans_no, description, total
+			FROM dtransactions WHERE emp_no=".$CORE_LOCAL->get("CashierNo")."
+			AND department IN (83,84)";
+		$eqR = $db_a->query($eqQ);
+		$eq_num = $db_a->num_rows($eqQ);
+
+		for ($i = 0;$i < $eq_num; $i++) {
+			$eq = $db_a->fetch_array($eqR);
+			$timeStamp = self::timeStamp($eq["datetime"]);
+			$receipt .= "  ".substr($timeStamp.$blank, 0, 13)
+			.substr($eq["register_no"].$blank, 0, 9)
+			.substr($eq["trans_no"].$blank, 0, 8)
+			.substr($eq["description"].$blank, 0, 2)
+			.substr($blank.number_format($eq["total"], 2), -14)."\n";
+			$eq_sum += $eq["total"];
+		}
+		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
+
+		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($eq_sum,2), -56)."\n";
+		$receipt .= str_repeat("\n", 2);
+	}
+
+
 	$receipt .= str_repeat("\n", 2);
 
 	ReceiptLib::writeLine($receipt.chr(27).chr(105));
