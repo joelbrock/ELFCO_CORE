@@ -331,6 +331,10 @@ class HouseCoupon extends SpecialUPC {
 			$value = $infoW["discountValue"];
 			break;
 		case "%": // percent discount on all items
+
+			if ($CORE_LOCAL->get("store","elfco")) 
+				$this->ret = PrehLib::percentDiscount(0,$this->ret);
+
 			Database::getsubtotals();
 			$value = $infoW["discountValue"]*$CORE_LOCAL->get("discountableTotal");
 			break;
