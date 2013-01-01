@@ -71,7 +71,7 @@ function addSub($name,$did){
 		if (is_numeric($tmp)) $sid = $tmp+1;
 	}
 
-	$insQ = sprintf("INSERT INTO subdepts VALUES (%d,'%s',%d)",
+	$insQ = sprintf("INSERT INTO subdepts VALUES (%d,%s,%d)",
 			$sid,$dbc->escape($name),$did);
 	$dbc->query($insQ);
 }

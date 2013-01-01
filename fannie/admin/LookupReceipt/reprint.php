@@ -95,7 +95,7 @@ function ccInfo($date1, $transNum){
 	$result = $dbc->query($query);
 	while ($row = $dbc->fetch_row($result)){
 		echo "<hr />";
-		echo '<i>610 E 4th St<br />Duluth, MN 55805</i><br />';
+		echo '<i>4960 Northwind Dr.<br />East Lansing, MI 48823</i><br />';
 		echo "Card: ".$row['issuer'].' '.$row['PAN'].'<br />';
 		echo "Name: ".$row['name'].'<br />';
 		echo "Entry Method: ".$row['entryMethod'].'<br />';
