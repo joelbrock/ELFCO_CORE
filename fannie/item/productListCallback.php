@@ -69,6 +69,12 @@ if (isset($_GET['action'])){
 		else
 			$loc = 0;
 
+		$inuse = $_GET['inuse'];
+		if ($inuse == 'true')
+			$inuse = 1;
+		else
+			$inuse = 0;
+
 		$upQ = "update products set
 				description='$desc',
 				department=$dept,		
@@ -78,6 +84,7 @@ if (isset($_GET['action'])){
 				scale=$wgt,		
 				discount=$disc,
 				local=$loc,
+				inuse=$inuse,
 				modified=".$dbc->now()."
 				where upc='$upc'";
 		//$ret .= $upQ;
@@ -142,7 +149,7 @@ if (isset($_GET['action'])){
 
 // get a | delimited list of department names
 // and numbers for building select boxes in javascript later
-$deptQ = "select dept_no,dept_name from departments WHERE dept_no NOT IN (60) order by dept_no";
+$deptQ = "select dept_no,dept_name from departments order by dept_no";
 $deptR = $dbc->query($deptQ);
 $depts = "";
 $dept_nos = "";
@@ -296,6 +303,12 @@ function edit(upc){
 	else
 		document.getElementById(upc+'local').innerHTML = "<input type=checkbox id=\"f"+upc+"local\" />";
 		
+	var loc = document.getElementById(upc+'inuse').innerHTML;
+	if (inuse == 'X')
+		document.getElementById(upc+'inuse').innerHTML = "<input type=checkbox id=\"f"+upc+"inuse\" checked />";
+	else
+		document.getElementById(upc+'inuse').innerHTML = "<input type=checkbox id=\"f"+upc+"inuse\" />";
+
 	var lnk = "<img src=\"<?php echo $FANNIE_URL;?>src/img/buttons/b_save.png\" alt=\"Save\" border=0 />";
 	document.getElementById(upc+'cmd').innerHTML = "<a href=\"\" onclick=\"save('"+upc+"'); return false;\">"+lnk+"</a>";
 }
@@ -316,6 +329,7 @@ function save(upc){
 	var disc = document.getElementById('f'+upc+'disc').checked;
 	var wgt = document.getElementById('f'+upc+'wgt').checked;
 	var loc = document.getElementById('f'+upc+'local').checked;
+	var inuse = document.getElementById('f'+upc+'inuse').checked;
 	
 	document.getElementById(upc+'desc').innerHTML = desc;
 	document.getElementById(upc+'dept').innerHTML = dept[1];
@@ -351,11 +365,16 @@ function save(upc){
 	else
 		document.getElementById(upc+'local').innerHTML = '-';
 	
+	if (inuse)
+		document.getElementById(upc+'inuse').innerHTML = 'X';
+	else
+		document.getElementById(upc+'inuse').innerHTML = '-';
+
 	var lnk = "<img src=\"<?php echo $FANNIE_URL;?>src/img/buttons/b_edit.png\" alt=\"Edit\" border=0 />";
 	var cmd = "<a href=\"\" onclick=\"edit('"+upc+"'); return false;\">"+lnk+"</a>";
 	document.getElementById(upc+'cmd').innerHTML = cmd;
 	
-	phpSend('update&upc='+upc+'&desc='+desc+'&dept='+dept[0]+'&price='+price+'&tax='+tax+'&fs='+fs+'&disc='+disc+'&wgt='+wgt+'&supplier='+supplier+'&local='+loc);
+	phpSend('update&upc='+upc+'&desc='+desc+'&dept='+dept[0]+'&price='+price+'&tax='+tax+'&fs='+fs+'&disc='+disc+'&wgt='+wgt+'&supplier='+supplier+'&local='+loc+'&inuse='+inuse);
 }
 
 function deleteCheck(upc,description){
@@ -514,7 +533,7 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
-			x.distributor
+			x.distributor,i.inUse as inUse
                         FROM products as i LEFT JOIN departments as d ON i.department = d.dept_no
 			LEFT JOIN prodExtra as x on i.upc = x.upc
 			LEFT JOIN taxrates AS t ON t.id = i.tax
@@ -593,7 +612,7 @@ function deleteCheck(upc,description){
 		}
 		else
 			echo "<th>UPC</th><th>Description</th><th>Dept</th><th>Supplier</th><th>Price</th>";
-		echo "<th>Tax</th><th>FS</th><th>Disc</th><th>Wg'd</th><th>Local</th><th>&nbsp;</th></tr>";
+		echo "<th>Tax</th><th>FS</th><th>Disc</th><th>Wg'd</th><th>Local</th><th>InUse</th><th>&nbsp;</th></tr>";
 		
 		/*
 		 * build the table with cells id'd so that javascript can see them
@@ -627,6 +646,7 @@ function deleteCheck(upc,description){
 			echo "<td align=center id=$row[0]disc>$row[6]</td>";
 			echo "<td align=center id=$row[0]wgt>$row[7]</td>";
 			echo "<td align=center id=$row[0]local>$row[8]</td>";
+			echo "<td align=center id=$row[0]inuse>$row[10]</td>";
 			if (!isset($_GET['excel']))
 				echo "<td align=center id=$row[0]cmd><a href=\"\" onclick=\"edit('$row[0]'); return false;\"><img src=\"{$FANNIE_URL}src/img/buttons/b_edit.png\" alt=\"Edit\" border=0 /></a></td>";
 			echo "</tr>\n";
