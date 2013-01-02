@@ -76,7 +76,7 @@ if (isset($_GET['action'])){
 			$inuse = 0;
 
 		$upQ = "update products set
-				description='$desc',
+				description=\"$desc\",
 				department=$dept,		
 				normal_price=$price,
 				tax=$tax,		
@@ -116,7 +116,7 @@ if (isset($_GET['action'])){
 			case when scale = 1 then 'Yes' else 'No' end as s
 			from products as p left join taxrates as t
 			on p.tax = t.id
-			where upc='$upc' and p.description='$desc'";
+			where upc='$upc' and p.description=\"$desc\"";
 		$fetchR = $dbc->query($fetchQ);
 		$fetchW = $dbc->fetch_array($fetchR);
 
