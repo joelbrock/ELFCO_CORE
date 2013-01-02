@@ -501,7 +501,8 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
-			x.distributor,i.inUse as inuse
+                        (CASE WHEN i.inUse = 1 THEN 'X' ELSE '-' END) as inuse,
+			x.distributor
                         FROM products as i LEFT JOIN departments as d ON i.department = d.dept_no
 			LEFT JOIN taxrates AS t ON t.id = i.tax
 			LEFT JOIN prodExtra as x on i.upc = x.upc
@@ -516,6 +517,7 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
+                        (CASE WHEN i.inUse = 1 THEN 'X' ELSE '-' END) as inuse,
 			x.distributor,i.inUse as inuse
                         FROM products as i LEFT JOIN superdepts as s ON i.department = s.dept_ID
 			LEFT JOIN taxrates AS t ON t.id = i.tax
@@ -533,6 +535,7 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
+                        (CASE WHEN i.inUse = 1 THEN 'X' ELSE '-' END) as inuse,
 			x.distributor,i.inUse as inuse
                         FROM products as i LEFT JOIN departments as d ON i.department = d.dept_no
 			LEFT JOIN prodExtra as x on i.upc = x.upc
@@ -639,14 +642,14 @@ function deleteCheck(upc,description){
 				echo "<td align=center>$row[0]</td>";
 			echo "<td align=center id=$row[0]desc>$row[1]</td>";
 			echo "<td align=center id=$row[0]dept>$row[2]</td>";
-			echo "<td align=center id=$row[0]supplier>$row[9]</td>";
+			echo "<td align=center id=$row[0]supplier>$row[10]</td>";
 			echo "<td align=center id=$row[0]price>$row[3]</td>";
 			echo "<td align=center id=$row[0]tax>$row[4]</td>";
 			echo "<td align=center id=$row[0]fs>$row[5]</td>";
 			echo "<td align=center id=$row[0]disc>$row[6]</td>";
 			echo "<td align=center id=$row[0]wgt>$row[7]</td>";
 			echo "<td align=center id=$row[0]local>$row[8]</td>";
-			echo "<td align=center id=$row[0]inuse>$row[10]</td>";
+			echo "<td align=center id=$row[0]inuse>$row[9]</td>";
 			if (!isset($_GET['excel']))
 				echo "<td align=center id=$row[0]cmd><a href=\"\" onclick=\"edit('$row[0]'); return false;\"><img src=\"{$FANNIE_URL}src/img/buttons/b_edit.png\" alt=\"Edit\" border=0 /></a></td>";
 			echo "</tr>\n";
