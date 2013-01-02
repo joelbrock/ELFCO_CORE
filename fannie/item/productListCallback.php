@@ -501,7 +501,7 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
-			x.distributor
+			x.distributor,i.inUse as inuse
                         FROM products as i LEFT JOIN departments as d ON i.department = d.dept_no
 			LEFT JOIN taxrates AS t ON t.id = i.tax
 			LEFT JOIN prodExtra as x on i.upc = x.upc
@@ -516,7 +516,7 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
-			x.distributor
+			x.distributor,i.inUse as inuse
                         FROM products as i LEFT JOIN superdepts as s ON i.department = s.dept_ID
 			LEFT JOIN taxrates AS t ON t.id = i.tax
 			LEFT JOIN departments as d on i.department = d.dept_no
@@ -533,7 +533,7 @@ function deleteCheck(upc,description){
                         (CASE WHEN i.discount = 0 THEN '-' ELSE 'X'END) as DISC,
                         (CASE WHEN i.scale = 1 THEN 'X' ELSE '-' END) as WGHd,
                         (CASE WHEN i.local = 1 THEN 'X' ELSE '-' END) as local,
-			x.distributor,i.inUse as inUse
+			x.distributor,i.inUse as inuse
                         FROM products as i LEFT JOIN departments as d ON i.department = d.dept_no
 			LEFT JOIN prodExtra as x on i.upc = x.upc
 			LEFT JOIN taxrates AS t ON t.id = i.tax
