@@ -20,7 +20,7 @@ if (isset($_POST['Yes'])){
   $gatherQ = '';
   if (isset($_POST['description'])){
     $desc = base64_decode($_POST['description']);
-    $gatherQ = "select upc,description,normal_price,department,tax,foodstamp,scale,modified,qttyenforced,discount,inuse from products where upc='$upc' and description='$desc'";
+    $gatherQ = "select upc,description,normal_price,department,tax,foodstamp,scale,modified,qttyenforced,discount,inuse from products where upc='$upc' and description=\"$desc\"";
   }
   else {
     $gatherQ = "select upc,description,normal_price,department,tax,foodstamp,scale,modified,qttyenforced,discount,inuse from products where upc='$upc'";
@@ -52,7 +52,7 @@ if (isset($_POST['Yes'])){
   $query = '';
   if (isset($_POST['description'])){
     $desc = base64_decode($_POST['description']);
-    $query = "delete from products where upc = '$upc' and description='$desc'";
+    $query = "delete from products where upc = '$upc' and description=\"$desc\"";
     //echo $query;
     //return;
   }

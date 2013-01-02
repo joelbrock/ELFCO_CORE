@@ -132,7 +132,7 @@ if (isset($_GET['action'])){
 		$upc = $_GET['upc'];
 		$desc = base64_decode($_GET['desc']);
 		
-		$delQ = "delete from products where upc='$upc' and description='$desc'";
+		$delQ = "delete from products where upc='$upc' and description=\"$desc\"";
 		//$ret .= $delQ;
 		$delR = $dbc->query($delQ);
 
