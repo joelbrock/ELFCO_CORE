@@ -615,18 +615,8 @@ function deleteCheck(upc,description){
 		}
 		else
 			echo "<th>UPC</th><th>Description</th><th>Dept</th><th>Supplier</th><th>Price</th>";
-
-		echo "<th>Tax</th><th>FS</th><th>Disc</th><th>Wg'd</th><th>Local</th>";
-		if (!isset($_GET['excel'])){
-			echo "<th><a href=$urlbase&sort=inuse&dir=";
-			if ($order == 'inuse')
-				echo "$otherdir>inUse</a></th>";
-			else
-				echo "desc>inUse</a></th>";	
-		else
-			echo "<th>inUse</th>";
-
-		echo "<th>&nbsp;</th></tr>";
+		echo "<th>Tax</th><th>FS</th><th>Disc</th><th>Wg'd</th><th>Local</th><th>InUse</th><th>&nbsp;</th></tr>";
+		
 		/*
 		 * build the table with cells id'd so that javascript can see them
 		 * by convention, the id of each cell in a row is prefixed by that row's
