@@ -116,8 +116,8 @@ if (isset($_GET['startDate'])){
 			$c = 0;
 		}	
 		$hour = $hourlyW[1];
-		$sum = $hourlyW[2];
-		$avg = $hourlyW[3];
+		$sum = number_format($hourlyW[2],2);
+		$avg = number_format($hourlyW[3],2);
 		while ($hour > $expectedHour){
 			echo "<td bgcolor=$colors[$c]>&nbsp;</td>";
 			echo "<td bgcolor=$colors[$c]>&nbsp;</td>";
