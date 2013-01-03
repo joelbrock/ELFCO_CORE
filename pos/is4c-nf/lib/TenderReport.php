@@ -24,8 +24,8 @@
 $CORE_PATH = isset($CORE_PATH)?$CORE_PATH:"";
 if (empty($CORE_PATH)){ while(!file_exists($CORE_PATH."css/pos.css")) $CORE_PATH .= "../"; }
 
-if (!function_exists('centerString')include_once($CORE_PATH."lib/ReceiptLib.php");
-if (!function_exists('centerBig')include_once($CORE_PATH."lib/ReceiptLib.php");
+if (!function_exists('centerString')include($CORE_PATH."lib/ReceiptLib.php");
+// if (!function_exists('centerBig')include_once($CORE_PATH."lib/ReceiptLib.php");
 /**
   @class TenderReport
   Generate a tender report
