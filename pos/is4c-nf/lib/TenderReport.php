@@ -135,8 +135,8 @@ static public function get(){
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
 
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($eq_sum,2), -56)."\n";
-		$receipt .= str_repeat("\n", 2);
-		$receipt .= substr($blank.$blank.$blank."Net Takings: ".number_format($net,2))."\n";
+		$receipt .= str_repeat("\n", 3);
+		$receipt .= ReceiptLib::centerString("Net Takings: ".number_format($net,2))."\n";
 	}
 	$receipt .= str_repeat("\n", 2);
 
