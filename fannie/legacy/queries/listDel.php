@@ -94,7 +94,7 @@ else {
           case when tax = 1 then 'Reg' else case when tax = 2 then 'Deli' else 'NoTax' end end as t,
           case when foodstamp = 1 then 'Yes' else 'No' end as fs,
           case when scale = 1 then 'Yes' else 'No' end as s
-          from products where upc='$upc' and description='$d'";
+          from products where upc='$upc' and description=\"$d\"";
     $r = $sql->query($q);
     $row = $sql->fetch_row($r);
     echo "<table cellspacing=2 cellpadding=2>";

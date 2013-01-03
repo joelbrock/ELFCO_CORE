@@ -59,8 +59,17 @@ if (isset($_REQUEST['submit'])){
 		$data[$stamp][$row['memType']]++;
 	}
 
-	$cols = array(0=>"NonMember",1=>"Member",2=>"Business",3=>"Staff Member",
-			4=>"Nabs",9=>"Staff NonMem");
+	$cols = array(0=>"NonMember",
+		1=>"Owner PIF",
+		12=>"Owner PIF Sr.",
+		2=>"Owner Instl",
+		13=>"Owner Inst Sr.",
+		3=>"Annual",
+		4=>"On Hold",
+		7=>"Other Co-op",
+		9=>"Staff Member",
+		10=>"Working Owner",
+	);
 
 	$placeholder = isset($_REQUEST['excel'])?'':'&nbsp;';
 

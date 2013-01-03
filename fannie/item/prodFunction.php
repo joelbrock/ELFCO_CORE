@@ -286,7 +286,7 @@ function itemParse($upc){
 			for($i=0;$i < $num;$i++){
         		$rowItem= $dbc->fetch_array($resultItem);
 	    		$upc = $rowItem['upc'];
-	    		echo "<a href='../item/itemMaint.php?upc=$upc'>" . $upc . " </a>- " . $rowItem['description'];
+	    		echo "<a href='../item/itemMaint.php?upc=$upc'>" . $upc . " </a>- " . $rowItem['vendorName'] . " " . $rowItem['description'];
 	 			if($rowItem['discounttype'] == 0) { echo "-- $" .$rowItem['normal_price']. "<br>"; }
 				else { echo "-- <font color=green>$" .$rowItem['special_price']. " onsale</font><br>"; }
     		}
