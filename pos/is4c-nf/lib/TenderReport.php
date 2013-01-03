@@ -24,7 +24,7 @@
 $CORE_PATH = isset($CORE_PATH)?$CORE_PATH:"";
 if (empty($CORE_PATH)){ while(!file_exists($CORE_PATH."css/pos.css")) $CORE_PATH .= "../"; }
 
-if (!function_exists("build_time")) include_once($CORE_PATH."lib/ReceiptLib.php");
+include_once($CORE_PATH."lib/ReceiptLib.php");
 
 /**
   @class TenderReport
@@ -58,7 +58,8 @@ static public function get(){
 	$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
 	$receipt = "";
 	$net = 0;
-
+	$itemize = 0;
+	
 	foreach(array_keys($DESIRED_TENDERS) as $tender_code){ 
 		$query = "select tdate from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
 			" and trans_subtype = '".$tender_code."' order by tdate";
