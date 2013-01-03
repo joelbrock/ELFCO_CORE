@@ -138,7 +138,7 @@ static public function get(){
 		$receipt .= str_repeat("\n", 2);
 	}
 	$receipt .= str_repeat("\n", 2);
-	$receipt .= substr($blank.$blank.$blank.$blank."Net Takings: ".number_format($net,2))."\n";
+	$receipt .= substr($blank.$blank.$blank."Net Takings: ".number_format($net,2))."\n";
 	$receipt .= str_repeat("\n", 2);
 
 	ReceiptLib::writeLine($receipt.chr(27).chr(105));
