@@ -80,8 +80,6 @@ if (isset($_REQUEST['submit'])){
 	$taxQ = "SELECT SUM(total) FROM $dlog WHERE trans_type = 'A'
 		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59')";
 	$taxR = $dbc->query($taxQ);
-	$tax = $taxR[0];
-
 	$supers = array();
 	$salesR = $dbc->query($sales);
 
@@ -118,7 +116,7 @@ if (isset($_REQUEST['submit'])){
 			
 		echo "</table><br />";
 	}
-	printf("<b>Sales Tax: </b>\$%.2f",$tax);
+	echo "<b>Sales Tax: </b> $taxR";
 	echo "<br />";
 	printf("<b>Total Sales: </b>\$%.2f",$grandTotal);
 }
