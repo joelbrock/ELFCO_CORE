@@ -36,6 +36,7 @@ echo "<b>Table</b>: <select name=\"tablename\">
 	<option>employees</option>
 	<option>departments</option>
 	<option>tenders</option>
+    <option>customReceipt</option>
 </select><br /><br />";
 
 echo "<b>Other table</b>: <input type=\"text\" name=\"othertable\" /><br /><br />";
