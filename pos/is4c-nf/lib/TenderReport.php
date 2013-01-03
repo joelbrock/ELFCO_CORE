@@ -106,9 +106,6 @@ static public function get(){
 
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($sum,2), -56)."\n";
 		$receipt .= str_repeat("\n", 2);
-
-		$receipt .= ReceiptLib::centerBig("Net Takings: ".number_format($net,2))."\n";
-		$receipt .= str_repeat("\n", 2);
 //		$receipt .= chr(27).chr(105);
 	}
 	//	Print itemized equity sales
@@ -140,8 +137,8 @@ static public function get(){
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($eq_sum,2), -56)."\n";
 		$receipt .= str_repeat("\n", 2);
 	}
-
-
+	$receipt .= str_repeat("\n", 2);
+	$receipt .= substr($blank.$blank.$blank.$blank."Net Takings: ".number_format($net,2))."\n";
 	$receipt .= str_repeat("\n", 2);
 
 	ReceiptLib::writeLine($receipt.chr(27).chr(105));
