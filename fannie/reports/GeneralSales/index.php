@@ -118,8 +118,7 @@ if (isset($_REQUEST['submit'])){
 			
 		echo "</table><br />";
 	}
-	echo "<b>Sales Tax: </b>\$" . $tax[0];
-	// printf("<b>Sales Tax: </b>\$%.2f",$tax);
+	echo "<b>Sales Tax: </b>\$" . number_format($tax[0],2);
 	echo "<br />";
 	printf("<b>Total Sales: </b>\$%.2f",$grandTotal);
 }
