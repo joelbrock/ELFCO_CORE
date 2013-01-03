@@ -77,7 +77,7 @@ if (isset($_REQUEST['submit'])){
 			CASE WHEN s.superID IS NULL THEN r.superID ELSE s.superID end,
 			CASE WHEN e.dept_no IS NULL THEN d.dept_no ELSE e.dept_no end";
 	}
-	$taxQ = "SELECT SUM(total) FROM $dlog WHERE trans_type = 'A'
+	$taxQ = "SELECT SUM(total) AS tax FROM $dlog WHERE trans_type = 'A'
 		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59')";
 	$taxR = $dbc->query($taxQ);
 	$supers = array();
@@ -116,7 +116,7 @@ if (isset($_REQUEST['submit'])){
 			
 		echo "</table><br />";
 	}
-	echo "<b>Sales Tax: </b> $taxR";
+	echo "<b>Sales Tax: </b>$" . number_format($taxR[0],2);
 	echo "<br />";
 	printf("<b>Total Sales: </b>\$%.2f",$grandTotal);
 }
