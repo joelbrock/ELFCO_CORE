@@ -104,7 +104,7 @@ static public function get(){
 		$net += $sum;
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
 
-		if ($tender_code == 'CA') $sum * -1;
+		if ($tender_code == 'CA') $sum = $sum * -1;
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($sum,2), -56)."\n";
 		$receipt .= str_repeat("\n", 2);
 //		$receipt .= chr(27).chr(105);
@@ -136,10 +136,10 @@ static public function get(){
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
 
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($eq_sum,2), -56)."\n";
-		$receipt .= str_repeat("\n", 3);
+		$receipt .= str_repeat("\n", 2);
 	}
 	$receipt .= ReceiptLib::centerString("Net Takings: ".number_format($net,2))."\n";
-	$receipt .= str_repeat("\n", 2);
+	$receipt .= str_repeat("\n", 4);
 
 	ReceiptLib::writeLine($receipt.chr(27).chr(105));
 	$db_a->close();
