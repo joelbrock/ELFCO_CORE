@@ -78,8 +78,10 @@ if (isset($_REQUEST['submit'])){
 			CASE WHEN e.dept_no IS NULL THEN d.dept_no ELSE e.dept_no end";
 	}
 	$taxQ = "SELECT SUM(total) FROM $dlog WHERE trans_type = 'A'
-		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59') ";
+		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59')";
 	$taxR = $dbc->query($taxQ);
+	$tax = $taxR[0];
+
 	$supers = array();
 	$salesR = $dbc->query($sales);
 
@@ -116,7 +118,8 @@ if (isset($_REQUEST['submit'])){
 			
 		echo "</table><br />";
 	}
-	printf("<b>Sales Tax: </b>\$%.2f",$taxR);
+	printf("<b>Sales Tax: </b>\$%.2f",$tax);
+	echo "<br />";
 	printf("<b>Total Sales: </b>\$%.2f",$grandTotal);
 }
 else {
