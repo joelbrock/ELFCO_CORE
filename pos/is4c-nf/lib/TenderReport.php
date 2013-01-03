@@ -99,12 +99,12 @@ static public function get(){
 				.substr($blank.number_format("0", 2), -10)
 				.substr($blank.number_format($row["tender"], 2), -14)."\n";
 			}
+			if ($tender_code == 'CA') $row['tender'] = $row['tender'] * -1;
 			$sum += $row["tender"];
 		}
 		$net += $sum;
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
 
-		if ($tender_code == 'CA') $sum = $sum * -1;
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($sum,2), -56)."\n";
 		$receipt .= str_repeat("\n", 2);
 //		$receipt .= chr(27).chr(105);
