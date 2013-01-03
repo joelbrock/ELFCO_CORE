@@ -24,8 +24,8 @@
 $CORE_PATH = isset($CORE_PATH)?$CORE_PATH:"";
 if (empty($CORE_PATH)){ while(!file_exists($CORE_PATH."css/pos.css")) $CORE_PATH .= "../"; }
 
-include_once($CORE_PATH."lib/ReceiptLib.php");
-
+if (!function_exists('centerString')include_once($CORE_PATH."lib/ReceiptLib.php");
+if (!function_exists('centerBig')include_once($CORE_PATH."lib/ReceiptLib.php");
 /**
   @class TenderReport
   Generate a tender report
@@ -59,7 +59,7 @@ static public function get(){
 	$receipt = "";
 	$net = 0;
 	$itemize = 0;
-	
+
 	foreach(array_keys($DESIRED_TENDERS) as $tender_code){ 
 		$query = "select tdate from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
 			" and trans_subtype = '".$tender_code."' order by tdate";
