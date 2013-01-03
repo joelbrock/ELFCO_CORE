@@ -57,6 +57,7 @@ static public function get(){
 			.substr("Amount".$blank, 0, 14)."\n";
 	$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n\n";
 	$receipt = "";
+	$net = 0;
 
 	foreach(array_keys($DESIRED_TENDERS) as $tender_code){ 
 		$query = "select tdate from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
@@ -99,11 +100,13 @@ static public function get(){
 			}
 			$sum += $row["tender"];
 		}
-		
+		$net += $sum;
 		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
 
 		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($sum,2), -56)."\n";
 		$receipt .= str_repeat("\n", 2);
+
+		$receipt .= centerBig("Net Takings: ".number_format($net,2))."\n";
 //		$receipt .= chr(27).chr(105);
 	}
 	//	Print itemized equity sales
