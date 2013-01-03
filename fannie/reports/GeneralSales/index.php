@@ -25,9 +25,6 @@ include('../../config.php');
 include($FANNIE_ROOT.'src/mysql_connect.php');
 include($FANNIE_ROOT.'src/select_dlog.php');
 
-$sql = new SQLManager($FANNIE_SERVER,$FANNIE_SERVER_DBMS,
-	$FANNIE_TRANS_DB,$FANNIE_SERVER_USER,$FANNIE_SERVER_PW);
-
 if (isset($_REQUEST['submit'])){
 	$d1 = $_REQUEST['date1'];
 	$d2 = $_REQUEST['date2'];
@@ -80,11 +77,11 @@ if (isset($_REQUEST['submit'])){
 			CASE WHEN s.superID IS NULL THEN r.superID ELSE s.superID end,
 			CASE WHEN e.dept_no IS NULL THEN d.dept_no ELSE e.dept_no end";
 	}
-	$taxQ = "SELECT SUM(total) AS tax FROM $dlog WHERE trans_type = 'A'
+	$taxQ = "SELECT SUM(total) FROM $dlog WHERE trans_type = 'A'
 		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59')";
-	$taxR = $sql->query($taxQ);
-	$tax = $sql->fetch_row($taxR);
-	
+	// $taxR = $dbc->query($taxQ);
+	$taxR = mysql_query($taxQ);
+	$tax = mysql_fetch_row($taxR);
 	$supers = array();
 	$salesR = $dbc->query($sales);
 
@@ -121,7 +118,8 @@ if (isset($_REQUEST['submit'])){
 			
 		echo "</table><br />";
 	}
-	echo "<b>Sales Tax: </b>$" . number_format($tax,2) . "<br />";
+	printf("<b>Sales Tax: </b>\$%.2f",$tax);
+	echo "<br />";
 	printf("<b>Total Sales: </b>\$%.2f",$grandTotal);
 }
 else {
