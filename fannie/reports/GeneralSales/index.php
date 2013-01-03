@@ -77,8 +77,9 @@ if (isset($_REQUEST['submit'])){
 			CASE WHEN s.superID IS NULL THEN r.superID ELSE s.superID end,
 			CASE WHEN e.dept_no IS NULL THEN d.dept_no ELSE e.dept_no end";
 	}
-
-	$taxR = $dbc->query("SELECT SUM(total) FROM $dlog WHERE trans_type = 'A'");
+	$taxQ = "SELECT SUM(total) FROM $dlog WHERE trans_type = 'A'
+		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59') ";
+	$taxR = $dbc->query($taxQ);
 	$supers = array();
 	$salesR = $dbc->query($sales);
 
