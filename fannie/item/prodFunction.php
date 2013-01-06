@@ -88,6 +88,7 @@ function itemParse($upc){
     echo "testwindow.moveTo(50,50);";
     echo "}";
     echo "</script>";
+    $inuse = (isset($_REQUEST['inuse'])) ? " AND inUse = 1" : "";
 
     if($num == 0 || !$num){
         noItem();
@@ -96,7 +97,7 @@ function itemParse($upc){
 		$dataQ = "SELECT description,brand,cost/units as cost,vendorName,margin,i.vendorID
 			FROM vendorItems AS i LEFT JOIN vendors AS v ON i.vendorID=v.vendorID
 			LEFT JOIN vendorDepartments AS d ON i.vendorDept=d.deptID
-			WHERE upc LIKE '%$upc'";
+			WHERE upc LIKE '%$upc'" .$inuse;
 		if (isset($_REQUEST['vid'])) $dataQ .= " AND i.vendorID=".((int)$_REQUEST['vid']);
 		$dataR = $dbc->query($dataQ);
 		if ($dbc->num_rows($dataR) > 0){
