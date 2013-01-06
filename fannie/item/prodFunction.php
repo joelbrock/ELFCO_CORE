@@ -35,6 +35,8 @@ function itemParse($upc){
 
     $queryItem = "";
     $numType = (isset($_REQUEST['ntype'])?$_REQUEST['ntype']:'UPC');
+    $inuse = (isset($_REQUEST['inuse_only'])) ? " AND p.inUse = 1" : "";
+
     if(is_numeric($upc)){
 	switch($numType){
 	case 'UPC':
@@ -44,7 +46,7 @@ function itemParse($upc){
 			FROM products as p left join 
 			prodExtra as x on p.upc=x.upc 
 			WHERE (p.upc = '$upc' or x.upc = '$upc')
-			AND p.store_id=0";
+			AND p.store_id=0".$inuse;
 		break;
 	case 'SKU':
 		$queryItem = "SELECT p.*,x.distributor,x.manufacturer 
@@ -52,15 +54,15 @@ function itemParse($upc){
 			vendorItems as v ON p.upc=v.upc 
 			left join prodExtra as x on p.upc=x.upc 
 			WHERE v.sku='$upc'
-			AND p.store_id=0";
+			AND p.store_id=0".$inuse;
 		break;
 	case 'Brand Prefix':
 	      $queryItem = "SELECT p.*,x.distributor,x.manufacturer 
 			FROM products as p left join 
 			prodExtra as x on p.upc=x.upc 
 			WHERE p.upc like '%$upc%' 
-			AND p.store_id=0
-			ORDER BY p.upc";
+			AND p.store_id=0".$inuse. 
+			" ORDER BY p.upc";
 		break;
 	}
     }else{
@@ -68,8 +70,8 @@ function itemParse($upc){
 		FROM products AS p LEFT JOIN 
 		prodExtra AS x ON p.upc=x.upc
 		WHERE description LIKE '%$upc%' 
-		AND p.store_id=0
-		ORDER BY description";
+		AND p.store_id=0".$inuse.
+		" ORDER BY description";
     }
     /* note: only search by HQ records (store_id=0) to avoid duplicates */
     $resultItem = $dbc->query($queryItem);
@@ -88,7 +90,6 @@ function itemParse($upc){
     echo "testwindow.moveTo(50,50);";
     echo "}";
     echo "</script>";
-    $inuse = (isset($_REQUEST['inuse_only'])) ? " AND inUse = 1" : "";
 
     if($num == 0 || !$num){
         noItem();
@@ -97,7 +98,7 @@ function itemParse($upc){
 		$dataQ = "SELECT description,brand,cost/units as cost,vendorName,margin,i.vendorID
 			FROM vendorItems AS i LEFT JOIN vendors AS v ON i.vendorID=v.vendorID
 			LEFT JOIN vendorDepartments AS d ON i.vendorDept=d.deptID
-			WHERE upc LIKE '%$upc'" .$inuse;
+			WHERE upc LIKE '%$upc'";
 		if (isset($_REQUEST['vid'])) $dataQ .= " AND i.vendorID=".((int)$_REQUEST['vid']);
 		$dataR = $dbc->query($dataQ);
 		if ($dbc->num_rows($dataR) > 0){
@@ -287,7 +288,7 @@ function itemParse($upc){
 			for($i=0;$i < $num;$i++){
         		$rowItem= $dbc->fetch_array($resultItem);
 	    		$upc = $rowItem['upc'];
-	    		echo "<a href='../item/itemMaint.php?upc=$upc'>" . $upc . " </a>- " . $rowItem['vendorName'] . " " . $rowItem['description'];
+	    		echo "<a href='../item/itemMaint.php?upc=$upc'>" . $upc . " </a>- " . $rowItem['manufacturer'] . " " . $rowItem['description'];
 	 			if($rowItem['discounttype'] == 0) { echo "-- $" .$rowItem['normal_price']. "<br>"; }
 				else { echo "-- <font color=green>$" .$rowItem['special_price']. " onsale</font><br>"; }
     		}
