@@ -78,7 +78,7 @@ echo "<input name=upc type=text id=upc> Enter
 <option>Brand Prefix</option>
 </select> or product name here<br>";
 
-echo "<input type=checkbox name=inuse_only checked=yes> Search inUse items only"
+echo "<input type=checkbox name=inuse_only checked=yes> Search inUse items only";
 echo "<input name=submit type=submit value=submit> ";
 echo "</form>";
 }

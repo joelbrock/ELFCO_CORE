@@ -88,7 +88,7 @@ function itemParse($upc){
     echo "testwindow.moveTo(50,50);";
     echo "}";
     echo "</script>";
-    $inuse = (isset($_REQUEST['inuse'])) ? " AND inUse = 1" : "";
+    $inuse = (isset($_REQUEST['inuse_only'])) ? " AND inUse = 1" : "";
 
     if($num == 0 || !$num){
         noItem();
