@@ -66,9 +66,8 @@ $TRANS = ($FANNIE_SERVER_DBMS == "MSSQL") ? $FANNIE_TRANS_DB.".dbo." : $FANNIE_T
 // 	WHERE ".$sql->now()." > h.end_date
 // 	OR (t.card_no IS NOT NULL AND t.coupID IS NOT NULL)";
 
-$sqlQ = "DELETE FROM houseVirtualCoupons AS h," .  
-	$TRANS . "houseCouponThisMonth AS m
-	WHERE h.card_no = m.card_no";
+$sqlQ = "DELETE FROM houseVirtualCoupons WHERE card_no IN(
+		SELECT card_no FROM " . $TRANS . "houseCouponThisMonth)";
 // if ($FANNIE_SERVER_DBMS == "MSSQL"){
 // 	$sqlQ = "DELETE FROM houseVirtualCoupons 
 // 		FROM houseVirtualCoupons AS h
@@ -79,7 +78,7 @@ $sqlQ = "DELETE FROM houseVirtualCoupons AS h," .
 // }
 $sql->query($sqlQ);
 // if ($delR === false) 
-// 	echo cron_msg("DELETE query failed<br />");
+	echo cron_msg("DELETE query failed<br />" . $sqlQ);
 // else
 // 	echo cron_msg("Successfully removed redeemed houseVirtualCoupons (" . num_rows($sqlR) . ")<br />");
 
