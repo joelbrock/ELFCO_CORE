@@ -76,11 +76,11 @@ $sqlQ = "DELETE FROM houseVirtualCoupons WHERE card_no IN(
 // 		WHERE ".$sql->now()." > h.end_date
 // 		OR (t.card_no IS NOT NULL AND t.coupID IS NOT NULL)";
 // }
-$sql->query($sqlQ);
-// if ($delR === false) 
-	echo cron_msg("DELETE query failed<br />" . $sqlQ);
-// else
-// 	echo cron_msg("Successfully removed redeemed houseVirtualCoupons (" . num_rows($sqlR) . ")<br />");
+$delR = $sql->query($sqlQ);
+if ($delR == false) 
+	echo cron_msg("Delete query failed<br />" . $sqlQ);
+else
+	echo cron_msg("Successfully removed redeemed houseVirtualCoupons";
 
 // set custdata.memcoupons equal to the number
 // of available coupons (in theory)
@@ -102,24 +102,23 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 		AND ".$sql->now()."<= h.end_date
 		GROUP BY c.CardNo";
 }
-$sql->query($upQ);
-
-// if ($upR === false)
-// 	echo cron_msg("Failed to update custdata field: memCoupons<br />");
-// else
-// 	echo cron_msg("Successfully updated custdata field: memCoupons<br />");
+$upR = $sql->query($upQ);
+if ($upR == false)
+	echo cron_msg("Failed to update custdata field: memCoupons<br />");
+else
+	echo cron_msg("Successfully updated custdata field: memCoupons<br />");
 
 // update blueline to match memcoupons
 $blueLineQ = "UPDATE custdata SET blueLine="
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
 		$sql->convert('memCoupons','CHAR'),"')'",'')
 	. "WHERE memType <> 0";
-$sql->query($blueLineQ);
+$blR = $sql->query($blueLineQ);
 
-// if ($blR === false)
-// 	echo cron_msg("Failed to update custdata field: blueLine<br />");
-// else
-// 	echo cron_msg("Successfully updated custdata field: blueLine<br />");
+if ($blR == false)
+	echo cron_msg("Failed to update custdata field: blueLine<br />");
+else
+	echo cron_msg("Successfully updated custdata field: blueLine<br />");
 
 //$sql->query("DROP TABLE TempVirtCoupon");
 
