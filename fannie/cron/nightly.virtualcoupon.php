@@ -103,10 +103,10 @@ if ($FANNIE_SERVER_DBMS == "MSSQL"){
 		GROUP BY c.CardNo";
 }
 $upR = $sql->query($upQ);
-if ($upR == false)
-	echo cron_msg("Failed to update custdata field: memCoupons<br />");
-else
-	echo cron_msg("Successfully updated custdata field: memCoupons<br />");
+// if ($upR == false)
+// 	echo cron_msg("Failed to update custdata field: memCoupons<br />");
+// else
+// 	echo cron_msg("Successfully updated custdata field: memCoupons<br />");
 
 // update blueline to match memcoupons
 $blueLineQ = "UPDATE custdata SET blueLine="
@@ -115,10 +115,10 @@ $blueLineQ = "UPDATE custdata SET blueLine="
 	. "WHERE memType <> 0";
 $blR = $sql->query($blueLineQ);
 
-if ($blR == false)
-	echo cron_msg("Failed to update custdata field: blueLine<br />");
-else
-	echo cron_msg("Successfully updated custdata field: blueLine<br />");
+// if ($blR == false)
+// 	echo cron_msg("Failed to update custdata field: blueLine<br />");
+// else
+// 	echo cron_msg("Successfully updated custdata field: blueLine<br />");
 
 //$sql->query("DROP TABLE TempVirtCoupon");
 
