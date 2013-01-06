@@ -46,7 +46,7 @@ $sql = new SQLManager($FANNIE_SERVER,$FANNIE_SERVER_DBMS,$FANNIE_OP_DB,
 $TRANS = ($FANNIE_SERVER_DBMS == "MSSQL") ? $FANNIE_TRANS_DB.".dbo." : $FANNIE_TRANS_DB.".";
 
 // clear out houseVirtualCoupons
-$sql->query("TRUNCATE TABLE TempVirtCoupon");
+$sql->query("TRUNCATE TABLE houseVirtualCoupons");
 
 echo cron_msg("Truncate table houseVirtualCoupons<br />");
 
