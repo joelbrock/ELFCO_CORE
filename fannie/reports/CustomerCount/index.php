@@ -40,35 +40,38 @@ if (isset($_REQUEST['submit'])){
 			$d1,$d2);
 	}
 
-	$sales = "SELECT year(tdate) as year, month(tdate) as month,
-			day(tdate) as day,max(memType) as memType,trans_num
-			FROM $dlog as t
-			WHERE 
-			tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59'
-			and trans_type in ('I','D')
-			AND upc <> 'RRR'
-			group by year(tdate),month(tdate),day(tdate),trans_num
-			order by year(tdate),month(tdate),day(tdate),max(memType)";
-	$data = array();
-	$result = $dbc->query($sales);
-	while($row = $dbc->fetch_row($result)){
-		$stamp = date("M j, Y",mktime(0,0,0,$row['month'],$row['day'],$row['year']));
-		if (!isset($data[$stamp])) $data[$stamp] = array("ttl"=>0);
-		if (!isset($data[$stamp][$row['memType']])) $data[$stamp][$row['memType']] = 0;
-		$data[$stamp]["ttl"]++;
-		$data[$stamp][$row['memType']]++;
-	}
+    $sales = "SELECT year(tdate) as year, month(tdate) as month,
+        day(tdate) as day,max(c.memType) as memType,trans_num
+        FROM $dlog as t, core_op.custdata as c
+        WHERE 
+        card_no = c.CardNo
+        AND tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59'
+        and trans_type in ('I','D')
+        AND upc <> 'RRR'
+        group by year(tdate),month(tdate),day(tdate),trans_num
+        order by year(tdate),month(tdate),day(tdate),max(memType)";
 
-	$cols = array(0=>"NonMember",
-		1=>"Owner PIF",
-		12=>"Owner PIF Sr.",
-		2=>"Owner Instl",
-		13=>"Owner Inst Sr.",
-		3=>"Annual",
-		4=>"On Hold",
-		7=>"Other Co-op",
-		9=>"Staff Member",
-		10=>"Working Owner",
+    $data = array();
+    $result = $dbc->query($sales);
+    while($row = $dbc->fetch_row($result)){
+        $stamp = date("M j, Y",mktime(0,0,0,$row['month'],$row['day'],$row['year']));
+        if (!isset($data[$stamp])) $data[$stamp] = array("ttl"=>0);
+        if (!isset($data[$stamp][$row['memType']])) $data[$stamp][$row['memType']] = 0;
+        $data[$stamp]["ttl"]++;
+        $data[$stamp][$row['memType']]++;
+    }
+
+    $cols = array(0=>"NonMember",
+        1=>"Owner<br>PIF",
+        12=>"Owner<br>PIF Sr.",
+        2=>"Owner<br>Instl",
+        13=>"Owner<br>Inst Sr.",
+        3=>"Annual",
+        4=>"On<br>Hold",
+        7=>"Other<br>Co-op",
+        9=>"Staff<br>Member",
+        10=>"Working<br>Owner",
+        14=>"Student<br>Housing"
 	);
 
 	$placeholder = isset($_REQUEST['excel'])?'':'&nbsp;';
