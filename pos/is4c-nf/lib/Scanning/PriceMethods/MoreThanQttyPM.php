@@ -125,7 +125,7 @@ class MoreThanQttyPM extends PriceMethod {
 			($priceObj->isSale() ? $row['specialquantity'] : $row['quantity']),
 			($priceObj->isSale() ? $row['specialgroupprice'] : $row['groupprice']),
 			$row['mixmatchcode'],
-			0,
+			($trans_qty == $quantity) ? 1 : 0,
 			0,
 			(isset($row['cost'])?$row['cost']*$quantity:0.00),
 			(isset($row['numflag'])?$row['numflag']:0),
