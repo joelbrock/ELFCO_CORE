@@ -21,6 +21,15 @@
 
 *********************************************************************************/
 
+header('Location: LikeCodeEditor.php');
+exit;
+
+/* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	* 21Jan2013 Eric Lee Fix duplicate "'" on $name resulting from escaping the form value.
+
+*/
+
 include('../../config.php');
 include($FANNIE_ROOT.'src/mysql_connect.php');
 include($FANNIE_ROOT.'auth/login.php');

@@ -67,10 +67,12 @@ class DefaultReceiptSort {
 				if(isset($row['category'])){
 					if (!isset($items[$row['category']]))
 						$items[$row['category']] = array();
+					//$items[$row['category']] = $this->upc_merge($items[$row['category']],$row);
 					$items[$row['category']][] = $row;
 				}
 				else {
-					$items['_uncategorized'] = array();
+					//$items[$row['_uncategorized']] = $this->upc_merge($items[$row['_uncategorized']],$row);
+					$items[$row['_uncategorized']][] = $row;
 				}
 			}
 		}
@@ -79,23 +81,29 @@ class DefaultReceiptSort {
 	
 		// first add uncategorized item records
 		if (count($items['_uncategorized'] > 0)){
+			$returnset = array_merge($returnset,$items['_uncategorized']);
+			/*
 			usort($items['_uncategorized'],array('DefaultReceiptSort','record_compare'));
 			foreach($items['_uncategorized'] as $row){
 				$returnset[] = $row;
 			}
+			*/
 		}
 
 		// next do categorized alphabetically
 		// if there are items for a given header,
 		// add that header followed by those items
 		if (count($headers) > 0){
-			asort($headers);
+			//asort($headers);
 			foreach($headers as $hrow){
 				if (count($items[$hrow['description']]) > 0){
 					$returnset[] = $hrow;
+					$returnset = array_merge($returnset,$items[$hrow['description']]);
+					/*
 					usort($items[$hrow['description']],array('DefaultReceiptSort','record_compare'));
 					foreach($items[$hrow['description']] as $irow)
 						$returnset[] = $irow;
+					*/
 				}
 			}
 		}
@@ -112,9 +120,12 @@ class DefaultReceiptSort {
 
 		// finally tenders
 		if(count($tenders) > 0){
+			$returnset = array_merge($returnset,$tenders);
+			/*
 			usort($tenders, array('DefaultReceiptSort','record_compare'));
 			foreach($tenders as $trow)
 				$returnset[] = $trow;
+			*/
 		}
 
 		return $returnset;
@@ -126,5 +137,40 @@ class DefaultReceiptSort {
 			return 0;
 		else
 			return $r1['trans_id'] - $r2['trans_id'];
+	}
+
+	/**
+	  Combine item records when appropriate
+	  @param $cur an array of records some of which
+		are keyed by UPC
+	  @param $new a new record
+	  @return $cur with the new record added
+	*/
+	protected function upc_merge($cur, $new){
+		if ($new['trans_status'] != '' || $row['trans_type'] != ''
+		   || $new['scale'] != 0 || $new['matched'] != 0){
+			/**
+			  By-weight, refund, void, or group discount
+			  items shouldn't be combined. They
+			  get added with a simple numerical key
+			*/
+			$cur[] = $new;
+		}
+		else if (isset($cur[$new['upc']])){
+			/**
+			  Valid item to merge; add to the existing record
+			*/
+			$cur[$new['upc']]['ItemQty'] += $new['ItemQty'];
+			$cur[$new['upc']]['quantity'] += $new['quantity'];
+			$cur[$new['upc']]['total'] += $new['total'];
+		}
+		else {
+			/**
+			  Valid item to merge; add record with
+			  UPC key.
+			*/
+			$cur[$new['upc']] = $new;
+		}
+		return $cur;
 	}
 }	

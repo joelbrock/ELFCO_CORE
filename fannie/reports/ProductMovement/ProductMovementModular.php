@@ -77,12 +77,13 @@ class ProductMovementModular extends FannieReportPage {
 			  t.upc,p.description,
 			  t.quantity as qty,
 			  sum(t.total) from
-			  $sumTable as t left join products as p on t.upc = p.upc 
-			  where t.upc = '$upc' AND
-			  tdate BETWEEN '$date1 00:00:00' AND '$date2 23:59:59'
+			  $dlog as t left join products as p on t.upc = p.upc 
+			  where t.upc = ? AND
+			  tdate BETWEEN ? AND ?
 			  group by year(t.tdate),month(t.tdate),day(t.tdate),
 			  t.upc,p.description
 			  order by year(t.tdate),month(t.tdate),day(t.tdate)";
+		$args = array($upc,$date1.' 00:00:00',$date2.' 23:59:59');
 	
 		if (strtolower($upc) == "rrr" || $upc == "0000000000052"){
 			if ($dlog == "dlog_90_view" || $dlog=="dlog_15")
@@ -96,15 +97,16 @@ class ProductMovementModular extends FannieReportPage {
 				sum(case when upc <> 'rrr' then quantity when volSpecial is null or volSpecial > 9999 then 0 else volSpecial end) as qty,
 				sum(t.total) from
 				$dlog as t
-				where upc = '$upc'
-				AND datetime BETWEEN '$date1 00:00:00' AND '$date2 23:59:59'
+				where upc = ?
+				AND datetime BETWEEN ? AND ?
 				and emp_no <> 9999 and register_no <> 99
 				and trans_status <> 'X'
 				GROUP BY YEAR(datetime),MONTH(datetime),DAY(datetime)
 				ORDER BY YEAR(datetime),MONTH(datetime),DAY(datetime)";
 			
 		}
-		$result = $dbc->query($query);
+		$prep = $dbc->prepare_statement($query);
+		$result = $dbc->exec_statement($prep,$args);
 
 		/**
 		  Simple report
@@ -143,35 +145,34 @@ class ProductMovementModular extends FannieReportPage {
 <form method = "get" action="ProductMovementModular.php">
 	<table border="0" cellspacing="0" cellpadding="5">
 		<tr> 
-			<td> <p><b>UPC</b></p>
-			<p><b>Excel</b></p>
+			<th>UPC</th>
+			<td>
+			<input type=text name=upc size=14 id=upc  />
 			</td>
-			<td><p>
-			<input type=text name=upc id=upc  />
-			</p>
-			<p>
-			<input type=checkbox name=excel id=excel value=xls /> 
-			</p>
+			<td>
+			<input type="checkbox" name="excel" id="excel" value="xls" />
+			<label for="excel">Excel</label>
+			</td>	
+		</tr>
+		<tr>
+			<th>Date Start</th>
+			<td>	
+		               <input type=text size=14 id=date1 name=date1 onfocus="this.value='';showCalendarControl(this);">
 			</td>
-
-			 <td>
-			<p><b>Date Start</b> </p>
-		         <p><b>End</b></p>
-		       </td>
-		            <td>
-		             <p>
-		               <input type=text size=25 name=date1 onfocus="this.value='';showCalendarControl(this);">
-		               </p>
-		               <p>
-		                <input type=text size=25 name=date2 onfocus="this.value='';showCalendarControl(this);">
-		         </p>
+			<td rowspan="3">
+			<?php echo FormLib::date_range_picker(); ?>
+			</td>
+		</tr>
+		<tr>
+			<th>End</th>
+			<td>
+		                <input type=text size=14 id=date2 name=date2 onfocus="this.value='';showCalendarControl(this);">
 		       </td>
 
 		</tr>
+		<tr>
 			<td> <input type=submit name=submit value="Submit"> </td>
 			<td> <input type=reset name=reset value="Start Over"> </td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
 		</tr>
 	</table>
 </form>

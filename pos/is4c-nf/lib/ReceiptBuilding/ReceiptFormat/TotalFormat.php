@@ -35,8 +35,11 @@ class TotalFormat extends DefaultReceiptFormat {
 	*/
 	function format($row){
 		switch($row['upc']){
-		case 'SUBTOTAL':
 		case 'TOTAL':
+			$this->is_bold = True;
+			return $this->align($row['upc'],$row['total']);	
+			break;
+		case 'SUBTOTAL':
 		case 'TAX':
 			return $this->align($row['upc'],$row['total']);	
 			break;
@@ -52,7 +55,6 @@ class TotalFormat extends DefaultReceiptFormat {
 
 		$ret = str_pad($text,44,' ',STR_PAD_LEFT);
 		$ret .= str_pad($amount,8,' ',STR_PAD_LEFT);
-		$ret .= str_repeat(' ',4);
 		return $ret;
 	}
 }

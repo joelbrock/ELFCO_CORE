@@ -77,6 +77,19 @@ static public function system_init() {
         $CORE_LOCAL->set("ccRemoteServerUp",1);
 	$CORE_LOCAL->set("search_or_list",0);
 	$CORE_LOCAL->set("ccTermOut","idle");
+	$CORE_LOCAL->set("inputMasked",0);
+
+	/**
+	  These variables used to be in ini.php
+	  but aren't actually configurable. They
+	  probably don't do anything at this time,
+	  although bits of legacy functionality may
+	  be present that could be fixed. In that
+	  case they should probably go back to
+	  ini.php
+	*/
+	$CORE_LOCAL->set("ddNotify",0); 
+	$CORE_LOCAL->set("promoMsg",0);
 }
 
 /**
@@ -142,6 +155,7 @@ static public function transReset() {
 	$CORE_LOCAL->set("warned",0);
 	$CORE_LOCAL->set("warnBoxType","");
 	$CORE_LOCAL->set("requestType","");
+	$CORE_LOCAL->set("lastWeight",0.00);
 
 	$CORE_LOCAL->set("CachePanEncBlock","");
 	$CORE_LOCAL->set("CachePinEncBlock","");
@@ -150,6 +164,11 @@ static public function transReset() {
 	$CORE_LOCAL->set("ebt_authcode","");
 	$CORE_LOCAL->set("ebt_vnum","");
 	$CORE_LOCAL->set("paycard_keyed",False);
+
+	foreach($CORE_LOCAL->get('PluginList') as $p){
+		$obj = new $p();
+		$obj->plugin_transaction_reset();
+	}
 }
 
 /**
@@ -239,8 +258,6 @@ static public function loaddata() {
 			$CORE_LOCAL->set("memberID",$row_local["card_no"]);
 		}
 	}
-	// moved, no need to stay open - andy 4/12/07
-	$db_local->close();
 
 	if ($CORE_LOCAL->get("memberID") == "0") {
 		// not used - andy 4/12/07
@@ -269,8 +286,6 @@ static public function loaddata() {
 			if ($CORE_LOCAL->get("SSI") == 1) 
 				$CORE_LOCAL->set("memMsg",$CORE_LOCAL->get("memMsg")." #");
 		}
-		// moved for proper scope - andy 4/12/07
-		$db_product->close();
 	}
 }
 
@@ -308,8 +323,6 @@ static public function customreceipt(){
 	foreach($counts as $key => $num){
 		$CORE_LOCAL->set($key."Count",$num);
 	}
-
-	$db->db_close();
 }
 
 }

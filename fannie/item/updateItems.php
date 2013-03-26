@@ -20,9 +20,25 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
+
+/* --FUNCTIONALITY- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ * This piece of code does quite a few things. Items below are grepped from the listing.
+
+/* Xel. Validate credentials of the operator.  */
+/* Xel. Notify dept manager of the new values.  */
+/* Xel. Insert or update products */
+/* Xel. Apply HQ updates to non-HQ records */
+/* Xel. Insert or update prodExtra */
+/* Xel. Insert or update prodUpdate */
+/* Xel. Insert or update scaleItems */
+/* Xel. Update product-related tables on the lanes.  */
+/* Xel. Update likecodes */
+/* Xel. Display the post-update values.  */
+
+/* */
+
 include('../config.php');
 require_once('../src/mysql_connect.php');
-require_once($FANNIE_ROOT.'classlib2.0/data/controllers/ProductsController.php');
 
 require_once('../auth/login.php');
 $validatedUser = validateUserQuiet('pricechange');
@@ -36,6 +52,10 @@ include('../src/header.html');
 
 $upc = str_pad($_REQUEST['upc'],'0',13,STR_PAD_LEFT);
 
+/* Establish values for all products fields
+    formatted for writing to the database
+    either from the form or defaults suitable for a new record.
+*/
 $up_array = array();
 $up_array['tax'] = isset($_REQUEST['tax'])?$_REQUEST['tax']:0;
 $up_array['foodstamp'] = isset($_REQUEST['FS'])?1:0;
@@ -44,7 +64,7 @@ $up_array['deposit'] = isset($_REQUEST['deposit'])?$_REQUEST['deposit']:0;
 $up_array['qttyEnforced'] = isset($_REQUEST['QtyFrc'])?1:0;
 $up_array['discount'] = isset($_REQUEST['NoDisc'])?0:1;
 $up_array['normal_price'] = isset($_REQUEST['price'])?$_REQUEST['price']:0;
-$up_array['description'] = isset($_REQUEST['descript'])?$_REQUEST['descript']:'';
+$up_array['description'] = $dbc->escape($_REQUEST['descript']);
 $up_array['pricemethod'] = 0;
 $up_array['groupprice'] = 0.00;
 $up_array['quantity'] = 0;
@@ -63,12 +83,7 @@ $up_array['subdept'] = $_REQUEST['subdepartment'];
 $up_array['local'] = isset($_REQUEST['local'])?1:0;
 $up_array['store_id'] = isset($_REQUEST['store_id'])?$_REQUEST['store_id']:0;
 $up_array['numflag'] = 0;
-if (isset($_REQUEST['flags']) && is_array($_REQUEST['flags'])){
-	foreach($_REQUEST['flags'] as $f){
-		if ($f != (int)$f) continue;
-		$up_array['numflag'] = $up_array['numflag'] | (1 << ($f-1));
-	}
-}
+
 
 /* turn on volume pricing if specified, but don't
    alter pricemethod if it's already non-zero */
@@ -79,11 +94,34 @@ if (isset($_REQUEST['doVolume']) && is_numeric($_REQUEST['vol_price']) && is_num
 	$up_array['quantity'] = $_REQUEST['vol_qtty'];
 }
 
+/* pull the current, HQ values for all the editable fields
+   and compare them to the submitted values
+   Store actual changes in the array $CHANGES
+*/
+$currentQ = "SELECT tax,foodstamp,scale,deposit,qttyEnforced,discount,normal_price,
+	description,pricemethod,groupprice,quantity,department,cost,subdept,local
+	FROM products WHERE upc='$upc' AND store_id=0";
+$currentR = $dbc->query($currentQ);
+$currentW = array();
+if ($dbc->num_rows($currentR) > 0)
+	$currentW = $dbc->fetch_row($currentR);
+$CHANGES = array();
+foreach($up_array as $column => $new_value){
+	if (!isset($currentW[$column])) continue; 
+	if ($currentW[$column] != trim($new_value,"'")){
+		$CHANGES[$column] = array(
+			'old' => $currentW[$column],
+			'new' => trim($new_value,"'")
+		);
+	}
+}
+
 $sR = $dbc->query("SELECT superID FROM MasterSuperDepts WHERE dept_ID=".$up_array['department']);
 $sID = 0;
 if ($dbc->num_rows($sR) > 0)
 	$sID = array_pop($dbc->fetch_row($sR));
 
+/* Xel. Validate credentials of the operator.  */
 $uid = 0;
 if (!$validatedUser && !$auditedUser && $logged_in){
   $validatedUser = validateUserQuiet('pricechange',$subdepartment);
@@ -96,15 +134,57 @@ elseif ($auditedUser){
   $auditedUID = getUID($auditedUser);
   $uid = $auditedUID;
   include('audit.php');
+/* Xel. Notify dept manager of the new values.  */
   if (!empty($likeCode))
     audit($sID,$auditedUser,$upc,$descript,$price,$tax,$FS,$Scale,$NoDisc,$likeCode);
   else
     audit($sID,$auditedUser,$upc,$descript,$price,$tax,$FS,$Scale,$NoDisc);
 }
 
-//$dbc->smart_update('products',$up_array,"upc='$upc'");
-ProductsController::update($upc, $up_array);
+/* Xel. Insert or update products */
+if ($up_array['store_id'] == $FANNIE_STORE_ID){
+	// record exists so update it
+	$dbc->smart_update('products',$up_array,"upc='$upc'");
+}
+else if($up_array['store_id']==0 && count($CHANGES) > 0){
+	// only the HQ record exists and this is not HQ
+	// so it has to be an insert
+	// only create a new record if changes really exist
+	$up_array['store_id'] = $FANNIE_STORE_ID;
+	$up_array['upc'] = $dbc->escape($_REQUEST['upc']);
+	$up_array['special_price'] = 0.00;
+	$up_array['specialpricemethod'] = 0;
+	$up_array['specialgroupprice'] = 0.00;
+	$up_array['specialquantity'] = 0;
+	// EL When these are assignable don't use defaults
+	$up_array['mixmatchcode'] = "'0'";
+	//
+	$up_array['discounttype'] = 0;
+	$up_array['start_date'] = "'1900-01-01'";
+	$up_array['end_date'] = "'1900-01-01'";
+	$up_array['numflag'] = 0;
+	$up_array['store_id'] = 0;
+	$dbc->smart_insert('products',$up_array);
+}
 
+/* Xel. Apply HQ updates to non-HQ records */
+// apply HQ updates to non-HQ records
+//  where the current value matches the old HQ value
+if ($FANNIE_STORE_ID==0 && count($CHANGES) > 0){
+	foreach($CHANGES as $col => $values){
+		$v_old = is_numeric($values['old']) ? $values['old'] : $dbc->escape($values['old']);
+		$v_new = is_numeric($values['new']) ? $values['new'] : $dbc->escape($values['new']);
+		$upQ = sprintf("UPDATE products SET %s=%s,modified=%s
+			WHERE %s=%s AND upc=%s AND store_id > 0",
+			$col,$v_new,
+			$dbc->now(),
+			$col,$v_old,
+			$dbc->escape($upc));
+		$upR = $dbc->query($upQ);
+	}
+}
+
+/* Xel. Insert or update prodExtra */
 if ($dbc->table_exists('prodExtra')){
 	$arr = array();
 	$arr['manufacturer'] = $dbc->escape($_REQUEST['manufacturer']);
@@ -127,11 +207,31 @@ if ($dbc->table_exists('prodExtra')){
 		$dbc->smart_update('prodExtra',$arr,"upc='$upc'");
 	}
 }
+/* Xel. Insert or update prodUpdate: audit trail */
+if ($dbc->table_exists("prodUpdate")){
+	$puarray = array(
+	'upc' => $dbc->escape($upc),
+	'description' => $up_array['description'],
+	'price' => $up_array['normal_price'],
+	'dept' => $up_array['department'],
+	'tax' => $up_array['tax'],
+	'fs' => $up_array['foodstamp'],
+	'scale' => $up_array['scale'],
+	'likeCode' => isset($_REQUEST['likeCode'])?$_REQUEST['likeCode']:0,
+	'modified' => $dbc->now(),
+	'user' => $uid,
+	'forceQty' => $up_array['qttyEnforced'],
+	'noDisc' => $up_array['discount'],
+	'inUse' => $up_array['inUse']
+	);
+	$dbc->smart_insert('prodUpdate',$puarray);
+}
+/* Xel. Insert or update scaleItems */
 if(isset($_REQUEST['s_plu'])){
 	$s_plu = substr($_REQUEST['s_plu'],3,4);
 	$scale_array = array();
 	$scale_array['plu'] = $upc;
-	$scale_array['itemdesc'] = $dbc->escape($up_array['description']);
+	$scale_array['itemdesc'] = $up_array['description'];
 	$scale_array['price'] = $up_array['normal_price'];
 	if (isset($_REQUEST['s_longdesc']) && !empty($_REQUEST['s_longdesc']))
 		$scale_array['itemdesc'] = $dbc->escape($_REQUEST['s_longdesc']);
@@ -176,10 +276,12 @@ if(isset($_REQUEST['s_plu'])){
 		$scale_array['label'],($scale_array['graphics']==1)?121:0);
 }
 
+/* Xel. Update product-related tables on the lanes.  */
 /* push updates to the lanes */
 include('laneUpdates.php');
 updateProductAllLanes($upc);
 
+/* Xel. Update likecodes */
 /* update the item's likecode if specified
    also update other items in the likecode
    if the appropriate box isn't checked */
@@ -193,9 +295,8 @@ if (isset($_REQUEST['likeCode']) && $_REQUEST['likeCode'] != -1){
 		$upcsR = $dbc->query($upcsQ);
 		unset($up_array['description']);
 		while($upcsW = $dbc->fetch_row($upcsR)){
-			ProductsController::update($upcsW[0], $up_array);
-			//$dbc->smart_update('products',$up_array,
-			//	"upc='$upcsW[0]' AND store_id=$FANNIE_STORE_ID");
+			$dbc->smart_update('products',$up_array,
+				"upc='$upcsW[0]' AND store_id=$FANNIE_STORE_ID");
 			updateProductAllLanes($upcsW[0]);
 		}
 	}
@@ -205,6 +306,7 @@ elseif (isset($_REQUEST['likeCode']) && $_REQUEST['likeCode'] == -1){
 }
 
 
+/* Xel. Display the post-update values.  */
 $query1 = "SELECT upc,description,normal_price,department,subdept,
 		foodstamp,scale,qttyEnforced,discount,inUse,deposit
 		 FROM products WHERE upc = '$upc'";
@@ -213,7 +315,7 @@ $row = $dbc->fetch_array($result1);
 
 echo "<table border=0>";
         echo "<tr><td align=right><b>UPC</b></td><td><font color='red'>".$row['upc']."</font><input type=hidden value='{$row['upc']}' name=upc></td>";
-        echo "</tr><tr><td><b>Description</b></td><td>{$row['description']}</td>";
+        echo "</tr><tr><td><b>DescriptionNew</b></td><td>{$row['description']}</td>";
         echo "<td><b>Price</b></td><td>\${$row['normal_price']}</td></tr></table>";
         echo "<table border=0><tr>";
         echo "<th>Dept<th>subDept<th>FS<th>Scale<th>QtyFrc<th>NoDisc<th>inUse<th>deposit</b>";
@@ -266,7 +368,8 @@ echo "<table border=0>";
         echo "</table>";
 		echo "<hr>"; 
 		echo "<form action='itemMaint.php' method=post>";
-        echo "<input name=upc type=text id=upc> Enter UPC/PLU here<br>";
+        echo "<input name=upc type=text id=upc> Enter UPC/PLU here<br />";
+				echo "To add a new item enter its UPC/PLU.<br />";
         echo "<input name=submit type=submit value=submit>";
         echo "</form>";
 ?>

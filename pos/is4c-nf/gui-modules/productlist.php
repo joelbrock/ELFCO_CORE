@@ -23,6 +23,7 @@
 
 /* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	* 11Feb2013 EL Support argument from initial PV command: PVAPPLES.
 	* 18Jan2013 Eric Lee Extended lookup to productUser.description, with Andy's help.
 	*                    Very slow unless products.upc has been changed to VARCHAR(13).
 
@@ -34,7 +35,6 @@ class productlist extends NoInputPage {
 
 	var $temp_result;
 	var $temp_num_rows;
-	var $temp_db;
 	var $boxSize;
 
 	function preprocess(){
@@ -43,6 +43,8 @@ class productlist extends NoInputPage {
 		$entered = "";
 		if (isset($_REQUEST["search"]))
 			$entered = strtoupper(trim($_REQUEST["search"]));
+		elseif ($CORE_LOCAL->get("pvsearch") != "")
+			$entered = strtoupper(trim($CORE_LOCAL->get("pvsearch")));
 		else{
 			$this->temp_num_rows = 0;
 			return True;
@@ -95,36 +97,25 @@ class productlist extends NoInputPage {
 				$entered = substr($entered, 0, 8)."00000";
 		}
 
-		$query = "select upc, description, normal_price, special_price, advertised, scale from products where "
-			."upc = '".$entered."' AND inUse  = '1'";
-		$this->boxSize = 3;
-		$sql = Database::pDataConnect();
-		if (!is_numeric($entered)) {
-			$query = "select upc, description, normal_price, special_price, "
-				."advertised, scale from products where "
-				."description like '%".$entered."%' "
-				."and upc LIKE ('0000000%') "
-				."and inUse='1' "
-				."order by description";
-			if ($sql->table_exists("productUser")){
-				$query = "SELECT p.upc,
-                   CASE WHEN u.description IS NULL THEN p.description
-                   ELSE u.description END as description,
-										p.normal_price, p.special_price, p.advertised, p.scale
-                   FROM products AS p
-									 	LEFT JOIN productUser AS u ON p.upc=u.upc
-									 WHERE (p.description LIKE '%$entered%' OR
-										 u.description LIKE '%$entered%')
-									 AND p.upc LIKE ('0000000%')
-									 AND p.inUse='1'
-									 ORDER BY description";
+		/* get all available modules */
+		$modules = AutoLoader::ListModules('ProductSearch');
+		$results = array();
+		$this->boxSize = 1;
+		/* search with each available module. Use UPC
+		   to filter out any duplicate results */
+		foreach($modules as $mod_name){
+			$mod = new $mod_name();
+			$mod_results = $mod->search($entered);
+			foreach($mod_results as $upc => $record){
+				if (!isset($results[$upc]))
+					$results[$upc] = $record;
 			}
-			$this->boxSize = 15;
+			if ($mod->result_size > $this->boxSize)
+				$this->boxSize = $mod->result_size;
 		}
 
-		$this->temp_result = $sql->query($query);
-		$this->temp_num_rows = $sql->num_rows($this->temp_result);
-		$this->temp_db = $sql;
+		$this->temp_result = $results;
+		$this->temp_num_rows = count($results);
 
 		return True;
 	} // END preprocess() FUNCTION
@@ -162,7 +153,6 @@ class productlist extends NoInputPage {
 		global $CORE_LOCAL;
 		$result = $this->temp_result;
 		$num_rows = $this->temp_num_rows;
-		$db = $this->temp_db;
 
 		if ($num_rows == 0) {
 			$this->productsearchbox(_("no match found")."<br />"._("next search or enter upc"));
@@ -178,8 +168,7 @@ class productlist extends NoInputPage {
 				."size=".$this->boxSize." onblur=\"\$('#search').focus();\" ondblclick=\"document.forms['selectform'].submit();\">";
 
 			$selected = "selected";
-			for ($i = 0; $i < $num_rows; $i++) {
-				$row = $db->fetch_array($result);
+			foreach($result as $row){
 				$price = $row["normal_price"];	
 
 				if ($row["scale"] != 0) $Scale = "S";
@@ -202,8 +191,6 @@ class productlist extends NoInputPage {
 			echo "</div>";
 		}
 
-		if (is_object($db))
-			$db->close();
 		$CORE_LOCAL->set("scan","noScan");
 		$CORE_LOCAL->set("beep","noBeep");
 		$this->add_onload_command("\$('#search').focus();\n");
@@ -218,7 +205,11 @@ class productlist extends NoInputPage {
 			</span>
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" autocomplete="off">
 			<input type="text" name="search" size="15" id="search"
+<<<<<<< HEAD
 				onblur="$('#search').focus();" />
+=======
+				onblur="$('#search).focus();" />
+>>>>>>> flathat/master
 			</form>
 			press [enter] to cancel
 			</div>

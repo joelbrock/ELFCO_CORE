@@ -112,27 +112,7 @@ class PreParser {
 	static public function get_preparse_chain(){
 
 		$set = AutoLoader::ListModules('PreParser');
-<<<<<<< HEAD
-
-		$preparse_chain = array();
-		$first = "";
-		foreach($set as $classname){
-			$instance = new $classname();
-			if ($instance->isLast())
-				array_push($preparse_chain,$classname);
-			elseif ($instance->isFirst())
-				$first = $classname;
-			else
-				array_unshift($preparse_chain,$classname);
-		}
-		if ($first != "")
-			array_unshift($preparse_chain,$first);
-
-		return $preparse_chain;
-
-		$PARSEROOT = realpath(dirname(__FILE__));
-=======
->>>>>>> 2734fbf59b4f5f20f89b9bbdef42ead85d7e5fab
+		$set = array_reverse($set);
 
 		$preparse_chain = array();
 		$first = "";
