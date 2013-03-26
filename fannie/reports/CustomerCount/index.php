@@ -109,19 +109,18 @@ if (isset($_REQUEST['submit'])){
 		$data[$stamp][$row['memType']]++;
 	}
 
-<<<<<<< HEAD
-	$cols = array(0=>"NonMember",
-		1=>"Owner PIF",
-		12=>"Owner PIF Sr.",
-		2=>"Owner Instl",
-		13=>"Owner Inst Sr.",
-		3=>"Annual",
-		4=>"On Hold",
-		7=>"Other Co-op",
-		9=>"Staff Member",
-		10=>"Working Owner",
-	);
-=======
+	// $cols = array(0=>"NonMember",
+	// 	1=>"Owner PIF",
+	// 	12=>"Owner PIF Sr.",
+	// 	2=>"Owner Instl",
+	// 	13=>"Owner Inst Sr.",
+	// 	3=>"Annual",
+	// 	4=>"On Hold",
+	// 	7=>"Other Co-op",
+	// 	9=>"Staff Member",
+	// 	10=>"Working Owner",
+	// );
+
 	if ( !isset($FANNIE_COOP_ID) || (isset($FANNIE_COOP_ID) && $FANNIE_COOP_ID != "WFC") ) {
 		$memQ = "SELECT memtype, memDesc FROM core_op.memtype";
 		$memR = $dbc->query($memQ);
@@ -134,7 +133,6 @@ if (isset($_REQUEST['submit'])){
 		$cols = array(0=>"NonMember",1=>"Member",2=>"Business",3=>"Staff Member",
 				4=>"Nabs",9=>"Staff NonMem");
 	}
->>>>>>> 78dafa83cd872982e95ddb6d457058b3024562d0
 
 	$placeholder = isset($_REQUEST['excel'])?'':'&nbsp;';
 
