@@ -29,8 +29,12 @@
   in the variable $CORE_LOCAL.
 */
 
+<<<<<<< HEAD
 // ini_set('display_errors',1);
 $elog = realpath(dirname(__FILE__).'/../../log/php-errors.log');
+=======
+$elog = realpath(dirname(__FILE__).'/../../log/').'/php-errors.log';
+>>>>>>> 2734fbf59b4f5f20f89b9bbdef42ead85d7e5fab
 ini_set('error_log',$elog);
 
 $LOCAL_STORAGE_MECHANISM = 'SessionStorage';

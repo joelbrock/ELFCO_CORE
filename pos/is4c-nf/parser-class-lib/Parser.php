@@ -143,6 +143,7 @@ class Parser {
 	static public function get_parse_chain(){
 
 		$set = AutoLoader::ListModules('Parser');
+<<<<<<< HEAD
 
 		$parse_chain = array();
 		$first = "";
@@ -182,9 +183,21 @@ class Parser {
 				else
 					array_unshift($parse_chain,$classname);
 
+=======
+
+		$parse_chain = array();
+		$first = "";
+		foreach($set as $classname){	
+			$instance = new $classname();
+			if ($instance->isLast()){
+				array_push($parse_chain,$classname);
+>>>>>>> 2734fbf59b4f5f20f89b9bbdef42ead85d7e5fab
 			}
+			elseif ($instance->isFirst())
+				$first = $classname;
+			else
+				array_unshift($parse_chain,$classname);
 		}
-		closedir($dh);
 		if ($first != "")
 			array_unshift($parse_chain,$first);
 

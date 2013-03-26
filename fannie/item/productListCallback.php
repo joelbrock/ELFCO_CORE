@@ -23,6 +23,8 @@
 
 include('../config.php');
 include($FANNIE_ROOT.'src/mysql_connect.php');
+require_once($FANNIE_ROOT.'classlib2.0/data/controllers/ProductsController.php');
+require_once($FANNIE_ROOT.'classlib2.0/lib/FormLib.php');
 require('laneUpdates.php');
 include($FANNIE_ROOT.'auth/login.php');
 $canDeleteItems = validateUserQuiet('delete_items');
@@ -40,29 +42,28 @@ if (isset($_GET['action'])){
 	switch($_GET['action']){
 	// simple - read in arguments, update the products table
 	case 'update':
-		$upc = $_GET['upc'];
-		$desc = $_GET['desc'];
-		$dept = $_GET['dept'];
-		$price = rtrim($_GET['price'],' ');
-		$tax = $_GET['tax'];
+		$upc = FormLib::get_form_value('upc');
+		$values = array();
+		$desc = FormLib::get_form_value('desc');
+		if ($desc !== '') $values['description'] = $desc;
+		$dept = FormLib::get_form_value('dept');
+		if ($dept !== '') $values['department'] = $dept;
+		$price = rtrim(FormLib::get_form_value('price'),' ');
+		if ($price !== '') $values['normal_price'] = $price;
+		$tax = FormLib::get_form_value('tax');
+		if ($tax !== '') $values['tax'] = $tax;
 		$supplier = $_GET['supplier'];
 
-		$fs = $_GET['fs'];
-		if ($fs == 'true')
-			$fs = 1;
-		else
-			$fs = 0;
-		$disc = $_GET['disc'];
-		if ($disc == 'true')
-			$disc = 1;
-		else
-			$disc = 0;
-		$wgt = $_GET['wgt'];
-		if ($wgt == 'true')
-			$wgt = 1;
-		else
-			$wgt = 0;
+		$fs = FormLib::get_form_value('fs');
+		if ($fs !== '') $values['foodstamp'] = ($fs=='true') ? 1 : 0;
+		$disc = FormLib::get_form_value('disc');
+		if ($disc !== '') $values['discount'] = ($disc=='true') ? 1 : 0;
+		$wgt = FormLib::get_form_value('wgt');
+		if ($wgt !== '') $values['scale'] = ($wgt=='true') ? 1 : 0;
+		$loc = FormLib::get_form_value('loc');
+		if ($loc !== '') $values['local'] = ($loc=='true') ? 1 : 0;
 
+<<<<<<< HEAD
 		$loc = $_GET['local'];
 		if ($loc == 'true')
 			$loc = 1;
@@ -89,16 +90,10 @@ if (isset($_GET['action'])){
 				where upc='$upc'";
 		//$ret .= $upQ;
 		$dbc->query($upQ);
+=======
+		ProductsController::update($upc, $values);
+>>>>>>> 2734fbf59b4f5f20f89b9bbdef42ead85d7e5fab
 		
-		if ($dbc->table_exists("prodUpdate")){
-			$q = "INSERT INTO prodUpdate
-				SELECT upc,description,normal_price,
-				department,tax,foodstamp,scale,0,
-				modified,-1,qttyEnforced,discount,
-				inUse FROM products WHERE upc='$upc'";
-			$dbc->query($q);
-		}
-
 		$up2Q = sprintf("UPDATE prodExtra SET distributor=%s WHERE upc='%s'",
 				$dbc->escape($supplier),$upc);	
 		$dbc->query($up2Q);
@@ -129,12 +124,16 @@ if (isset($_GET['action'])){
 		$ret .= "`".$upc."`".$encoded_desc;
 		break;
 	case 'doDelete':
-		$upc = $_GET['upc'];
+		$upc = FormLib::get_form_value('upc');
 		$desc = base64_decode($_GET['desc']);
 		
+<<<<<<< HEAD
 		$delQ = "delete from products where upc='$upc' and description=\"$desc\"";
 		//$ret .= $delQ;
 		$delR = $dbc->query($delQ);
+=======
+		ProductsController::delete($upc);
+>>>>>>> 2734fbf59b4f5f20f89b9bbdef42ead85d7e5fab
 
 		$delXQ = "delete from prodExtra where upc='$upc'";
 		$delXR = $dbc->query($delXQ);

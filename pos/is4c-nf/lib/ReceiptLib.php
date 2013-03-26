@@ -521,19 +521,18 @@ static public function printCCSigSlip($dateTimeStamp,$ref,$storeCopy=True,$rp=0)
 	} else {		// else if current transaction, just grab most recent 
 		if ($storeCopy){
 			$idclause = " and transID = ".$CORE_LOCAL->get("paycard_id");
-			$limit = " TOP 1 ";
+			//$limit = " TOP 1 ";
 		}
 		$sort = " desc ";
 		$db = Database::tDataConnect();
 	}
 	// query database for cc receipt info 
 	$query = "select ".$limit." tranType, amount, PAN, entryMethod, issuer, xResultMessage, xApprovalNumber, xTransactionID, name, "
-		." datetime from ccReceiptView where [date]=".date('Ymd',$dateTimeStamp)
+		." datetime from ccReceiptView where date=".date('Ymd',$dateTimeStamp)
 		." and cashierNo = ".$emp." and laneNo = ".$reg
 		." and transNo = ".$trans ." ".$idclause
 		." order by datetime, cashierNo, laneNo, transNo, xTransactionID, transID ".$sort.", sortorder ".$sort;
 	if ($CORE_LOCAL->get("DBMS") == "mysql" && $rp == 0){
-		$query = str_replace("[date]","date",$query);
 		if ($limit != ""){
 			$query = str_replace($limit,"",$query);
 			$query .= " LIMIT 1";
@@ -1033,9 +1032,9 @@ static public function printReceipt($arg1,$second=False) {
 	self::$PRINT_OBJ = new ESCPOSPrintHandler();
 
 	$kicker_class = ($CORE_LOCAL->get("kickerModule")=="") ? 'Kicker' : $CORE_LOCAL->get('kickerModule');
-	$kicker_obj = new $kicker_class();
+	$kicker_object = new $kicker_class();
 	if (!is_object($kicker_object)) $kicker_object = new Kicker();
-	$dokick = $kicker_obj->doKick();
+	$dokick = $kicker_object->doKick();
 	$receipt = "";
 
 	if ($arg1 == "full" && $dokick) {	// ---- apbw 03/29/05 Drawer Kick Patch
@@ -1193,7 +1192,6 @@ static public function printReceipt($arg1,$second=False) {
 		} /***** jqh end big if statement change *****/
 	}
 	else {
-		$receipt = self::chargeBalance($receipt);
 	}
 
 	/* --------------------------------------------------------------
