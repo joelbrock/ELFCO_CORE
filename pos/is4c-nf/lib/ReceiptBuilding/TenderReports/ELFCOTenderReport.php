@@ -21,20 +21,8 @@
 
 *********************************************************************************/
 
-/**
-  @class DefaultTenderReport
-  Generate a tender report
-*/
-class DefaultTenderReport extends TenderReport {
+class ElfcoTenderReport extends TenderReport {
 
-/** 
- Print a tender report
-
- This tender report is based on a single tender tape view
- rather than multiple views (e.g. ckTenders, ckTenderTotal, etc).
- Which tenders to include is defined via checkboxes by the
- tenders on the install page's "extras" tab.
- */
 static public function get(){
 	global $CORE_LOCAL;
 
