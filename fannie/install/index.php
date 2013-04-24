@@ -21,39 +21,23 @@
 
 *********************************************************************************/
 
-
-/* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	*  5Dec2012 Eric Lee Added table memContactPrefs
-
-*/
-
 ini_set('display_errors','1');
-?>
-<?php 
 require(dirname(__FILE__).'/../config.php'); 
 include(dirname(__FILE__).'/util.php');
 include(dirname(__FILE__).'/db.php');
 ?>
-Necessities
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="auth.php">Authentication</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="mem.php">Members</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="prod.php">Products</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="stores.php">Stores</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="update.php">Updates</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="plugins.php">Plugins</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="menu.php">Menu</a>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="sample_data/extra_data.php">Sample Data</a>
+<html>
+<head>
+<title>Fannie install checks: Necesseties</title>
+<link rel="stylesheet" href="../src/css/install.css" type="text/css" />
+<script type="text/javascript" src="../src/jquery/jquery.js"></script>
+</head>
+<body>
+<?php 
+echo showInstallTabs("Necessities");
+?>
 <form action=index.php method=post>
-<h1>Fannie install checks</h1>
+<h1>Fannie install checks: Necessities</h1>
 <?php
 // path detection
 $FILEPATH = rtrim(__FILE__,'index.php');
@@ -580,6 +564,70 @@ for($i=0; $i<$FANNIE_NUM_SCALES; $i++){
 confset('FANNIE_SCALES',$conf);
 }
 ?>
+
+<hr />
+<b>Co-op</b>
+<br />Use this to identify code that is specific to your co-op.
+<br />Particularly important if you plan to contribute to the CORE IT code base.
+<br />Try to use a code that will not be confused with any other, e.g. "WEFC_Toronto" instead of "WEFC".
+<br />Co-op ID: 
+<?php
+if (!isset($FANNIE_COOP_ID)) $FANNIE_COOP_ID = '';
+if (isset($_REQUEST['FANNIE_COOP_ID'])) $FANNIE_COOP_ID=$_REQUEST['FANNIE_COOP_ID'];
+confset('FANNIE_COOP_ID',"'$FANNIE_COOP_ID'");
+printf("<input type=\"text\" name=\"FANNIE_COOP_ID\" value=\"%s\" />",$FANNIE_COOP_ID);
+?>
+
+<hr />
+<b>Locale</b> <br />
+Set the Country and Language where Fannie will run.
+<br />If these are not set in Fannie configuration but are set in the Linux environment the environment values will be used as
+defaults that can be overridden by settings here.
+
+<br /><b>Country</b> <br />
+<?php
+// If the var doesn't exist in config.php assign a default value.
+if (!isset($FANNIE_COUNTRY)) $FANNIE_COUNTRY = "";
+// If the form var is set assign it to the local copy of the config var.
+if (isset($_REQUEST['FANNIE_COUNTRY'])) $FANNIE_COUNTRY = $_REQUEST['FANNIE_COUNTRY'];
+// Change or add the local copy to the config file.
+confset('FANNIE_COUNTRY',"'$FANNIE_COUNTRY'");
+if ( !isset($FANNIE_COUNTRY) && isset($_ENV['LANG']) ) {
+	$FANNIE_COUNTRY = substr($_ENV['LANG'],3,2);
+}
+?>
+<select name="FANNIE_COUNTRY" size='1'>
+<?php
+//Use I18N country codes.
+$countries = array("US"=>"USA", "CA"=>"Canada");
+foreach (array_keys($countries) as $key) {
+	printf("<option value='%s' %s>%s</option>", $key, (($FANNIE_COUNTRY == $key)?'selected':''), $countries["$key"]);
+}
+?>
+</select>
+
+<br /><b>Language</b> <br />
+<?php
+// If the var doesn't exist in config.php assign a default value.
+if (!isset($FANNIE_LANGUAGE)) $FANNIE_LANGUAGE = "";
+// If the form var is set assign it to the local copy of the config var.
+if (isset($_REQUEST['FANNIE_LANGUAGE'])) $FANNIE_LANGUAGE = $_REQUEST['FANNIE_LANGUAGE'];
+// Change or add the local copy to the config file.
+confset('FANNIE_LANGUAGE',"'$FANNIE_LANGUAGE'");
+if ( !isset($FANNIE_LANGUAGE) && isset($_ENV['LANG']) ) {
+	$FANNIE_LANGUAGE = substr($_ENV['LANG'],0,2);
+}
+?>
+<select name="FANNIE_LANGUAGE" size='1'>
+<?php
+//Use I18N language codes.
+$langs = array("en"=>"English", "fr"=>"French", "sp"=>"Spanish");
+foreach (array_keys($langs) as $key) {
+	printf("<option value='%s' %s>%s</option>", $key, (($FANNIE_LANGUAGE == $key)?'selected':''), $langs["$key"]);
+}
+?>
+</select><br />
+
 <hr />
 <input type=submit value="Re-run" />
 </form>
@@ -855,6 +903,9 @@ function create_trans_dbs($con){
 			'efsnetRequestMod','trans');
 
 	$ret[] = create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
+			'efsnetTokens','trans');
+
+	$ret[] = create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
 			'ccReceiptView','trans');
 
 	$ret[] = create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_TRANS_DB,
@@ -878,7 +929,8 @@ function create_trans_dbs($con){
 		price float,
 		INDEX (upc))";
 	if (!$con->table_exists('InvDelivery',$FANNIE_TRANS_DB)){
-		$con->query($invCur,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invCur,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$invCur = "CREATE TABLE InvDeliveryLM (
@@ -888,7 +940,8 @@ function create_trans_dbs($con){
 		quantity double,
 		price float)";
 	if (!$con->table_exists('InvDeliveryLM',$FANNIE_TRANS_DB)){
-		$con->query($invCur,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invCur,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$invArc = "CREATE TABLE InvDeliveryArchive (
@@ -899,7 +952,8 @@ function create_trans_dbs($con){
 		price float,
 		INDEX(upc))";
 	if (!$con->table_exists('InvDeliveryArchive',$FANNIE_TRANS_DB)){
-		$con->query($invArc,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invArc,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$invRecent = "CREATE VIEW InvRecentOrders AS
@@ -911,7 +965,8 @@ function create_trans_dbs($con){
 		sum(price) as price
 		FROM InvDeliveryLM GROUP BY inv_date,upc";
 	if (!$con->table_exists('InvRecentOrders',$FANNIE_TRANS_DB)){
-		$con->query($invRecent,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invRecent,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$union = "CREATE VIEW InvDeliveryUnion AS
@@ -930,7 +985,8 @@ function create_trans_dbs($con){
 		FROM InvDeliveryArchive
 		GROUP BY upc,vendor_id";
 	if (!$con->table_exists("InvDeliveryUnion",$FANNIE_TRANS_DB)){
-		$con->query($union,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($union,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$total = "CREATE VIEW InvDeliveryTotals AS
@@ -939,7 +995,8 @@ function create_trans_dbs($con){
 		FROM InvDeliveryUnion
 		GROUP BY upc";
 	if (!$con->table_exists("InvDeliveryTotals",$FANNIE_TRANS_DB)){
-		$con->query($total,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($total,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 
@@ -1098,7 +1155,8 @@ function create_delayed_dbs(){
 		AND trans_type = 'I' AND trans_subtype <> '0'
 		AND register_no <> 99 AND emp_no <> 9999";
 	if (!$con->table_exists("InvSales",$FANNIE_TRANS_DB)){
-		$con->query($invSalesView,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invSalesView,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$invRecentSales = "CREATE VIEW InvRecentSales AS
@@ -1112,7 +1170,8 @@ function create_delayed_dbs(){
 		".$con->datediff('s.inv_date','t.inv_date')." >= 0
 		group by t.upc";
 	if (!$con->table_exists("InvRecentSales",$FANNIE_TRANS_DB)){
-		$con->query($invRecentSales,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invRecentSales,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$invSales = "CREATE TABLE InvSalesArchive (
@@ -1122,7 +1181,8 @@ function create_delayed_dbs(){
 		price float,
 		INDEX(upc))";
 	if (!$con->table_exists('InvSalesArchive',$FANNIE_TRANS_DB)){
-		$con->query($invSales,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($invSales,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$union = "CREATE VIEW InvSalesUnion AS
@@ -1137,7 +1197,8 @@ function create_delayed_dbs(){
 		FROM InvSalesArchive
 		GROUP BY upc";
 	if (!$con->table_exists("InvSalesUnion",$FANNIE_TRANS_DB)){
-		$con->query($union,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($union,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$total = "CREATE VIEW InvSalesTotals AS
@@ -1146,7 +1207,8 @@ function create_delayed_dbs(){
 		FROM InvSalesUnion
 		GROUP BY upc";
 	if (!$con->table_exists("InvSalesTotals",$FANNIE_TRANS_DB)){
-		$con->query($total,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($total,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 		
 	$adj = "CREATE TABLE InvAdjustments (
@@ -1155,7 +1217,8 @@ function create_delayed_dbs(){
 		diff double,
 		INDEX(upc))";
 	if (!$con->table_exists("InvAdjustments",$FANNIE_TRANS_DB)){
-		$con->query($adj,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($adj,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$adjTotal = "CREATE VIEW InvAdjustTotals AS
@@ -1163,7 +1226,8 @@ function create_delayed_dbs(){
 		FROM InvAdjustments
 		GROUP BY upc";
 	if (!$con->table_exists("InvAdjustTotals",$FANNIE_TRANS_DB)){
-		$con->query($adjTotal,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($adjTotal,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$opstr = $FANNIE_OP_DB;
@@ -1188,7 +1252,8 @@ function create_delayed_dbs(){
 		ON d.upc = s.upc LEFT JOIN
 		InvAdjustTotals AS a ON d.upc=a.upc";
 	if (!$con->table_exists("Inventory",$FANNIE_TRANS_DB)){
-		$con->query($inv,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($inv,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 
 	$cache = "CREATE TABLE InvCache (
@@ -1199,7 +1264,8 @@ function create_delayed_dbs(){
 		LastAdjustDate datetime,
 		CurrentStock int)";
 	if (!$con->table_exists("InvCache",$FANNIE_TRANS_DB)){
-		$con->query($cache,$FANNIE_TRANS_DB);
+		$prep = $con->prepare_statement($cache,$FANNIE_TRANS_DB);
+		$con->exec_statement($prep,array(),$FANNIE_TRANS_DB);
 	}
 	
 	return $ret;
@@ -1226,7 +1292,8 @@ function create_archive_dbs($con) {
 			{$FANNIE_TRANS_DB}{$dbconn}dtransactions";
 	}
 	if (!$con->table_exists($archive,$FANNIE_ARCHIVE_DB)){
-		$con->query($query,$FANNIE_ARCHIVE_DB);
+		$create = $con->prepare_statement($query,$FANNIE_ARCHIVE_DB);
+		$con->exec_statement($create,array(),$FANNIE_ARCHIVE_DB);
 		// create the first partition if needed
 		if ($FANNIE_ARCHIVE_METHOD == "partitions"){
 			$p = "p".date("Ym");
@@ -1236,7 +1303,8 @@ function create_archive_dbs($con) {
 				(PARTITION %s 
 					VALUES LESS THAN (TO_DAYS('%s'))
 				)",$p,$limit);
-			$con->query($partQ);
+			$prep = $dbc->prepare_statement($partQ);
+			$con->exec_statement($prep);
 		}
 	}
 
@@ -1288,8 +1356,9 @@ function create_archive_dbs($con) {
 
 	$dlog_view = ($FANNIE_ARCHIVE_METHOD != "partitions") ? "dlog".$dstr : "dlogBig";
 	if (!$con->table_exists($dlog_view,$FANNIE_ARCHIVE_DB)){
-		$con->query("CREATE VIEW $dlog_view AS $dlogView",
+		$prep = $con->prepare_statement("CREATE VIEW $dlog_view AS $dlogView",
 			$FANNIE_ARCHIVE_DB);
+		$con->exec_statement($prep,array(),$FANNIE_ARCHIVE_DB);
 	}
 
 	$rp_dt_view = ($FANNIE_ARCHIVE_METHOD != "partitions") ? "rp_dt_receipt_".$dstr : "rp_dt_receipt_big";
@@ -1404,7 +1473,8 @@ function create_archive_dbs($con) {
 			where voided <> 5 and UPC <> 'TAX' and UPC <> 'DISCOUNT'";
 	}
 	if (!$con->table_exists($rp_dt_view,$FANNIE_ARCHIVE_DB)){
-		$con->query($rp1Q,$FANNIE_ARCHIVE_DB);
+		$prep = $con->prepare_statement($rp1Q,$FANNIE_ARCHIVE_DB);
+		$con->exec_statement($prep,array(),$FANNIE_ARCHIVE_DB);
 	}
 
 	$rp_view = ($FANNIE_ARCHIVE_METHOD != "partitions") ? "rp_receipt_header_".$dstr : "rp_receipt_header_big";
@@ -1447,7 +1517,8 @@ function create_archive_dbs($con) {
 			group by register_no, emp_no, trans_no, card_no, datetime";
 	}
 	if (!$con->table_exists($rp_view,$FANNIE_ARCHIVE_DB)){
-		$con->query($rp2Q,$FANNIE_ARCHIVE_DB);
+		$prep = $con->prepare_statement($rp2Q,$FANNIE_ARCHIVE_DB);
+		$con->exec_statement($prep,array(),$FANNIE_ARCHIVE_DB);
 	}
 
 	$ret[] = create_if_needed($con,$FANNIE_SERVER_DBMS,$FANNIE_ARCHIVE_DB,

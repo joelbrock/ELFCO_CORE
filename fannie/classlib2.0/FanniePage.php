@@ -50,6 +50,12 @@ class FanniePage {
 	protected $scripts = array();
 	protected $css_files = array();
 
+	public function __construct(){
+		global $FANNIE_AUTH_DEFAULT;
+		if ( isset($FANNIE_AUTH_DEFAULT) )
+			$this->must_authenticate = $FANNIE_AUTH_DEFAULT;
+	}
+
 	/**
 	  Toggle using menus
 	  @param $menus boolean
@@ -188,8 +194,12 @@ class FanniePage {
 
 			echo $this->body_content();
 
-			if ($this->window_dressing)
-				echo $this->get_footer();
+			if ($this->window_dressing){
+				$footer = $this->get_footer();
+				$footer = str_ireplace('</html>','',$footer);
+				$footer = str_ireplace('</body>','',$footer);
+				echo $footer;
+			}
 
 			foreach($this->scripts as $s_url => $s_type){
 				printf('<script type="%s" src="%s"></script>',
@@ -219,6 +229,8 @@ class FanniePage {
 					$css_url);
 				echo "\n";
 			}
+
+			if ($this->window_dressing) echo '</body></html>';
 		}
 	}
 }

@@ -30,9 +30,16 @@ class SigTermCommands extends Parser {
 			$CORE_LOCAL->set("paycard_keyed",True);
 			return True;
 		}
-		elseif ($str == "TERMRESET"){
-			UdpComm::udpSend("termReset");
+		elseif ($str == "TERMRESET" || $str == "TERMREBOOT"){
+			if ($str == "TERMRESET")
+				UdpComm::udpSend("termReset");
+			else
+				UdpComm::udpSend("termReboot");
 			$CORE_LOCAL->set("paycard_keyed",False);
+			$CORE_LOCAL->set("CachePanEncBlock","");
+			$CORE_LOCAL->set("CachePinEncBlock","");
+			$CORE_LOCAL->set("CacheCardType","");
+			$CORE_LOCAL->set("CacheCardCashBack",0);
 			return True;
 		}
 		elseif ($str == "CCFROMCACHE"){
@@ -62,10 +69,15 @@ class SigTermCommands extends Parser {
 			$CORE_LOCAL->set("CachePanEncBlock","");
 			$CORE_LOCAL->set("CachePinEncBlock","");
 			$CORE_LOCAL->set("CacheCardType","");
+			$CORE_LOCAL->set("CacheCardCashBack",0);
 			return True;
 		}
 		else if (substr($str,0,5) == "TERM:"){
 			$CORE_LOCAL->set("CacheCardType",substr($str,5));
+			return True;
+		}
+		else if (substr($str,0,7) == "TERMCB:"){
+			$CORE_LOCAL->set("CacheCardCashBack",substr($str,7));
 			return True;
 		}
 		return False;

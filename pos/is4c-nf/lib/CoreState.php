@@ -160,6 +160,7 @@ static public function transReset() {
 	$CORE_LOCAL->set("CachePanEncBlock","");
 	$CORE_LOCAL->set("CachePinEncBlock","");
 	$CORE_LOCAL->set("CacheCardType","");
+	$CORE_LOCAL->set("CacheCardCashBack",0);
 	$CORE_LOCAL->set("paycard_voiceauthcode","");
 	$CORE_LOCAL->set("ebt_authcode","");
 	$CORE_LOCAL->set("ebt_vnum","");
@@ -323,6 +324,19 @@ static public function customreceipt(){
 	foreach($counts as $key => $num){
 		$CORE_LOCAL->set($key."Count",$num);
 	}
+}
+
+static public function getCustomerPref($key){
+	global $CORE_LOCAL;
+	if ($CORE_LOCAL->get('memberID') == 0) return '';
+	$db = Database::pDataConnect();
+	$q = sprintf('SELECT pref_value FROM custPreferences WHERE
+		card_no=%d AND pref_key=\'%s\'',
+		$CORE_LOCAL->get('memberID'),$key);
+	$r = $db->query($q);
+	if ($r === False) return '';
+	if ($db->num_rows($r) == 0) return '';
+	return array_pop($db->fetch_row($r));
 }
 
 }

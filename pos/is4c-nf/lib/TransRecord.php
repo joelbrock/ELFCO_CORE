@@ -23,6 +23,7 @@
 
 /* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+	* 10Apr2013 Andy Theuninck Filter backslash out of comments
 	* 19Jan2013 Eric Lee Fix typo "Datbase" in reverseTaxExempt
 
 */
@@ -122,6 +123,7 @@ static public function addItem($strupc, $strdescription, $strtransType, $strtran
 
 		$CORE_LOCAL->set("refund",0);
 		$CORE_LOCAL->set("refundComment","");
+		$CORE_LOCAL->set("autoReprint",1);
 
 		if ($CORE_LOCAL->get("refundDiscountable")==0)
 			$intdiscountable = 0;
@@ -338,6 +340,7 @@ static public function addtender($strtenderdesc, $strtendercode, $dbltendered) {
 static public function addcomment($comment) {
 	if (strlen($comment) > 30)
 		$comment = substr($comment,0,30);
+	$comment = str_replace("\\",'',$comment);
 	self::addItem("",$comment, "C", "CM", "D", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
@@ -700,7 +703,6 @@ static public function addactivity($activity) {
 		$db->identifier_escape('Interval')	=> MiscLib::nullwrap($interval)
 		);
 	$result = $db->smart_insert("activitytemplog",$values);
-
 }
 
 /**
