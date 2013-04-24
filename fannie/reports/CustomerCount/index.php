@@ -20,6 +20,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
+
 header('Location: CustomerCountReport.php');
 
 exit;
@@ -38,126 +39,81 @@ exit;
 	*          but member type counts more accurate with T.
 */
 
-// include('../../config.php');
-// include($FANNIE_ROOT.'src/mysql_connect.php');
-// include($FANNIE_ROOT.'src/select_dlog.php');
+include('../../config.php');
+include($FANNIE_ROOT.'src/mysql_connect.php');
+include($FANNIE_ROOT.'src/select_dlog.php');
 
-// if (isset($_REQUEST['submit'])){
-// 	$d1 = $_REQUEST['date1'];
-// 	$d2 = $_REQUEST['date2'];
+if (isset($_REQUEST['submit'])){
+	$d1 = $_REQUEST['date1'];
+	$d2 = $_REQUEST['date2'];
 
-// 	$dlog = select_dlog($d1,$d2);
+	$dlog = select_dlog($d1,$d2);
 
-// 	if (isset($_REQUEST['excel'])){
-// 		header("Content-Disposition: inline; filename=customers_{$d1}_{$d2}.xls");
-// 		header("Content-type: application/vnd.ms-excel; name='excel'");
-// 	}
-// 	else{
-// 		printf("<a href=index.php?date1=%s&date2=%s&submit=yes&excel=yes>Save to Excel</a>",
-// 			$d1,$d2);
-// 	}
+	if (isset($_REQUEST['excel'])){
+		header("Content-Disposition: inline; filename=customers_{$d1}_{$d2}.xls");
+		header("Content-type: application/vnd.ms-excel; name='excel'");
+	}
+	else{
+		printf("<a href=index.php?date1=%s&date2=%s&submit=yes&excel=yes>Save to Excel</a>",
+			$d1,$d2);
+	}
 
-// 	/* I know this is mysql-specific. I left it because this file isn't actually
-// 	   used and it reduces merge conflicts - Andy 15Mar2013 */
+    $sales = "SELECT year(tdate) as year, month(tdate) as month,
+        day(tdate) as day,max(c.memType) as memType,trans_num
+        FROM $dlog as t, core_op.custdata as c
+        WHERE 
+        card_no = c.CardNo
+        AND tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59'
+        and trans_type in ('I','D')
+        AND upc <> 'RRR'
+        group by year(tdate),month(tdate),day(tdate),trans_num
+        order by year(tdate),month(tdate),day(tdate),max(memType)";
 
-// 	/* For dtransactions, transarchive, trans_archive.transArchive*
-// 	 * As far as I know these tables are never searched.
-// 	*/
-// 	if ( strpos($dlog,"dlog") === FALSE ) {
-// 		$dte = "datetime";
-// 		$tn = "CONCAT_WS('-', CAST(t.register_no AS CHAR), CAST(t.emp_no AS CHAR), CAST(t.trans_no AS CHAR))";
-// 		$tna = "$tn AS trans_num";
-// 		$trans_type = "trans_type in ('T')";
-// 		$sales = "SELECT year($dte) as year, month($dte) as month,
-// 				day($dte) as day, max(memType) as memType, $tna
-// 				FROM $dlog as t
-// 				WHERE 
-// 				$dte BETWEEN '$d1 00:00:00' AND '$d2 23:59:59'
-// 				AND trans_type = 'T'
-// 				AND upc <> 'RRR'
-// 				GROUP BY year($dte),month($dte),day($dte),$tn
-// 				ORDER BY year($dte),month($dte),day($dte), max(memType)";
-// 	}
-// 	// For dlog fieldset tables.
-// 	else {
-// 		$dte = "tdate";
-// 		if ( strpos($dlog,"trans_archive") === FALSE ) {
-// 			$tn = "trans_num";
-// 			$tna = "$tn";
-// 		} else {
-// 			$tn = "CONCAT_WS('-', CAST(t.register_no AS CHAR), CAST(t.emp_no AS CHAR), CAST(t.trans_no AS CHAR))";
-// 			$tna = "$tn AS trans_num";
-// 		}
-// 		$sales = "SELECT year($dte) as year, month($dte) as month,
-// 				day($dte) as day, max(c.memType) as memType, $tna
-// 				FROM $dlog as t
-// 				LEFT JOIN core_op.custdata c ON c.CardNo = t.card_no
-// 				WHERE 
-// 				tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59'
-// 				AND trans_type = 'T'
-// 				AND upc <> 'RRR'
-// 				GROUP BY year($dte),month($dte),day($dte),$tn
-// 				ORDER BY year($dte),month($dte),day($dte), max(c.memType)";
-// 	}
+    $data = array();
+    $result = $dbc->query($sales);
+    while($row = $dbc->fetch_row($result)){
+        $stamp = date("M j, Y",mktime(0,0,0,$row['month'],$row['day'],$row['year']));
+        if (!isset($data[$stamp])) $data[$stamp] = array("ttl"=>0);
+        if (!isset($data[$stamp][$row['memType']])) $data[$stamp][$row['memType']] = 0;
+        $data[$stamp]["ttl"]++;
+        $data[$stamp][$row['memType']]++;
+    }
 
-// 	$data = array();
-// 	$result = $dbc->query($sales);
-// 	while($row = $dbc->fetch_row($result)){
-// 		$stamp = date("M j, Y",mktime(0,0,0,$row['month'],$row['day'],$row['year']));
-// 		if (!isset($data[$stamp])) $data[$stamp] = array("ttl"=>0);
-// 		if (!isset($data[$stamp][$row['memType']])) $data[$stamp][$row['memType']] = 0;
-// 		$data[$stamp]["ttl"]++;
-// 		$data[$stamp][$row['memType']]++;
-// 	}
+    $cols = array(0=>"NonMember",
+        1=>"Owner<br>PIF",
+        12=>"Owner<br>PIF Sr.",
+        2=>"Owner<br>Instl",
+        13=>"Owner<br>Inst Sr.",
+        3=>"Annual",
+        4=>"On<br>Hold",
+        7=>"Other<br>Co-op",
+        9=>"Staff<br>Member",
+        10=>"Working<br>Owner",
+        14=>"Student<br>Housing"
+	);
 
-// 	// $cols = array(0=>"NonMember",
-// 	// 	1=>"Owner PIF",
-// 	// 	12=>"Owner PIF Sr.",
-// 	// 	2=>"Owner Instl",
-// 	// 	13=>"Owner Inst Sr.",
-// 	// 	3=>"Annual",
-// 	// 	4=>"On Hold",
-// 	// 	7=>"Other Co-op",
-// 	// 	9=>"Staff Member",
-// 	// 	10=>"Working Owner",
-// 	// );
+	$placeholder = isset($_REQUEST['excel'])?'':'&nbsp;';
 
-// 	if ( !isset($FANNIE_COOP_ID) || (isset($FANNIE_COOP_ID) && $FANNIE_COOP_ID != "WFC") ) {
-// 		$memQ = "SELECT memtype, memDesc FROM core_op.memtype";
-// 		$memR = $dbc->query($memQ);
-// 		$cols = array();
-// 		while($row = $dbc->fetch_row($memR)){
-// 			$cols[$row['memtype']] = $row['memDesc'];
-// 		}
-// 	}
-// 	else {
-// 		$cols = array(0=>"NonMember",1=>"Member",2=>"Business",3=>"Staff Member",
-// 				4=>"Nabs",9=>"Staff NonMem");
-// 	}
+	echo '<table cellspacing="0" cellpadding="4" border="1">';
+	echo '<tr><th>Date</th>';
+	foreach($cols as $k=>$label)
+		echo '<th>'.$label.'</th>';
+	echo '<th>Total</th></tr>';
+	$sum = 0;
+	foreach($data as $date=>$row){
+		echo '<tr><td>'.$date.'</td>';
+		foreach($cols as $k=>$v){
+			if (isset($row[$k])) echo '<td>'.$row[$k].'</td>';
+			else echo '<td>'.$placeholder.'</td>';
+		}
+		echo '<td>'.$row["ttl"].'</td></tr>';
+		$sum += $row["ttl"];
+	}
+	echo '<tr><td>Grand Total</td>';
+	echo '<td colspan="'.count($cols).'">'.$placeholder.'</td>';
+	echo '<td>'.$sum.'</td></tr>';
+	echo '</table>';
 
-// 	$placeholder = isset($_REQUEST['excel'])?'':'&nbsp;';
-
-// 	echo "<p style='font-weight:bold;'>Transaction Count by Day by Member Type for $d1 to $d2</p>\n";
-
-// 	echo '<table cellspacing="0" cellpadding="4" border="1">';
-// 	echo '<tr><th>Date</th>';
-// 	foreach($cols as $k=>$label)
-// 		echo '<th>'.$label.'</th>';
-// 	echo '<th>Total</th></tr>';
-// 	$sum = 0;
-// 	foreach($data as $date=>$row){
-// 		echo '<tr><td>'.$date.'</td>';
-// 		foreach($cols as $k=>$v){
-// 			if (isset($row[$k])) echo '<td>'.$row[$k].'</td>';
-// 			else echo '<td>'.$placeholder.'</td>';
-// 		}
-// 		echo '<td>'.$row["ttl"].'</td></tr>';
-// 		$sum += $row["ttl"];
-// 	}
-// 	echo '<tr><td>Grand Total</td>';
-// 	echo '<td colspan="'.count($cols).'">'.$placeholder.'</td>';
-// 	echo '<td>'.$sum.'</td></tr>';
-// 	echo '</table>';
 
 			
 // }

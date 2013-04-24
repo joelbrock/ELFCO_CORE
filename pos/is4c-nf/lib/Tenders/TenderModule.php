@@ -130,7 +130,9 @@ class TenderModule {
 	  @return string tender code
 	*/
 	function ChangeType(){
-		return $this->change_type;
+		// return $this->change_type;
+		return "CA";
+
 	}
 
 }
