@@ -24,56 +24,66 @@
 *********************************************************************************/
 //	TODO -- Add javascript for batcher product entry popup window		~joel 2007-08-21
 
+/* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	* 22Feb2013 Eric Lee Add support for editing
+	*           products.quantity, .groupprice, .pricemethod, .mixmatchcode
+	*           products.size, .unitofmeasure
+	* 10Feb2013 Eric Lee In itemParse add FANNIE_STORE_ID to globals.
+
+*/
+
+
 include_once('../src/mysql_connect.php');
 include_once('../auth/login.php');
 include_once('ajax.php');
 
 function itemParse($upc){
     global $dbc,$FANNIE_URL;
+    global $FANNIE_STORE_ID;
+    global $FANNIE_COOP_ID;
 
     $logged_in = checkLogin();
 
     $queryItem = "";
     $numType = (isset($_REQUEST['ntype'])?$_REQUEST['ntype']:'UPC');
-    $inuse = (isset($_REQUEST['inuse_only'])) ? " AND p.inUse = 1" : "";
-
     if(is_numeric($upc)){
-	switch($numType){
-	case 'UPC':
-		$upc = str_pad($upc,13,0,STR_PAD_LEFT);
-		$savedUPC = $upc;
-		$queryItem = "SELECT p.*,x.distributor,x.manufacturer 
-			FROM products as p left join 
-			prodExtra as x on p.upc=x.upc 
-			WHERE (p.upc = '$upc' or x.upc = '$upc')
-			AND p.store_id=0".$inuse;
-		break;
-	case 'SKU':
-		$queryItem = "SELECT p.*,x.distributor,x.manufacturer 
-			FROM products as p inner join 
-			vendorItems as v ON p.upc=v.upc 
-			left join prodExtra as x on p.upc=x.upc 
-			WHERE v.sku='$upc'
-			AND p.store_id=0".$inuse;
-		break;
-	case 'Brand Prefix':
-	      $queryItem = "SELECT p.*,x.distributor,x.manufacturer 
-			FROM products as p left join 
-			prodExtra as x on p.upc=x.upc 
-			WHERE p.upc like '%$upc%' 
-			AND p.store_id=0".$inuse. 
-			" ORDER BY p.upc";
-		break;
-	}
+			switch($numType){
+				case 'UPC':
+					$upc = str_pad($upc,13,0,STR_PAD_LEFT);
+					$savedUPC = $upc;
+					$queryItem = "SELECT p.*,x.distributor,x.manufacturer 
+						FROM products as p left join 
+						prodExtra as x on p.upc=x.upc 
+						WHERE (p.upc = '$upc' or x.upc = '$upc')
+						AND p.store_id=0";
+					break;
+				case 'SKU':
+					$queryItem = "SELECT p.*,x.distributor,x.manufacturer 
+						FROM products as p inner join 
+						vendorItems as v ON p.upc=v.upc 
+						left join prodExtra as x on p.upc=x.upc 
+						WHERE v.sku='$upc'
+						AND p.store_id=0";
+					break;
+				case 'Brand Prefix':
+					$queryItem = "SELECT p.*,x.distributor,x.manufacturer 
+						FROM products as p left join 
+						prodExtra as x on p.upc=x.upc 
+						WHERE p.upc like '%$upc%' 
+						AND p.store_id=0
+						ORDER BY p.upc";
+					break;
+			}
     }else{
+				/* note: only search by HQ records (store_id=0) to avoid duplicates */
         $queryItem = "SELECT p.*,x.distributor,x.manufacturer 
-		FROM products AS p LEFT JOIN 
-		prodExtra AS x ON p.upc=x.upc
-		WHERE description LIKE '%$upc%' 
-		AND p.store_id=0".$inuse.
-		" ORDER BY description";
+			FROM products AS p LEFT JOIN 
+			prodExtra AS x ON p.upc=x.upc
+			WHERE description LIKE '%$upc%' 
+			AND p.store_id=0
+			ORDER BY description";
     }
-    /* note: only search by HQ records (store_id=0) to avoid duplicates */
     $resultItem = $dbc->query($queryItem);
     $num = $dbc->num_rows($resultItem);
    
@@ -98,7 +108,7 @@ function itemParse($upc){
 		$dataQ = "SELECT description,brand,cost/units as cost,vendorName,margin,i.vendorID
 			FROM vendorItems AS i LEFT JOIN vendors AS v ON i.vendorID=v.vendorID
 			LEFT JOIN vendorDepartments AS d ON i.vendorDept=d.deptID
-			WHERE upc LIKE '%$upc'";
+			WHERE upc='$upc'";
 		if (isset($_REQUEST['vid'])) $dataQ .= " AND i.vendorID=".((int)$_REQUEST['vid']);
 		$dataR = $dbc->query($dataQ);
 		if ($dbc->num_rows($dataR) > 0){
@@ -141,31 +151,72 @@ function itemParse($upc){
 	echo "</tr>";
         echo "<tr align=top>";
     	echo "<td align=left width=5px>";	
+		/**
+			**	BEGIN CHAINEDSELECTOR CLASS
+			**/
+				require('../src/chainedSelectors.php');
 
-		$dresult = mysql_query("SELECT * FROM departments");
-		echo "<select id=\"dept_list\" name=\"department\">\n";
-		echo "<option value=\"\">----------------</option>\n";
-		while($drow = mysql_fetch_array($dresult)) {
-			echo "<option value=" . $drow['dept_no'];
-			if ($new != 1) {
-				if ($drow['dept_no'] == $rowItem['department']) { echo " selected=\"selected\"";}
-			}
-			echo ">" . $drow['dept_no'] . " - " . $drow['dept_name'] . "</option>\n";
-		}
-		echo "</select>\n\n";
+				//prepare names
+				$selectorNames = array(
+					CS_FORM=>"pickSubDepartment", 
+					CS_FIRST_SELECTOR=>"department", 
+					CS_SECOND_SELECTOR=>"subdepartment");
 
-		$sresult = mysql_query("SELECT * FROM subdepts ORDER BY subdept_name");
-		echo "<select id=\"subdept_list\" name=\"subdepartment\">\n";
-		echo "<option value=\"\">----------------</option>\n";
-		while($srow = mysql_fetch_array($sresult)) {
-			echo "<option value=" . $srow['subdept_no'] . " class=" . $srow['dept_ID'];
-			if ($new != 1) {
-				if ($srow['subdept_no'] == $rowItem['subdept']) { echo " selected=\"selected\"";}
-			}
-			echo ">" . $srow['subdept_name'] . "</option>\n";
-		}
-		echo "</select>\n\n";
+				//		$department = $rowItem[12];
+				//		$subdepartment = $rowItem[27];
 
+				//query database, assemble data for selectors
+				$Query = "SELECT d.dept_no AS dept_no, d.dept_name AS dept_name,
+					CASE WHEN s.subdept_no IS NULL THEN 0 ELSE s.subdept_no END as subdept_no,
+					CASE WHEN s.subdept_name IS NULL THEN 'None' ELSE s.subdept_name END AS subdept_name
+					FROM departments AS d LEFT JOIN
+					subdepts AS s ON d.dept_no=s.dept_ID
+					ORDER BY d.dept_no,s.subdept_no";
+			    if(!($DatabaseResult = $dbc->query($Query)))
+			    {
+			        print("The query failed!<br>\n");
+			        exit();
+			    }
+
+			    while($row = $dbc->fetch_object($DatabaseResult))
+			    {
+			    	$selectorData[] = array(
+						CS_SOURCE_ID=>$row->dept_no, 
+					    CS_SOURCE_LABEL=>$row->dept_name, 
+					    CS_TARGET_ID=>$row->subdept_no, 
+						CS_TARGET_LABEL=>$row->subdept_name);
+			    }            
+
+				//instantiate class
+				$subdept = new chainedSelectors(
+					$selectorNames, 
+			        $selectorData);
+				?>
+					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html40/loose.dtd">
+					<html>
+					<head>
+					<script type="text/javascript" language="JavaScript">
+					<?php
+					    $subdept->printUpdateFunction($row); //rowItem
+					?>
+					</script>
+					</head>
+					<body>
+					<!-- <form name="pickSubDepartment" action="insertItem.php"> -->
+					<?php
+					    $subdept->printSelectors($row); //rowItem
+					?>
+					<script type="text/javascript" language="JavaScript">
+					<?php
+					    $subdept->initialize();
+					?>
+					</script>
+					</body>
+					</html>
+				<?php
+		   	   /**
+				**	CHAINEDSELECTOR CLASS ENDS . . . . . . . NOW
+				**/
 		echo "</td><td align=left>";
 		$taxQ = "SELECT id,description FROM taxrates ORDER BY id";
 		$taxR = $dbc->query($taxQ);
@@ -288,7 +339,7 @@ function itemParse($upc){
 			for($i=0;$i < $num;$i++){
         		$rowItem= $dbc->fetch_array($resultItem);
 	    		$upc = $rowItem['upc'];
-	    		echo "<a href='../item/itemMaint.php?upc=$upc'>" . $upc . " </a>- " . $rowItem['manufacturer'] . " " . $rowItem['description'];
+	    		echo "<a href='../item/itemMaint.php?upc=$upc'>" . $upc . " </a>- " . $rowItem['description'];
 	 			if($rowItem['discounttype'] == 0) { echo "-- $" .$rowItem['normal_price']. "<br>"; }
 				else { echo "-- <font color=green>$" .$rowItem['special_price']. " onsale</font><br>"; }
     		}
@@ -379,27 +430,68 @@ function itemParse($upc){
         echo "</tr>";
         echo "<tr align=top>";
     	echo "<td align=left>";	
+	   /**
+		**	BEGIN CHAINEDSELECTOR CLASS
+		**/
+			require('../src/chainedSelectors.php');
 
-		$dresult = mysql_query("SELECT * FROM departments");
-		echo "<select id=\"dept_list\" name=\"department\">\n";
-		echo "<option value=\"\">----------------</option>\n";
-		while($drow = mysql_fetch_array($dresult)) {
-			echo "<option value=" . $drow['dept_no'];
-			if ($drow['dept_no'] == $rowItem['department']) { echo " selected=\"selected\"";}
-			echo ">" . $drow['dept_no'] . " - " . $drow['dept_name'] . "</option>\n";
-		}
-		echo "</select>\n\n";
+			$selectorNames = array(
+				CS_FORM=>"pickSubDepartment", 
+				CS_FIRST_SELECTOR=>"department", 
+				CS_SECOND_SELECTOR=>"subdepartment");
 
-		$sresult = mysql_query("SELECT * FROM subdepts ORDER BY subdept_name");
-		echo "<select id=\"subdept_list\" name=\"subdepartment\">\n";
-		echo "<option value=\"\">----------------</option>\n";
-		while($srow = mysql_fetch_array($sresult)) {
-			echo "<option value=" . $srow['subdept_no'] . " class=" . $srow['dept_ID'];
-			if ($srow['subdept_no'] == $rowItem['subdept']) { echo " selected=\"selected\"";}
-			echo ">" . $srow['subdept_name'] . "</option>\n";
-		}
-		echo "</select>\n\n";
+			$Query = "SELECT d.dept_no AS dept_no, d.dept_name AS dept_name,
+				CASE WHEN s.subdept_no IS NULL THEN 0 ELSE s.subdept_no END as subdept_no,
+				CASE WHEN s.subdept_name IS NULL THEN 'None' ELSE s.subdept_name END AS subdept_name
+				FROM departments AS d LEFT JOIN
+				subdepts AS s ON d.dept_no=s.dept_ID
+				ORDER BY d.dept_no,s.subdept_no";
 
+		    $DatabaseResult = False;
+		    if(!($DatabaseResult = $dbc->query($Query)))
+		    {
+		        print("The query failed!<br>\n");
+		        exit();
+		    }
+		    while($row = $dbc->fetch_object($DatabaseResult))
+		    {
+		    	$selectorData[] = array(
+					CS_SOURCE_ID=>$row->dept_no, 
+				    CS_SOURCE_LABEL=>$row->dept_no." - ".$row->dept_name, 
+				    CS_TARGET_ID=>$row->subdept_no, 
+					CS_TARGET_LABEL=>$row->subdept_name);
+			}            
+
+			$subdept = new chainedSelectors(
+				$selectorNames, 
+		        $selectorData);
+			?>
+				<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html40/loose.dtd">
+				<html>
+				<head>
+				<script type="text/javascript" language="JavaScript">
+				<?php
+				    $subdept->printUpdateFunction($rowItem);
+				?>
+				</script>
+				</head>
+				<body>
+				<!-- <form name="pickSubDepartment" action="updateItems.php"> -->
+				<?php
+				    $subdept->printSelectors($rowItem);
+				?>
+				<script type="text/javascript" language="JavaScript">
+				<?php
+				    $subdept->initialize();
+				?>
+				</script>
+				</body>
+				</html>
+			<?php			
+	   	   /**
+			**	CHAINEDSELECTOR CLASS ENDS . . . . . . . NOW
+			**/
+//                echo " </td>";
 		echo "</td><td align=left>";
 		$taxQ = "SELECT id,description FROM taxrates ORDER BY id";
 		$taxR = $dbc->query($taxQ);
@@ -575,8 +667,13 @@ function itemParse($upc){
 			echo '</tr></table></fieldset>';
 
 			echo "<br /><fieldset id=marginfs>";
-			echo "<legend>Margin</legend>";
-			MarginFS($rowItem['upc'],$rowItem['cost'],$rowItem['department']);
+			if ( isset($FANNIE_COOP_ID) && $FANNIE_COOP_ID == "WEFC_Torontx" ) {
+				echo "<legend>Markup</legend>";
+				MarkupFS($rowItem['upc'],$rowItem['cost'],$rowItem['department']);
+			} else {
+				echo "<legend>Margin</legend>";
+				MarginFS($rowItem['upc'],$rowItem['cost'],$rowItem['department']);
+			}
 			echo "</fieldset>";
 
 			echo '<fieldset id="lanefs">';
