@@ -35,75 +35,94 @@ General Settings
 ************************************************************************************/
 
 $CORE_LOCAL->set("OS",'other');
-$CORE_LOCAL->set("browserOnly",1);
+$CORE_LOCAL->set('browserOnly',1);
+
 $CORE_LOCAL->set("store",'elfco');
-$CORE_LOCAL->set("laneno",1);
+$CORE_LOCAL->set("laneno",2);
 
 /************************************************************************************
 Data Connection Settings
 ************************************************************************************/
-$CORE_LOCAL->set("mServer",'localhost');
-$CORE_LOCAL->set("mDatabase",'COREserver');
+$CORE_LOCAL->set('mServer','192.168.1.10');
+
+$CORE_LOCAL->set("mDatabase",'core_trans');
 $CORE_LOCAL->set("mDBMS",'mysql');
 				// Options: mssql, mysql, pgsql
-$CORE_LOCAL->set("mUser",'is4cserver');
-$CORE_LOCAL->set("mPass",'is4cserver');
+$CORE_LOCAL->set("mUser",'coreserver');
+$CORE_LOCAL->set("mPass",'coreserver');
 
 $CORE_LOCAL->set("DBMS",'mysql');
 $CORE_LOCAL->set("tDatabase",'translog');
 $CORE_LOCAL->set("pDatabase",'opdata');
 $CORE_LOCAL->set("localhost",'localhost');
-$CORE_LOCAL->set("localUser",'is4clane');
-$CORE_LOCAL->set("localPass",'is4clane');
+$CORE_LOCAL->set("localUser",'corelane');
+$CORE_LOCAL->set("localPass",'corelane');
 
 /***********************************************************************************
 Receipt & Printer Settings
 ************************************************************************************/
 
-$CORE_LOCAL->set("print",1);
-$CORE_LOCAL->set("newReceipt",1);
+$CORE_LOCAL->set('print',1);
 
-//$CORE_LOCAL->set("printerPort","LPT1:");
-//$CORE_LOCAL->set("printerPort","/dev/lp0");
-$CORE_LOCAL->set("printerPort",'fakereceipt.txt');
+$CORE_LOCAL->set('newReceipt',1);
 
-$CORE_LOCAL->set("receiptHeaderCount",0);
-$CORE_LOCAL->set("receiptFooterCount",0);
-$CORE_LOCAL->set("ckEndorseCount",0);
+
+$CORE_LOCAL->set('printerPort','/dev/usb/lp0');
+
+//$CORE_LOCAL->set('printerPort','/pos/ELFCO_CORE/pos/is4c-nf/log/fakereceipt.txt');
+
+//$CORE_LOCAL->set('printerPort','/dev/usb/lp0');
+
+
+$CORE_LOCAL->set("receiptHeaderCount",4);
+$CORE_LOCAL->set("receiptFooterCount",10);
+$CORE_LOCAL->set("ckEndorseCount",3);
 $CORE_LOCAL->set("chargeSlipCount",0);
+
+$CORE_LOCAL->set("ckEndorse1", "FOR DEPOSIT ONLY");
+$CORE_LOCAL->set("ckEndorse2", "East Lansing Food Co-op");
+$CORE_LOCAL->set("ckEndorse3", "Account#: 10000436550");
 
 /***********************************************************************************
 Screen Message Settings
 ************************************************************************************/
 
-$CORE_LOCAL->set("welcomeMsgCount",0);
-$CORE_LOCAL->set("trainingMsgCount",0);
-$CORE_LOCAL->set("farewellMsgCount",0);
+$CORE_LOCAL->set("welcomeMsgCount",2);
+$CORE_LOCAL->set("trainingMsgCount",2);
+$CORE_LOCAL->set("farewellMsgCount",2);
 
-$CORE_LOCAL->set("alertBar",'ELFCo - Alert');
+$CORE_LOCAL->set("alertBar",'ELFCO - Alert');
+$CORE_LOCAL->set("farewellMsg1","Thanks for shopping at ELFCO.");
+$CORE_LOCAL->set("farewellMsg2","YOU OWN IT!");
 
 /***********************************************************************************
 Credit Card
 ************************************************************************************/
 
-$CORE_LOCAL->set("CCintegrate",1);
-$CORE_LOCAL->set("gcIntegrate",1);
-$CORE_LOCAL->set("ccLive",1); 			// credit card integration live or testing. live = 1, testing = 0
-$CORE_LOCAL->set("RegisteredPaycardClasses",array('MercuryGift','GoEMerchant'));
+$CORE_LOCAL->set("CCintegrate",0);
+$CORE_LOCAL->set("gcIntegrate",0);
+$CORE_LOCAL->set("ccLive",0); 			// credit card integration live or testing. live = 1, testing = 0
+$CORE_LOCAL->set('RegisteredPaycardClasses',array());
+
 
 /***********************************************************************************
 Other Settings
 ************************************************************************************/
 
-$CORE_LOCAL->set("discountEnforced",1);
-$CORE_LOCAL->set("lockScreen",1);
+$CORE_LOCAL->set('discountEnforced',1);
+
+$CORE_LOCAL->set('lockScreen',1);
+
 $CORE_LOCAL->set("ddNotify",0); 
 $CORE_LOCAL->set("promoMsg",0);
 
-$CORE_LOCAL->set("memlistNonMember",0);
+$CORE_LOCAL->set('memlistNonMember',0);
+
 $CORE_LOCAL->set("cashOverLimit",1);
-$CORE_LOCAL->set("dollarOver",50);
-$CORE_LOCAL->set("defaultNonMem",'11');
+$CORE_LOCAL->set('dollarOver',20);
+
+$CORE_LOCAL->set('defaultNonMem','99999');
+
 
 if ($CORE_LOCAL->get("inputMasked") == "")
 	$CORE_LOCAL->set("inputMasked",0);
@@ -112,23 +131,42 @@ $CORE_LOCAL->set("SCReceipt",1);			/***staff charge receipt - print default for 
 $CORE_LOCAL->set("CustomerDisplay",0);
 $CORE_LOCAL->set("touchscreen",False);
 
-//$CORE_LOCAL->set("SigCapture",'COM1');
-$CORE_LOCAL->set("SigCapture",'');
-$CORE_LOCAL->set("visitingMem",'');
-$CORE_LOCAL->set("scalePort",'');
-$CORE_LOCAL->set("scaleDriver",'');
+//$CORE_LOCAL->set('SigCapture','');
+
+$CORE_LOCAL->set('SigCapture','');
+
+$CORE_LOCAL->set('visitingMem','10000');
+
+$CORE_LOCAL->set('scalePort','/dev/ttyS0');
+
+$CORE_LOCAL->set('scaleDriver','NewMagellan');
+
 $CORE_LOCAL->set("CCSigLimit",0);
-$CORE_LOCAL->set("SpecialUpcClasses",array());
+$CORE_LOCAL->set("PriceMethodCount",4);
+$CORE_LOCAL->set('SpecialUpcClasses',array('CouponCode','HouseCoupon','SpecialOrder'));
+
 $CORE_LOCAL->set("DiscountTypeCount",5);
 $CORE_LOCAL->set("DiscountTypeClasses",array('NormalPricing','EveryoneSale','MemberSale','CaseDiscount','StaffSale'));
-$CORE_LOCAL->set("PriceMethodCount",3);
-$CORE_LOCAL->set("PriceMethodClasses",array('BasicPM','GroupPM','QttyEnforcedGroupPM'));
-$CORE_LOCAL->set("enableFranking",0);
-$CORE_LOCAL->set("BottleReturnDept",'');
-$CORE_LOCAL->set("ReceiptHeaderImage",'');
-$CORE_LOCAL->set("timeout",180000);
-$CORE_LOCAL->set("TRDesiredTenders",array());
+$CORE_LOCAL->set("PriceMethodClasses",array('BasicPM','GroupPM','QttyEnforcedGroupPM','MoreThanQttyPM'));
+$CORE_LOCAL->set("enableFranking",1);
+$CORE_LOCAL->set("BottleReturnDept",'80');
+$CORE_LOCAL->set("ReceiptHeaderImage",'rcpt_hdr.bmp');
+$CORE_LOCAL->set('timeout','180000');
+
+$CORE_LOCAL->set('TRDesiredTenders',array('CA'=>'Cash','CK'=>'Check','MC'=>'Manual Coupons','CP'=>'Scanned Coupons','CC'=>'Credit Card','DC'=>'Debit Card','EF'=>'EBT','EC'=>'EBT Cash','EL'=>'Coffee Club','GD'=>'Gift Card','MI'=>'Instore Charges','TV'=>'Travelers Check'));
+
 $CORE_LOCAL->set("DrawerKickMedia", array());
 
 @include_once(dirname(__FILE__).'/ini-local.php');
+$CORE_LOCAL->set('refundDiscountable',1);
+$CORE_LOCAL->set('LineItemDiscountMem','0.000000');
+$CORE_LOCAL->set('LineItemDiscountNonMem','0.000000');
+$CORE_LOCAL->set('emailReceiptFrom','');
+$CORE_LOCAL->set('kickerModule','ELFCO_Kicker');
+$CORE_LOCAL->set('FooterModules',array('SavedOrCouldHave','TransPercentDiscount','MemSales','EveryoneSales','MultiTotal'));
+$CORE_LOCAL->set('ModularTenders','1');
+$CORE_LOCAL->set('TenderMap',array('CK'=>'CheckTender','EF'=>'FoodstampTender','EC'=>'FoodstampTender','TC'=>'GiftCertificateTender','MI'=>'StoreChargeTender','TV'=>'CheckTender'));
+$CORE_LOCAL->set('PluginList',array('MemberCard','PriceCheck','QuickKeys','QuickMenus','VirtualCoupon'));
+$CORE_LOCAL->set('memberUpcPrefix','000440');
+$CORE_LOCAL->set('member_subtotal',True);
 ?>
