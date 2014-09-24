@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 $my_menu = array(
@@ -18,3 +19,14 @@ $my_menu = array(
 );
 
 ?>
+=======
+<?php
+
+$my_menu = array(
+	"Charge Available Card" => "CCFROMCACHE",
+	"Reboot Terminal" => "TERMREBOOT",
+	"Tender External CC" => "MANUALCC"
+);
+
+?>
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d

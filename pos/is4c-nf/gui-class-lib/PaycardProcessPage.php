@@ -69,7 +69,7 @@ class PaycardProcessPage extends BasicPage {
 						$.ajax({url: '<?php echo $this->page_url; ?>ajax-callbacks/ajax-end.php',
 							cache: false,
 							type: 'post',
-							data: 'receiptType='+data.receipt,
+                            data: 'receiptType='+data.receipt+'&ref=<?php echo ReceiptLib::receiptNumber(); ?>',
 							error: function(){
 								location = destination;
 							},
@@ -122,7 +122,7 @@ class PaycardProcessPage extends BasicPage {
 		$this->paycard_jscript_functions();
 		$this->head_content();
 		echo "</head>";
-		echo "<body>";
+		echo '<body class="'.$this->body_class.'">';
 		echo "<div id=\"boundingBox\">";
 		$this->input_header($this->action);
 		$this->body_content();	

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 $my_menu = array(
@@ -10,3 +11,15 @@ $my_menu = array(
 );
 
 ?>
+=======
+<?php
+
+$my_menu = array(
+	"Local Eggs" => "6018",
+	"Saratoga Water 1 Liter" => "6064",
+	"Shredded Parmesan Cheese" => "6028",
+	"Castelvetrano Olives with pits" => "6008"
+);
+
+?>
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d

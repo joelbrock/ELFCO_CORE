@@ -236,13 +236,6 @@ new productlist();
 
 *********************************************************************************/
 
-/* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	* 11Feb2013 EL Support argument from initial PV command: PVAPPLES.
-	* 18Jan2013 Eric Lee Extended lookup to productUser.description, with Andy's help.
-	*                    Very slow unless products.upc has been changed to VARCHAR(13).
-
-*/
 
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
 
@@ -279,8 +272,6 @@ class productlist extends NoInputPage {
 			return False;
 		}
 
-		$CORE_LOCAL->get("away",1);
-
 		if (is_numeric($entered)) {
 			// expand UPC-E to UPC-A
 			if (substr($entered, 0, 1) == 0 && strlen($entered) == 7) {
@@ -312,12 +303,15 @@ class productlist extends NoInputPage {
 				$entered = substr($entered, 0, 8)."00000";
 		}
 
-		/* get all available modules */
+		/* Get all enabled plugins and standard modules of the base. */
 		$modules = AutoLoader::ListModules('ProductSearch');
 		$results = array();
 		$this->boxSize = 1;
-		/* search with each available module. Use UPC
-		   to filter out any duplicate results */
+		/* Search first with the plugins
+         	 *  and then with standard modules.
+        	 * Keep only the first instance of each upc.
+        	 * Increase the depth of the list from module parameters.
+         	*/
 		foreach($modules as $mod_name){
 			$mod = new $mod_name();
 			$mod_results = $mod->search($entered);
@@ -335,32 +329,13 @@ class productlist extends NoInputPage {
 		return True;
 	} // END preprocess() FUNCTION
 
-	function head_content(){
-		global $CORE_LOCAL;
+	function head_content()
+    {
 		// Javascript is only really needed if there are results
-		if ($this->temp_num_rows != 0){
-		?>
-		<script type="text/javascript" >
-		var prevKey = -1;
-		var prevPrevKey = -1;
-		function processkeypress(e) {
-			var jsKey;
-			if (e.keyCode) // IE
-				jsKey = e.keyCode;
-			else if(e.which) // Netscape/Firefox/Opera
-				jsKey = e.which;
-			if (jsKey==13) {
-				if ( (prevPrevKey == 99 || prevPrevKey == 67) &&
-				(prevKey == 108 || prevKey == 76) ){ //CL<enter>
-					$('#search option:selected').val('');
-				}
-				$('#selectform').submit();
-			}
-			prevPrevKey = prevKey;
-			prevKey = jsKey;
-		}
-		</script> 
-		<?php
+		if ($this->temp_num_rows != 0) {
+            ?>
+            <script type="text/javascript" src="../js/selectSubmit.js"></script>
+            <?php
 		}
 	} // END head() FUNCTION
 
@@ -373,7 +348,7 @@ class productlist extends NoInputPage {
 			$this->productsearchbox(_("no match found")."<br />"._("next search or enter upc"));
 		}
 		else {
-			$this->add_onload_command("\$('#search').keypress(processkeypress);\n");
+			$this->add_onload_command("selectSubmit('#search', '#selectform')\n");
 
 			echo "<div class=\"baseHeight\">"
 				."<div class=\"listbox\">"
@@ -400,14 +375,12 @@ class productlist extends NoInputPage {
 			echo "</select>"
 				."</form>"
 				."</div>"
-				."<div class=\"listboxText centerOffset\">"
+				."<div class=\"listboxText coloredText centerOffset\">"
 				._("clear to cancel")."</div>"
 				."<div class=\"clear\"></div>";
 			echo "</div>";
 		}
 
-		$CORE_LOCAL->set("scan","noScan");
-		$CORE_LOCAL->set("beep","noBeep");
 		$this->add_onload_command("\$('#search').focus();\n");
 	} // END body_content() FUNCTION
 
@@ -420,11 +393,7 @@ class productlist extends NoInputPage {
 			</span>
 			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" autocomplete="off">
 			<input type="text" name="search" size="15" id="search"
-<<<<<<< HEAD
 				onblur="$('#search').focus();" />
-=======
-				onblur="$('#search).focus();" />
->>>>>>> flathat/master
 			</form>
 			press [enter] to cancel
 			</div>
@@ -434,7 +403,8 @@ class productlist extends NoInputPage {
 
 }
 
-new productlist();
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF']))
+	new productlist();
 
 ?>
 >>>>>>> 6ef701b7099b88df44d419903824240e3f91a588

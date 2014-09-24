@@ -26,25 +26,38 @@
   Opens drawer for cash, credit card over $25,
   credit card refunds, and stamp sales
 */
-class WFC_Kicker extends Kicker {
+class WFC_Kicker extends Kicker 
+{
 
-	function doKick(){
-		$db = Database::tDataConnect();
+    public function doKick($trans_num)
+    {
+        global $CORE_LOCAL;
+        $db = Database::tDataConnect();
 
-		$query = "select trans_id from localtemptrans where 
-			(trans_subtype = 'CA' and total <> 0) or 
-			(trans_subtype = 'CC' AND (total < -25 or total > 0)) or 
-			upc='0000000001065'";
+        $query = "SELECT trans_id 
+                  FROM localtranstoday 
+                  WHERE ( 
+                    (trans_subtype = 'CA' and total <> 0) 
+                    OR upc='0000000001065'
+                  ) AND " . $this->refToWhere($trans_num);
 
-		$result = $db->query($query);
-		$num_rows = $db->num_rows($result);
+        $result = $db->query($query);
+        $num_rows = $db->num_rows($result);
 
-		return ($num_rows > 0) ? True : False;
-	}
+        $ret = ($num_rows > 0) ? true : false;
 
-	function kickOnSignIn(){
-		return False;
-	}
+        // use session to override default behavior
+        // based on specific cashier actions rather
+        // than transaction state
+        $override = $CORE_LOCAL->get('kickOverride');
+        $CORE_LOCAL->set('kickOverride',false);
+        if ($override === true) $ret = true;
+
+        return $ret;
+    }
+
+    public function kickOnSignIn() {
+        return false;
+    }
 }
 
-?>

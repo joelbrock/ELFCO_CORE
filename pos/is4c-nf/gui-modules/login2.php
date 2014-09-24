@@ -21,42 +21,95 @@
 
 *********************************************************************************/
 
-ini_set('display_errors','1');
-
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
+<<<<<<< HEAD
+=======
+AutoLoader::LoadMap();
+CoreState::loadParams();
 
-class login2 extends BasicPage {
+class login2 extends BasicPage 
+{
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
-	var $box_color;
-	var $msg;
+	private $box_css_class;
+	private $msg;
 
-	function preprocess(){
-		$this->box_color = '#004080';
+	public $body_class = '';
+
+	public function preprocess()
+    {
+		global $CORE_LOCAL;
+		$this->box_css_class = 'coloredArea';
 		$this->msg = _('please enter your password');
 
-		if (isset($_REQUEST['reginput'])){
-			if (Authenticate::check_password($_REQUEST['reginput'])){
+		if (isset($_REQUEST['reginput']) || isset($_REQUEST['userPassword'])) {
+
+			$passwd = '';
+			if (isset($_REQUEST['reginput']) && !empty($_REQUEST['reginput'])) {
+				$passwd = $_REQUEST['reginput'];
+				UdpComm::udpSend('goodBeep');
+			} elseif (isset($_REQUEST['userPassword']) && !empty($_REQUEST['userPassword'])) {
+				$passwd = $_REQUEST['userPassword'];
+            }
+
+			if (Authenticate::checkPassword($passwd)) {
 				Database::testremote();
 				$sd = MiscLib::scaleObject();
-				if (is_object($sd))
+				if (is_object($sd)) {
 					$sd->ReadReset();
+                }
+
+				/**
+				  Find a drawer for the cashier
+				*/
 				$my_drawer = ReceiptLib::currentDrawer();
-				if ($my_drawer == 0)
+				if ($my_drawer == 0) {
+					$available = ReceiptLib::availableDrawers();	
+					if (count($available) > 0) { 
+						ReceiptLib::assignDrawer($CORE_LOCAL->get('CashierNo'),$available[0]);
+						$my_drawer = $available[0];
+					}
+				} else {
+					ReceiptLib::assignDrawer($CORE_LOCAL->get('CashierNo'),$my_drawer);
+                }
+
+                TransRecord::addLogRecord(array(
+                    'upc' => 'SIGNIN',
+                    'description' => 'Sign In Emp#' . $CORE_LOCAL->get('CashierNo'),
+                ));
+
+				/**
+				  Use Kicker object to determine whether the drawer should open
+				  The first line is just a failsafe in case the setting has not
+				  been configured.
+				*/
+				if (session_id() != '') {
+					session_write_close();
+                }
+				$kicker_class = ($CORE_LOCAL->get("kickerModule")=="") ? 'Kicker' : $CORE_LOCAL->get('kickerModule');
+				$kicker_object = new $kicker_class();
+				if ($kicker_object->kickOnSignIn()) {
+					ReceiptLib::drawerKick();
+                }
+
+				if ($my_drawer == 0) {
 					$this->change_page($this->page_url."gui-modules/drawerPage.php");
-				else
+				} else {
 					$this->change_page($this->page_url."gui-modules/pos2.php");
-				return False;
-			}
-			else {
-				$this->box_color = '#800000';
+                }
+
+				return false;
+			} else {
+				$this->box_css_class = 'errorColoredArea';
 				$this->msg = _('password invalid, please re-enter');
 			}
 		}
 
-		return True;
+		return true;
 	}
 
-	function head_content(){
+	public function head_content()
+    {
 		?>
 		<script type="text/javascript">
 		function closeFrames() {
@@ -65,29 +118,36 @@ class login2 extends BasicPage {
 		</script>
 		<?php
 		$this->default_parsewrapper_js();
+		$this->scanner_scale_polling(True);
 	}
 
-	function body_content(){
+	public function body_content()
+    {
 		global $CORE_LOCAL;
 		// 18Agu12 EL Add separately for readability of source.
-		$this->add_onload_command("\$('#reginput').focus();");
+		$this->add_onload_command("\$('#userPassword').focus();");
 		$this->add_onload_command("\$('#scalebox').css('display','none');");
-		$this->add_onload_command("\$('body').css('background-image','none');");
 
 		?>
 		<div id="loginTopBar">
 			<div class="name">I S 4 C</div>
 			<div class="version">P H P &nbsp; D E V E L O P M E N T
+<<<<<<< HEAD
 			&nbsp; V E R S I O N &nbsp; 2 .0 .0 (beta)</div>
 			<div class="welcome"><?php echo _("W E L C O M E"); ?></div>
+=======
+			&nbsp; V E R S I O N &nbsp; 2 .0 .0</div>
+			<div class="welcome coloredArea"><?php echo _("W E L C O M E"); ?></div>
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 		</div>
 		<div id="loginCenter">
-		<div class="box" style="background:<?php echo $this->box_color; ?>;" >
+		<div class="box <?php echo $this->box_css_class; ?>">
 				<b><?php echo _("log in"); ?></b>
 				<form id="formlocal" name="form" method="post" autocomplete="off" 
 					action="<?php echo $_SERVER['PHP_SELF']; ?>">
-				<input type="password" name="reginput" size="20" tabindex="0" 
-					onblur="$('#reginput').focus();" id="reginput" >
+				<input type="password" name="userPassword" size="20" tabindex="0" 
+					onblur="$('#userPassword').focus();" id="userPassword" >
+				<input type="hidden" name="reginput" id="reginput" value="" />
 				<p>
 				<?php echo $this->msg ?>
 				</p>
@@ -95,15 +155,9 @@ class login2 extends BasicPage {
 			</div>	
 		</div>
 		<div id="loginExit">
-			<?php echo _("EXIT"); ?>
-			<?php
-			if ($CORE_LOCAL->get("browserOnly") == 1) {
-				echo "<a href=\"\" onclick=\"window.top.close();\" ";
-			}
-			else {
-				//echo "<a href='/bye.html' onclick=\"var cw=window.open('','Customer_Display'); cw.close()\" ";
-				echo "<a href=\"/bye.html\" ";
-			}
+			<?php 
+            echo _("EXIT");
+            echo "<a href=\"\" ";
 			echo "onmouseover=\"document.exit.src='{$this->page_url}graphics/switchred2.gif';\" ";
 			echo "onmouseout=\"document.exit.src='{$this->page_url}graphics/switchblue2.gif';\">";
 			?>
@@ -118,6 +172,8 @@ class login2 extends BasicPage {
 
 }
 
-new login2();
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])) {
+	new login2();
+}
 
 ?>

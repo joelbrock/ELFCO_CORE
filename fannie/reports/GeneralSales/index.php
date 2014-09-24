@@ -20,7 +20,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
+header('Location: GeneralSalesReport.php');
 
+<<<<<<< HEAD
 /* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	* 28Jan13 EL Exclusions for non-countable transactions:
@@ -251,3 +253,5 @@ $('input[name="date2"]').focus(function() {
 include($FANNIE_ROOT.'src/footer.html');
 }
 ?>
+=======
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d

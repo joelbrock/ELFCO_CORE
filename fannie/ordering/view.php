@@ -21,25 +21,27 @@
 
 *********************************************************************************/
 include('../config.php');
-include($FANNIE_ROOT.'src/mysql_connect.php');
-include($FANNIE_ROOT.'src/tmp_dir.php');
+include($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
+$dbc = FannieDB::get($FANNIE_OP_DB);
 
 include($FANNIE_ROOT.'auth/login.php');
 if (!checkLogin()){
-	$url = $FANNIE_URL."auth/ui/loginform.php";
-	$rd = $FANNIE_URL."ordering/";
-	header("Location: $url?redirect=$rd");
-	exit;
+    $url = $FANNIE_URL."auth/ui/loginform.php";
+    $rd = $FANNIE_URL."ordering/";
+    header("Location: $url?redirect=$rd");
+    exit;
 }
 
-session_start();
+if (session_id() == '') {
+    session_start();
+}
 
 $page_title = "Special Order :: Create";
 $header = "Create Special Order";
 include($FANNIE_ROOT.'src/header.html');
 
 $orderID = isset($_REQUEST['orderID'])?$_REQUEST['orderID']:'';
-$return_path = (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'],'git/fannie/ordering/clearinghouse.php')) ? $_SERVER['HTTP_REFERER'] : '';
+$return_path = (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'],'fannie/ordering/clearinghouse.php')) ? $_SERVER['HTTP_REFERER'] : '';
 if (!empty($return_path)) $_SESSION['specialOrderRedirect'] = $return_path;
 else if (isset($_SESSION['specialOrderRedirect'])) $return_path = $_SESSION['specialOrderRedirect'];
 else $return_path = $FANNIE_URL."ordering/";
@@ -50,29 +52,29 @@ $next = -1;
 $found = False;
 $cachepath = sys_get_temp_dir()."/ordercache/";
 if (isset($_REQUEST['k']) && file_exists($cachepath.$_REQUEST['k'])){
-	$fp = fopen($cachepath.$_REQUEST['k'],'r');
-	while (($buffer = fgets($fp, 4096)) !== false) {
-		if ((int)$buffer == $orderID) $found = True;
-		else if (!$found) $prev = (int)$buffer;
-		else if ($found) {
-			$next = (int)$buffer;
-			break;
-		}
-	}
-	fclose($fp);
+    $fp = fopen($cachepath.$_REQUEST['k'],'r');
+    while (($buffer = fgets($fp, 4096)) !== false) {
+        if ((int)$buffer == $orderID) $found = True;
+        else if (!$found) $prev = (int)$buffer;
+        else if ($found) {
+            $next = (int)$buffer;
+            break;
+        }
+    }
+    fclose($fp);
 
-	echo '<div><div style="float:left;width:48%">';
-	if ($prev == -1)
-		echo 'Prev';
-	else
-		printf('<a href="view.php?orderID=%d&k=%s">Prev</a>',$prev,$_REQUEST['k']);
-	echo '</div><div style="text-align:right;float:right;width:48%">';
-	if ($next == -1)
-		echo 'Next';
-	else
-		printf('<a href="view.php?orderID=%d&k=%s">Next</a>',$next,$_REQUEST['k']);
-	echo '</div></div>';
-	echo '<div style="clear:both"></div>';
+    echo '<div><div style="float:left;width:48%">';
+    if ($prev == -1)
+        echo 'Prev';
+    else
+        printf('<a href="view.php?orderID=%d&k=%s">Prev</a>',$prev,$_REQUEST['k']);
+    echo '</div><div style="text-align:right;float:right;width:48%">';
+    if ($next == -1)
+        echo 'Next';
+    else
+        printf('<a href="view.php?orderID=%d&k=%s">Next</a>',$next,$_REQUEST['k']);
+    echo '</div></div>';
+    echo '<div style="clear:both"></div>';
 }
 
 

@@ -29,7 +29,8 @@
   provides meta-information about the plugin like settings
   and enable/disable hooks
 */
-class Plugin {
+class Plugin 
+{
 
 	/**
 	  Desired settings. These are automatically exposed
@@ -60,12 +61,24 @@ class Plugin {
 
 	}
 
+    /**
+      Callback. Triggered when plugin settings are updated.
+    */
+    public function settingChange()
+    {
+
+    }
+
 	/**
 	  Callback. Triggered after every transaction.
 	  Use for reseting any session/state info.
 	*/
 	public function plugin_transaction_reset(){
 
+	}
+
+	public function plugin_draw_icon(){
+		return '';
 	}
 
 	/**
@@ -81,23 +94,26 @@ class Plugin {
 	  @param $file string filename
 	  @return plugin name or boolean False
 	*/
-	public static function MemberOf($file){
+	public static function memberOf($file)
+    {
 		$file = realpath($file);
 		$sep = '/';
-		if (strstr($file,'/'))
+		if (strstr($file,'/')) {
 			$sep = '/';
-		elseif (strstr($file,'\\'))
+		} elseif (strstr($file,'\\')) {
 			$sep = '\\';
-		else
-			return False;
+		} else {
+			return false;
+        }
 
 		$dirs = explode($sep, $file);
-		for($i=0;$i<count($dirs);$i++){
-			if ($dirs[$i] == "plugins" && isset($dirs[$i+1]))
+		for($i=0;$i<count($dirs);$i++) {
+			if ($dirs[$i] == "plugins" && isset($dirs[$i+1])) {
 				return $dirs[$i+1];
+            }
 		}
 
-		return False;
+		return false;
 	}
 
 	/**
@@ -105,12 +121,15 @@ class Plugin {
 	  @param $plugin string plugin name
 	  @return True or False
 	*/
-	public static function IsEnabled($plugin){
+	static public function isEnabled($plugin)
+    {
 		global $CORE_LOCAL;
 		$list = $CORE_LOCAL->get("PluginList");
-		if (!is_array($list)) return False;
+		if (!is_array($list)) {
+            return false;
+        }
 
-		return (in_array($plugin, $list)) ? True : False;
+		return (in_array($plugin, $list)) ? true : false;
 	}
 
 	/**
@@ -118,19 +137,23 @@ class Plugin {
 	  @param $path starting directory
 	  @return array of class name => full file name
 	*/
-	public static function PluginMap($path="",$in=array()){
+	static public function pluginMap($path="",$in=array())
+    {
 		if($path=="") $path = dirname(__FILE__);
 		$dh = opendir($path);
-		while( ($file = readdir($dh)) !== False){
+		while( ($file = readdir($dh)) !== False) {
 			if ($file[0] == ".") continue;
-			if (is_dir($path."/".$file))
-				$in = self::PluginMap(realpath($path.'/'.$file),$in);
-			if (substr($file,-4)==".php" && $file != "Plugin.php")
+
+			if (is_dir($path."/".$file)) {
+				$in = self::pluginMap(realpath($path.'/'.$file),$in);
+            }
+			if (substr($file,-4)==".php" && $file != "Plugin.php") {
 				$in[substr($file,0,strlen($file)-4)] = realpath($path.'/'.$file);
+            }
 		}
 		closedir($dh);
+
 		return $in;
 	}
 }
 
-?>

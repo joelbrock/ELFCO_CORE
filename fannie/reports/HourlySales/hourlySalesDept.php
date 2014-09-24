@@ -20,6 +20,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
+<<<<<<< HEAD
 
 include('../../config.php');
 include($FANNIE_ROOT.'src/mysql_connect.php');
@@ -147,51 +148,9 @@ include($FANNIE_ROOT.'src/header.html');
 <script type="text/javascript">
 function update(targetdiv,sourcediv){
 	document.getElementById(targetdiv).value = document.getElementById(sourcediv).value;
+=======
+if (dirname(__FILE__) == dirname($_SERVER['PHP_SELF'])) {
+    header('Location: HourlySalesReport.php');
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
-</script>
-<?php
-	$deptQ = $dbc->prepare_statement("select dept_no,dept_name from departments order by dept_no");
-	$deptR = $dbc->exec_statement($deptQ);
-	$depts = array();
-	$dept_nos = array();
-	$count = 0;
-	while ($deptW = $dbc->fetch_array($deptR)){
-		$dept_nos[$count] = $deptW[0];
-		$depts[$count++] = $deptW[1];
-	}
-?>
-<form name='addBatch' action = 'hourlySalesDept.php' method='GET'>
-<table>
-<tr><td>Dept. Start</td><td>
-	<input type=text name=deptStart id=deptStart size=4 value=1 />
-	<select id=deptStartSelect onchange="update('deptStart','deptStartSelect');">
-	<?php
-	for ($i = 0; $i < $count; $i++)
-		echo "<option value=$dept_nos[$i]>$dept_nos[$i] $depts[$i]</option>";
-	?>
-	</select>
-	</td>
-     <td>Dept. End</td><td>
-	<input type=text name=deptEnd id=deptEnd size=4 value=1 />
-	<select id=deptEndSelect  onchange="update('deptEnd','deptEndSelect');">
-	<?php
-	for ($i = 0; $i < $count; $i++)
-		echo "<option value=$dept_nos[$i]>$dept_nos[$i] $depts[$i]</option>";
-	?>
-	</select>
-     </td>
-</tr><tr>
-	<td>Start Date</td>
-     <td><input name="startDate" onfocus="this.value='';showCalendarControl(this);" type="text"></td>
-	<td>End Date</td>
-     <td><input name="endDate" onfocus="this.value='';showCalendarControl(this);" type="text"></td>
-</tr><tr>
-     <td colspan=2><input type=checkbox name=weekday value=1>Group by weekday?</td>
-     <td><input type =submit name=submit value ="Get Report"></td></tr>
-</table>
-</form>
 
-<?php
-include($FANNIE_ROOT.'src/footer.html');
-}
-?>

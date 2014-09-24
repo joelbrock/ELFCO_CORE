@@ -25,6 +25,7 @@
 
    monthly.virtualcoupon.php
 
+<<<<<<< HEAD
 	Reset monthly virtual coupons:
 	-- re-populate houseVirtualCoupons
 	-- reset custdata: memCoupons and blueLine values
@@ -32,6 +33,15 @@
 	NOTE:  Pretty much MUST be run on the first day of the month (and
 	BEFORE nightly.virtualCoupons) to work as intended.  
 	And don't forget to push to lanes overnight!
+=======
+    Reset monthly virtual coupons:
+    -- re-populate houseVirtualCoupons
+    -- reset custdata: memCoupons and blueLine values
+
+    NOTE:  Pretty much MUST be run on the first day of the month (and
+    BEFORE nightly.virtualCoupons) to work as intended.  
+    And don't forget to push to lanes overnight!
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 */
 
 include('../config.php');
@@ -41,7 +51,11 @@ include($FANNIE_ROOT.'src/cron_msg.php');
 set_time_limit(0);
 
 $sql = new SQLManager($FANNIE_SERVER,$FANNIE_SERVER_DBMS,$FANNIE_OP_DB,
+<<<<<<< HEAD
 		$FANNIE_SERVER_USER,$FANNIE_SERVER_PW);
+=======
+        $FANNIE_SERVER_USER,$FANNIE_SERVER_PW);
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 $TRANS = ($FANNIE_SERVER_DBMS == "MSSQL") ? $FANNIE_TRANS_DB.".dbo." : $FANNIE_TRANS_DB.".";
 
@@ -52,8 +66,13 @@ echo cron_msg("Truncate table houseVirtualCoupons<br />");
 
 // re-populate houseVirtualCoupons
 $insQ = "INSERT INTO houseVirtualCoupons (card_no,coupID,description,start_date,end_date) 
+<<<<<<< HEAD
 	SELECT c.CardNo, '11111', 'Owner Appreciation 10% Discount', DATE_FORMAT(NOW() ,'%Y-%m-01 00:00:00'), 
 	CONCAT(LAST_DAY(NOW()),' 23:59:59') FROM custdata AS c WHERE c.memType <> 0";
+=======
+    SELECT c.CardNo, '00001', 'Owner Appreciation 10% Discount', DATE_FORMAT(NOW() ,'%Y-%m-01 00:00:00'), 
+    CONCAT(LAST_DAY(NOW()),' 23:59:59') FROM custdata AS c WHERE c.memType <> 0";
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $insR = $sql->query($insQ);
 echo cron_msg("Re-populate houseVirtualCoupons");
 
@@ -62,19 +81,33 @@ echo cron_msg("Re-populate houseVirtualCoupons");
 $sql->query("UPDATE custdata SET memCoupons = 0");  // set memCoupons = 0 first
 
 $upQ = "UPDATE custdata AS c, houseVirtualCoupons AS h
+<<<<<<< HEAD
 	SET c.memCoupons=1
 	WHERE c.CardNo=h.card_no 
 	AND ".$sql->now()." >= h.start_date 
 	AND ".$sql->now()."<= h.end_date
 	AND c.memType <> 0";
+=======
+    SET c.memCoupons=1
+    WHERE c.CardNo=h.card_no 
+    AND ".$sql->now()." >= h.start_date 
+    AND ".$sql->now()."<= h.end_date
+    AND c.memType <> 0";
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 $sql->query($upQ);
 
 // update blueline to match memcoupons
 $blueLineQ = "UPDATE custdata SET blueLine="
+<<<<<<< HEAD
 	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
 		$sql->convert('memCoupons','CHAR'),"')'",'')
 	. "WHERE memType <> 0";
+=======
+    .$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
+        $sql->convert('memCoupons','CHAR'),"')'",'')
+    . "WHERE memType <> 0";
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $sql->query($blueLineQ);
 
 echo cron_msg("Updated values in core_op.custdata");

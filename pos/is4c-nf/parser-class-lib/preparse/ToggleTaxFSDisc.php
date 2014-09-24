@@ -32,6 +32,7 @@ class ToggleTaxFSDisc extends PreParser {
 	// use bit-masks to determine the which toggles
 	// should be enabled
 	function check($str){
+		global $CORE_LOCAL;
 		$this->tfd = 0;
 		if (substr($str,0,5) == "1TNFN" || substr($str,0,5) == "FN1TN"){
 			$this->remainder = substr($str,5);
@@ -59,11 +60,6 @@ class ToggleTaxFSDisc extends PreParser {
 		elseif (substr($str,0,2) == "DN"){
 			$this->remainder = substr($str,2);
 			$this->tfd = $this->tfd | $this->DISC;	
-			return True;
-		}
-		elseif (substr($str,0,2) == "ND"){
-			$this->remainder = substr($str,2);
-			$CORE_LOCAL->set("nd",1);
 			return True;
 		}
 		return False;	
@@ -100,12 +96,6 @@ class ToggleTaxFSDisc extends PreParser {
 			<tr>
 				<td>DN<i>ringable</i></td>
 				<td>Toggle discount setting for <i>ringable</i>
-				which may be an item or group of same items
-				using *</td>
-			</tr>
-			<tr>
-				<td>ND<i>ringable</i></td>
-				<td>Force no discount for <i>ringable</i>
 				which may be an item or group of same items
 				using *</td>
 			</tr>

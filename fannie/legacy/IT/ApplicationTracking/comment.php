@@ -46,8 +46,8 @@ $note_text = "";
 $note_date = date("Y-m-d");
 
 if ($noteID != -1){
-	$dataQ = "SELECT note_text,note_date FROM notes WHERE noteID=$noteID";
-	$dataR = $sql->query($dataQ);
+	$dataQ = $sql->prepare("SELECT note_text,note_date FROM notes WHERE noteID=?");
+	$dataR = $sql->execute($dataQ, array($noteID));
 	$dataW = $sql->fetch_row($dataR);
 	
 	$note_date = $dataW[1];

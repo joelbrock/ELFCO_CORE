@@ -638,20 +638,7 @@ class PrintHandler {
 	  @param the output string
 	*/
 	function writeLine($text){
-		global $CORE_LOCAL;
-		if ($CORE_LOCAL->get("print") != 0) {
-
-			/* check fails on LTP1: in PHP4
-			   suppress open errors and check result
-			   instead 
-			*/
-			//if (is_writable($CORE_LOCAL->get("printerPort"))){}
-			$fp = fopen($CORE_LOCAL->get("printerPort"), "w");
-			if ($fp){
-				fwrite($fp, $text);
-				fclose($fp);
-			}
-		}
+        ReceiptLib::writeLine($text);
 	}
 
 	/**
@@ -659,17 +646,36 @@ class PrintHandler {
 	  @param $fn a bitmap file
 	  @return printer command string
 	*/
-	function RenderBitmapFromFile($fn){
+	function RenderBitmapFromFile($fn, $align='C'){
+		return $this->RenderBitmap($fn, $align);
+	}
+
+	/**
+	  Turn bitmap into receipt string
+	  @param $arg string filename OR Bitmap obj
+	  @return receipt-formatted string
+	*/
+	function RenderBitmap($arg, $align='C'){
 		$slip = "";
 
 		if (!class_exists('Bitmap')) return "";
 
-		$bmp = new Bitmap();
-		$bmp->Load($fn);
+		$bmp = null;
+		if (is_object($arg) && is_a($arg, 'Bitmap')){
+			$bmp = $arg;
+		}
+		else if (file_exists($arg)){
+			$bmp = new Bitmap();
+			$bmp->load($arg);
+		}
 
-		$bmpData = $bmp->GetRawData();
-		$bmpWidth = $bmp->GetWidth();
-		$bmpHeight = $bmp->GetHeight();
+		// argument was invalid
+		if ($bmp === null)
+			return "";
+
+		$bmpData = $bmp->getRawData();
+		$bmpWidth = $bmp->getWidth();
+		$bmpHeight = $bmp->getHeight();
 		$bmpRawBytes = (int)(($bmpWidth + 7)/8);
 
 		$stripes = $this->TransposeBitmapData($bmpData, $bmpWidth);

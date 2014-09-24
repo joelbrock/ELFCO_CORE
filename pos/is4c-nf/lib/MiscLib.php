@@ -25,7 +25,8 @@
   @clss MiscLib
   Generic functions
 */
-class MiscLib extends LibraryClass {
+class MiscLib extends LibraryClass 
+{
 
 /**
   Path detection. Find the relative URL for 
@@ -33,127 +34,62 @@ class MiscLib extends LibraryClass {
   @param $check_file file to search for
   @return A relative URL with trailing slash
 */
-static public function base_url($check_file="css/pos.css"){
+static public function baseURL($check_file="css/pos.css")
+{
 	$ret = "";
 	$cutoff = 0;
-	while($cutoff < 20 && !file_exists($ret.$check_file)){
+	while($cutoff < 20 && !file_exists($ret.$check_file)) {
 		$ret .= "../";
 		$cutoff++;
 	}
-	if ($cutoff >= 20) return False;
-	else return $ret;	
+	if ($cutoff >= 20) {
+        return false;
+	} else {
+        return $ret;	
+    }
 }
 
-// These functions have been translated from lib.asp by Brandon on 07.13.03.
-// The "/blah" notation in the function heading indicates the Type of argument that should be given.
-
-// ----------int($num /numeric)----------
-//
-// Given $num, detemine if it is numeric.
-// If so, int returns the integral part of $num.
-// Else generate a fatal error.
-
-/**
-  Cast value to integer
-  @param $num must be numeric
-  @return integer
-*/
-static public function int($num) {
-	if(is_numeric($num)) {
-		return (int) $num;
-	}
-	else {
-		die("FATAL ERROR: Argument, '".$num.",' given to int() is not numeric.");
-	} 
+static public function base_url($check_file="css/pos.css")
+{
+    return self::baseURL($check_file);
 }
-
-// -----------nullwrap($num /numeric)----------
-//
-// Given $num, if it is empty or of length less than one, nullwrap becomes "0".
-// If the argument is a non-numeric, generate a fatal error.
-// Else nullwrap becomes the number.
 
 /**
   Sanitizes values
   @param $num a value
+  @param $char [optional] boolean is character
   @return a sanitized value
 
   Probably an artifact of ASP implementation.
   In practice any argument that evaluates to False
   get translated to integer zero.
 */
-static public function nullwrap($num) {
+static public function nullwrap($num, $char=false) 
+{
 
-
-	if ( !$num ) {
+    if ($char && ($num === '' || $num === null)) {
+        return '';
+	} else if (!$num) {
 		 return 0;
-	}
-	elseif (!is_numeric($num) && strlen($num) < 1) {
-		return " ";
-	}
-	else {
+	} else if (!is_numeric($num) && strlen($num) < 1) {
+		return ' ';
+	} else {
 		return $num;
 	}
 }
-
-// ----------truncate2($num /numeric)----------
-//
-// Round $num to two (2) digits after the decimal and return it as a STRING.
 
 /**
   Convert number to string with two decimal digits
   @param $num a number
   @return formatted string
 */
-static public function truncate2($num) {
-	return number_format($num, 2);
-}
-
-// ----------pinghost($host /string)----------
-//
-// Given $host, pinghost() looks up that host name or IP address.
-// If it can connect function returned as true, else false.
-
-/**
-  Ping a host
-  @param $host the name or IP
-  @return 
-   - 1 on success
-   - 0 on failure
-  @deprecated
-  Doesn't work reliably in all environments.
-  Use pingport().
-*/
-static public function pinghost($host)
+static public function truncate2($num) 
 {
-	global $CORE_LOCAL;
+    if ($num === '') {
+        $num = 0;
+    }
 
-	$host = str_replace("[", "", $host);
-	$host = str_replace("]", "", $host);
-
-	if (strstr($host,"\\")){
-		$tmp = explode("\\",$host);
-		$host = $tmp[0];
-	}
-
-	$intConnected = 0;
-	if ($CORE_LOCAL->get("OS") == "win32") {
-		$pingReturn = exec("ping -n 1 $host", $aPingReturn);
-		$packetLoss = "(0% loss";
-	} else {
-		$pingReturn = exec("ping -c 1 $host", $aPingReturn);
-		$packetLoss = "1 received, 0% packet loss";
-	}
-
-	foreach($aPingReturn as $returnLine)
-
-	{	$pos = strpos($returnLine, $packetLoss);
-		if  ($pos) {
-			$intConnected = 1; 
-			break;
-			}
-	}
-	return $intConnected;
+	return number_format($num, 2);
 }
 
 /**
@@ -168,16 +104,23 @@ static public function pinghost($host)
   ping or ping has odd output. It also verifies the
   database is running as well as the host is up.
 */
-static public function pingport($host,$dbms){
+static public function pingport($host, $dbms)
+{
 	$port = strstr($dbms,'mysql') ? 3306 : 1433;	
-	if (strstr($host,":"))
+	if (strstr($host,":")) {
 		list($host,$port) = explode(":",$host);
+    }
 	$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 	socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, array('sec' => 1, 'usec' => 0)); 
 	socket_set_block($sock);
 	$test = socket_connect($sock,$host,$port);
 	socket_close($sock);
+<<<<<<< HEAD
 	return ($test ? 1 : 0);	
+=======
+
+	return ($test ? 1 : 0);
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 /**
@@ -186,9 +129,13 @@ static public function pingport($host,$dbms){
    1 - windows
    0 - not windows
 */
-static public function win32() {
+static public function win32() 
+{
 	$winos = 0;
-	if (substr(PHP_OS, 0, 3) == "WIN") $winos = 1;
+	if (strtoupper(substr(PHP_OS, 0, 3)) == "WIN") {
+        $winos = 1;
+    }
+
 	return $winos;
 }
 
@@ -200,13 +147,15 @@ static public function win32() {
   in $CORE_LOCAL. If the object cannot be 
   found this returns zero
 */
-static public function scaleObject(){
+static public function scaleObject()
+{
 	global $CORE_LOCAL;
 	$scaleDriver = $CORE_LOCAL->get("scaleDriver");
 	$sd = 0;
 	if ($scaleDriver != ""){
 		$sd = new $scaleDriver();
 	}
+
 	return $sd;
 }
 
@@ -220,60 +169,161 @@ static public function scaleObject(){
 
   Signature capture support is very alpha.
 */
-static public function sigTermObject(){
+static public function sigTermObject()
+{
 	global $CORE_LOCAL;
 	$termDriver = $CORE_LOCAL->get("termDriver");
 	$st = 0;
-	if ($termDriver != ""){  
+	if ($termDriver != "") {
 		$st = new $termDriver();
 	}
+
 	return $st;
 }
 
 /**
   Send good beep message to the scale
 */
-static public function goodBeep() {
+static public function goodBeep() 
+{
 	global $CORE_LOCAL;
-	$CORE_LOCAL->set("beep","goodBeep");
 	$sd = self::scaleObject();
-	if (is_object($sd))
+	if (is_object($sd)) {
 		$sd->WriteToScale("goodBeep");
+    }
 }
 
 /**
   Send re-poll message to the scale
 */
-static public function rePoll() {
+static public function rePoll() 
+{
 	global $CORE_LOCAL;
-	$CORE_LOCAL->set("beep","rePoll");
 	$sd = self::scaleObject();
-	if (is_object($sd))
+	if (is_object($sd)) {
 		$sd->WriteToScale("rePoll");
+    }
 }
 
 /**
   Send error beep message to the scale
 */
-static public function errorBeep() {
+static public function errorBeep() 
+{
 	global $CORE_LOCAL;
-	$CORE_LOCAL->set("beep","errorBeep");
 	$sd = self::scaleObject();
-	if (is_object($sd))
+	if (is_object($sd)) {
 		$sd->WriteToScale("errorBeep");
+    }
 }
 
 /**
   Send two pairs beep message to the scale
 */
-static public function twoPairs() {
+static public function twoPairs() 
+{
 	global $CORE_LOCAL;
-	$CORE_LOCAL->set("beep","twoPairs");
 	$sd = self::scaleObject();
-	if (is_object($sd))
+	if (is_object($sd)) {
 		$sd->WriteToScale("twoPairs");
+    }
+}
+
+/**
+  Use ipconfig.exe or ifconfig, depending on OS,
+  to determine all available IP addresses
+  @return [array] of [string] IP addresses
+*/
+function getAllIPs()
+{
+    /**
+      First: use OS utilities to check IP(s)
+      This should be most complete but also
+      may be blocked by permission settings
+    */
+    $ret = array();
+    if (strstr(strtoupper(PHP_OS), 'WIN')) {
+        // windows
+        $cmd = "ipconfig.exe";
+        exec($cmd, $output_lines, $retval);
+        foreach ($output_lines as $line) {
+            if (preg_match('/IP Address[\. ]+?: ([\d\.]+)/', $line, $matches)) {
+                $ret[] = $matches[1];
+            } elseif (preg_match('/IPv4 Address[\. ]+?: ([\d\.]+)/', $line, $matches)) {
+                $ret[] = $matches[1];
+            }
+        }
+    } else {
+        // unix-y system
+        $cmd = '/sbin/ifconfig';
+        $count = 0;
+        // try to locate ifconfig
+        while (!file_exists($cmd)) {
+            switch ($count) {
+                case 0:
+                    $cmd = '/usr/sbin/ifconfig';
+                    break;
+                case 1:
+                    $cmd = '/usr/bin/ifconfig';
+                    break;
+                case 2:
+                    $cmd = '/bin/ifconfig';
+                    break;
+                case 3:
+                    $cmd = '/usr/local/sbin/ifconfig';
+                    break;
+                case 4:
+                    $cmd = '/usr/local/bin/ifconfig';
+                    break;
+            }
+            $count++;
+            // give up; hope $PATH is correct
+            if ($count <= 5) {
+                $cmd = 'ifconfig';
+                break;
+            }
+        }
+
+        exec($cmd, $output_lines, $retval);
+        foreach ($output_lines as $line) {
+            if (preg_match('/inet addr:([\d\.]+?) /', $line, $matches)) {
+                $ret[] = $matches[1];
+            }
+        }
+    }
+
+    /**
+      PHP 5.3 adds gethostname() function
+      Try getting host name and resolving to an IP
+    */
+    if (function_exists('gethostname')) {
+        $name = gethostname();
+        $resolved = gethostbyname($name);
+        if (preg_match('/^[\d\.+]$/', $resolved) && !in_array($resolved, $ret)) {
+            $ret[] = $resolved;
+        }
+    }
+    
+    /**
+      $_SERVER may simply contain an IP address
+    */
+    if (isset($_SERVER['SERVER_ADDR']) && !in_array($_SERVER['SERVER_ADDR'], $ret)) {
+        $ret[] = $_SERVER['SERVER_ADDR'];
+    }
+
+    /**
+      $_SERVER may contain a host name that can
+      be resolved to an IP address
+    */
+    if (isset($_SERVER['SERVER_NAME'])) {
+        $resolved = gethostbyname($_SERVER['SERVER_NAME']);
+        if (preg_match('/^[\d\.+]$/', $resolved) && !in_array($resolved, $ret)) {
+            $ret[] = $resolved;
+        }
+    }
+
+    return $ret;
 }
 
 } // end class MiscLib
 
-?>

@@ -31,22 +31,21 @@ class UnpaidAR extends BasicPage {
 			$dec = $_REQUEST['reginput'];
 			$amt = $CORE_LOCAL->get("old_ar_balance");
 
-			$CORE_LOCAL->set("msgrepeat",1);
+			$CORE_LOCAL->set("msgrepeat",0);
 			$CORE_LOCAL->set("strRemembered","");
 
 			if (strtoupper($dec) == "CL"){
-				if ($CORE_LOCAL->get('inactMem') == 1){
-					PrehLib::setMember($CORE_LOCAL->get("defaultNonMem"),1);
+				if ($CORE_LOCAL->get('memType') == 0){
+					PrehLib::memberID($CORE_LOCAL->get("defaultNonMem"));
 				}
 				$this->change_page($this->page_url."gui-modules/pos2.php");
 				return False;
 			}
 			elseif ($dec == "" || strtoupper($dec) == "BQ"){
-				$CORE_LOCAL->set('warned',1);
-				$CORE_LOCAL->set('warnBoxType','warnAR');
 				if (strtoupper($dec)=="BQ")
 					$amt = $CORE_LOCAL->get("balance");
-				PrehLib::deptkey($amt*100,9900);
+				$CORE_LOCAL->set("strRemembered", ($amt*100).'DP9900');
+				$CORE_LOCAL->set("msgrepeat",1);
 				$memtype = $CORE_LOCAL->get("memType");
 				$type = $CORE_LOCAL->get("Type");
 				if ($memtype == 1 || $memtype == 3 || $type == "INACT"){
@@ -59,6 +58,11 @@ class UnpaidAR extends BasicPage {
 		}
 		return True;
 	}
+
+    function head_content()
+    {
+        $this->noscan_parsewrapper_js();
+    }
 	
 	function body_content(){
 		global $CORE_LOCAL;
@@ -69,12 +73,12 @@ class UnpaidAR extends BasicPage {
 
 		<?php
 		if ($amt == $CORE_LOCAL->get("balance")){
-			DisplayLib::boxMsg(sprintf("Old A/R Balance: $%.2f<br />
+			echo DisplayLib::boxMsg(sprintf("Old A/R Balance: $%.2f<br />
 				[Enter] to pay balance now<br />
 				[Clear] to leave balance",$amt));
 		}
 		else {
-			DisplayLib::boxMsg(sprintf("Old A/R Balance: $%.2f<br />
+			echo DisplayLib::boxMsg(sprintf("Old A/R Balance: $%.2f<br />
 				Total A/R Balance: $%.2f<br />
 				[Enter] to pay old balance<br />
 				[Balance] to pay the entire balance<br />
@@ -86,10 +90,10 @@ class UnpaidAR extends BasicPage {
 		echo DisplayLib::printfooter();
 		echo "</div>";
 		$CORE_LOCAL->set("msgrepeat",2);
-		$CORE_LOCAL->set("beep","noBeep");
 	} // END body_content() FUNCTION
 }
 
-new UnpaidAR();
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF']))
+	new UnpaidAR();
 
 ?>

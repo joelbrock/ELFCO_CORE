@@ -172,8 +172,17 @@ class paycardEntered extends Parser {
 					$ret['output'] = PaycardLib::paycard_msgBox($type,"Type Mismatch",
 						"Foodstamp eligible amount inapplicable","[clear] to cancel");
 					return $ret;
-				}
+				} 
 			}
+            /**
+              Always validate amount as non-zero
+            */
+            if ($CORE_LOCAL->get('fsEligible') <= 0.005 && $CORE_LOCAL->get('fsEligible') >= -0.005) {
+                $ret['output'] = PaycardLib::paycard_msgBox($type,_('Zero Total'),
+                    "Foodstamp eligible amount is zero","[clear] to cancel");
+                UdpComm::udpSend('termReset');
+                return $ret;
+            } 
 			$CORE_LOCAL->set("paycard_amount",$CORE_LOCAL->get("fsEligible"));
 		}
 		if (($type == 'EBTCASH' || $type == 'DEBIT') && $CORE_LOCAL->get('CacheCardCashBack') > 0){
@@ -189,16 +198,8 @@ class paycardEntered extends Parser {
 			return $ret;
 		}
 
-		/*
-		if ($CORE_LOCAL->get("paycard_type") == PaycardLib::PAYCARD_TYPE_CREDIT){
-			PaycardLib::paycard_reset();
-			$ret['main_frame'] = MiscLib::base_url().'cc-modules/gui/ProcessPage.php';
-			return $ret;
-		}
-		*/
-
 		foreach($CORE_LOCAL->get("RegisteredPaycardClasses") as $rpc){
-			if (!class_exists($rpc)) include_once(MiscLib::base_url()."cc-modules/$rpc.php");
+			if (!class_exists($rpc)) continue;
 			$myObj = new $rpc();
 			if ($myObj->handlesType($CORE_LOCAL->get("paycard_type")))
 				return $myObj->entered($validate,$ret);

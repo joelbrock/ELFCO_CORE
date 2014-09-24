@@ -20,27 +20,6 @@
 
 *********************************************************************************/
 
-function saveScript(vID){
-	var scriptName = $('#vscript').val();
-
-	if (vscript == ''){
-		return;
-	}
-
-	$.ajax({
-		url: 'ajax.php',
-		type: 'POST',
-		timeout: 1000,
-		data: 'vid='+vID+'&script='+scriptName+'&action=saveScript',
-		error: function(){
-			alert('Error saving script name');
-		},
-		success: function(resp){
-			alert('Saved as '+scriptName);
-		}
-	});
-}
-
 function vendorchange(){
 	var vID = $('#vendorselect').val();
 
@@ -62,15 +41,34 @@ function vendorchange(){
 	$.ajax({
 		url: 'VendorIndexPage.php',
 		type: 'POST',
-		timeout: 1000,
+		timeout: 5000,
 		data: 'vid='+vID+'&action=vendorDisplay',
 		error: function(){
 		alert('Error loading XML document');
 		},
 		success: function(resp){
 			$('#contentarea').html(resp);
+            $('.delivery').change(saveDelivery);
 		}
 	});
+}
+
+function saveDelivery()
+{
+    var data = $('.delivery').serialize();
+	var vid = $('#vendorselect').val();
+    $.ajax({
+        url: 'VendorIndexPage.php',
+        data: 'action=saveDelivery&vID='+vid+'&'+data,
+        method: 'post',
+        dataType: 'json',
+        success: function(resp){
+            if (resp.next && resp.nextNext) {
+                $('#nextDelivery').html(resp.next);
+                $('#nextNextDelivery').html(resp.nextNext);
+            }
+        }
+    });
 }
 
 function newvendor(){
@@ -78,13 +76,59 @@ function newvendor(){
 	$.ajax({
 		url: 'VendorIndexPage.php',
 		type: 'POST',
-		timeout: 1000,
+		timeout: 5000,
 		data: 'name='+name+'&action=newVendor',
 		error: function(){
 		alert('Error loading XML document');
 		},
 		success: function(resp){
 			top.location='VendorIndexPage.php?vid='+resp;
+		}
+	});
+}
+
+function editSaveVC(vendorID){
+	if ($('#vcPhoneEdit').length == 0)
+		editVC(vendorID);
+	else
+		saveVC(vendorID);
+}
+
+function editVC(vendorID){
+	var phone = $('#vcPhone').html();
+	$('#vcPhone').html('<input type="text" id="vcPhoneEdit" value="'+phone+'" />');
+
+	var fax = $('#vcFax').html();
+	$('#vcFax').html('<input type="text" id="vcFaxEdit" value="'+fax+'" />');
+
+	var email = $('#vcEmail').html();
+	$('#vcEmail').html('<input type="text" id="vcEmailEdit" value="'+email+'" />');
+
+	var web = $('#vcWebsite').html();
+	$('#vcWebsite').html('<input type="text" id="vcWebsiteEdit" value="'+web+'" />');
+
+	var notes = $('#vcNotes').html();
+	$('#vcNotes').html('<br /><textarea rows="5" cols="35" id="vcNotesEdit">'+notes+'</textarea>');
+
+	$('#vcEditSave').html('Save Contact Info');
+	$('#vcPhoneEdit').focus();
+}
+
+function saveVC(vendorID){
+	var dataStr = 'vendorID='+vendorID;
+	dataStr += '&phone='+$('#vcPhoneEdit').val();
+	dataStr += '&fax='+$('#vcFaxEdit').val();
+	dataStr += '&email='+$('#vcEmailEdit').val();
+	dataStr += '&website='+$('#vcWebsiteEdit').val();
+	dataStr += '&notes='+$('#vcNotesEdit').val();
+	dataStr += '&action=saveContactInfo';
+
+	$.ajax({
+		url: 'VendorIndexPage.php',
+		method: 'post',
+		data: dataStr,
+		success: function(resp){
+			$('#contentarea').html(resp);
 		}
 	});
 }

@@ -50,17 +50,17 @@ class TenderOut extends Parser {
 			if ($asTender != "FS") {
 				TransRecord::addchange($cash_return,'CA');
 			}
-			if ($asTender == "CK" && $cash_return > 0) {
-				$CORE_LOCAL->set("cashOverAmt",1); // apbw/cvr 3/5/05 cash back beep
-			}
 			$CORE_LOCAL->set("End",1);
 			$ret['output'] = DisplayLib::printReceiptFooter();
 			$ret['redraw_footer'] = true;
 			$ret['receipt'] = 'full';
+            TransRecord::finalizeTransaction();
 		} else {
 			$CORE_LOCAL->set("change",0);
 			$CORE_LOCAL->set("fntlflag",0);
-			PrehLib::ttl();
+			$ttl_result = PrehLib::ttl();
+            TransRecord::debugLog('Tender Out (PrehLib): ' . print_r($ttl_result, true));
+            TransRecord::debugLog('Tender Out (amtdue): ' . print_r($CORE_LOCAL->get('amtdue'), true));
 			$ret['output'] = DisplayLib::lastpage();
 		}
 		return $ret;

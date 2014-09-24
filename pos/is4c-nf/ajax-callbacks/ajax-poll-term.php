@@ -21,8 +21,25 @@
 
 *********************************************************************************/
 
+<<<<<<< HEAD
+=======
+/**
+ @deprecated 11Mar14 Andy
+
+ This is related to the Ingenico i6550 driver.
+ It's never been used in production and likely
+ doesn't work at this point, but may be helpful
+ as a starting point if that driver needs to
+ be resurrected.
+*/
+
+ini_set('display_errors','Off');
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
 
+/** $termDriver is a subclass of ScaleDriverWrapper 
+    the SigCapture setting is no longer in use though.
+*/
 $termDriver = $CORE_LOCAL->get("SigCapture");
 $td = 0;
 if ($termDriver != "") 
