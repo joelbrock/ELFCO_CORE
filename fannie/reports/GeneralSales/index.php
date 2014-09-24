@@ -124,9 +124,29 @@ if (isset($_REQUEST['submit'])){
 			CASE WHEN s.superID IS NULL THEN r.superID ELSE s.superID end,
 			CASE WHEN e.dept_no IS NULL THEN d.dept_no ELSE e.dept_no end";
 	}
+	$coups = "SELECT CASE WHEN t.upc = '' THEN 'Vendor Coupon' ELSE (CASE WHEN t.upc = 004999911111 THEN 'Member Appreciation Discount' ELSE t.upc END) END,
+		SUM(t.total),SUM(t.quantity)
+		FROM $dlog AS t
+		WHERE (tDate BETWEEN ? AND ?)
+		AND t.trans_subtype IN ('IC','MC')
+		AND t.trans_type in ('I','D')
+		AND t.trans_status not in ('D','X','Z')
+		AND t.emp_no not in (7000, 9999)
+		AND t.register_no != 99";
+	
+	$taxQ = "SELECT SUM(total) FROM $dlog WHERE trans_type = 'A' 
+		AND (tDate BETWEEN '$d1 00:00:00' AND '$d2 23:59:59')";
+        
+	$taxR = mysql_query($taxQ);
+	$tax = mysql_fetch_row($taxR);
+	
 	$supers = array();
 	$prep = $dbc->prepare_statement($sales);
 	$salesR = $dbc->exec_statement($prep,array($d1.' 00:00:00',$d2.' 23:59:59'));
+
+	$prep = $dbc->prepare_statement($coups);
+	$coupsR = $dbc->exec_statement($prep,array($d1.' 00:00:00',$d2.' 23:59:59'));
+
 	
 	$curSuper = 0;
 	$grandTotal = 0;
@@ -161,6 +181,9 @@ if (isset($_REQUEST['submit'])){
 			
 		echo "</table><br />";
 	}
+	
+	echo "<b>Sales Tax: </b>\$" . number_format($tax[0],2);
+	echo "<br />"
 
 	printf("<b>Total Sales: </b>\$%.2f",$grandTotal);
 }
