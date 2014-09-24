@@ -524,9 +524,10 @@ static public function addCoupon($strupc, $intdepartment, $dbltotal, $foodstamp=
   @param $strupc coupon UPC
   @param $intdepartment associated POS department
   @param $dbltotal coupon amount (should be negative)
+  @param $foodstamp reduce FS total
 */
-static public function addhousecoupon($strupc, $intdepartment, $dbltotal) {
-	self::addItem($strupc, " * Store Coupon", "I", "IC", "C", $intdepartment, 1, $dbltotal, $dbltotal, $dbltotal, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
+static public function addhousecoupon($strupc, $intdepartment, $dbltotal, $foodstamp=1) {
+	self::addItem($strupc, " * Store Coupon", "I", "IC", "C", $intdepartment, 1, $dbltotal, $dbltotal, $dbltotal, 0, 0, $foodstamp, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
 }
 
 /**

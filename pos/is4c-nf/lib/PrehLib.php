@@ -23,11 +23,6 @@
 
 /* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-<<<<<<< HEAD
-=======
-	13Feb2013 Andy Theuninck visitingMem support for memdiscountadd
-	13Jan2013 Eric Lee New omtr_ttl() based on ttl() for Ontario Meal Tax Rebate.
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 	18Sep2012 Eric Lee In setMember support for not displaying subtotal.
 
 */
@@ -1019,8 +1014,6 @@ static public function ttl() {
 	return True;
 }
 
-<<<<<<< HEAD
-=======
 //---------------------------------------
 
 //-------------------------------------------------
@@ -1179,7 +1172,6 @@ static public function omtr_ttl() {
 
 //---------------------------------------
 
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 /**
   See what the last item in the transaction is currently
   @return localtemptrans.description for the last item
