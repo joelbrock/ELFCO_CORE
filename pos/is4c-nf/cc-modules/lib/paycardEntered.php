@@ -152,6 +152,35 @@ class paycardEntered extends Parser {
 		// determine card issuer and type
 		$CORE_LOCAL->set("paycard_type",PaycardLib::paycard_type($CORE_LOCAL->get("paycard_PAN")));
 		$CORE_LOCAL->set("paycard_issuer",PaycardLib::paycard_issuer($CORE_LOCAL->get("paycard_PAN")));
+<<<<<<< HEAD:pos/is4c-nf/cc-modules/lib/paycardEntered.php
+=======
+
+		/* check card type. Credit is default. */
+		$type = $CORE_LOCAL->get("CacheCardType");
+		if ($type == ''){
+			$type = 'CREDIT';
+			$CORE_LOCAL->set("CacheCardType","CREDIT");
+		}
+	
+		/* assign amount due. EBT food should use eligible amount */
+		$CORE_LOCAL->set("paycard_amount",$CORE_LOCAL->get("amtdue"));
+		if ($type == 'EBTFOOD'){
+			if ($CORE_LOCAL->get('fntlflag') == 0){
+				/* try to automatically do fs total */
+				$try = PrehLib::fsEligible();
+				if ($try !== True){
+					$ret['output'] = PaycardLib::paycard_msgBox($type,"Type Mismatch",
+						"Foodstamp eligible amount inapplicable","[clear] to cancel");
+					return $ret;
+				}
+			}
+			$CORE_LOCAL->set("paycard_amount",$CORE_LOCAL->get("fsEligible"));
+		}
+		if (($type == 'EBTCASH' || $type == 'DEBIT') && $CORE_LOCAL->get('CacheCardCashBack') > 0){
+			$CORE_LOCAL->set('paycard_amount',
+				$CORE_LOCAL->get('amtdue') + $CORE_LOCAL->get('CacheCardCashBack'));
+		}
+>>>>>>> 6ef701b7099b88df44d419903824240e3f91a588:pos/is4c-nf/plugins/Paycards/lib/paycardEntered.php
 	
 		// if we knew the type coming in, make sure it agrees
 		if( $type != PaycardLib::PAYCARD_TYPE_UNKNOWN && $type != $CORE_LOCAL->get("paycard_type")) {

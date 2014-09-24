@@ -1,7 +1,7 @@
 <?php
 /*******************************************************************************
 
-    Copyright 2012 Whole Foods Co-op.
+    Copyright 2013 Whole Foods Co-op.
 
     This file is part of IT CORE.
 
@@ -21,22 +21,12 @@
 
 *********************************************************************************/
 
-/**
-  @class TenderFormat
-  Module for print-formatting 
-  tender records.
-*/
-class TenderFormat extends DefaultReceiptFormat {
+ini_set('display_errors','Off');
+include_once(realpath(dirname(__FILE__).'/../lib/AutoLoader.php'));
 
-	/**
-	  Formatting function
-	  @param $row a single receipt record
-	  @return a formatted string
-	*/
-	function format($row){
-		$ret = str_pad($row['description'],44,' ',STR_PAD_LEFT);
-		$ret .= str_pad(sprintf('%.2f',-1*$row['total']),8,' ',STR_PAD_LEFT);
-		$ret .= str_repeat(' ',4);
-		return $ret;
-	}
-}
+/*
+if ($CORE_LOCAL->get("testremote")==0)
+	Database::testremote(); 
+*/
+
+echo 'Done';

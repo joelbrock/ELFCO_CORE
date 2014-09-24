@@ -1,7 +1,7 @@
 <?php
 /*******************************************************************************
 
-    Copyright 2012 Whole Foods Co-op.
+    Copyright 2013 Whole Foods Co-op.
 
     This file is part of IT CORE.
 
@@ -22,27 +22,37 @@
 *********************************************************************************/
 
 /**
-  @class OtherFormat
-  Module for print-formatting 
-  miscelaneous records. 
+  @class ProductSearch
+  Base class for providing product search results
 */
-class OtherFormat extends DefaultReceiptFormat {
+class ProductSearch {
 
 	/**
-	  Formatting function
-	  @param $row a single receipt record
-	  @return a formatted string
+	  Set how big the result box is (in rows)
+	*/	
+	public $result_size = 15;
+
+	/**
+	  Do the actual search
+	  @param $str a search string
+	  @return array
+
+	  The return value is an array of product records.
+	  Each record should have the following keys:
+	    upc
+	    description
+	    normal_price
+	    scale
+	  The records can simply be query results or
+	  you can use some custom construction
+
+	  The outer array should be of the form
+	  upc => record so returns from multiple searches
+	  can be merged together easily.
 	*/
-	function format($row){
-		if ($row['trans_type'] == '0'){
-			// tare
-			$description = strtolower($description);
-			$description = str_replace('**',' =',$description);
-			return $description;
-		}
-		else if ($row['trans_type'] == 'H'){
-			return $row['description'];
-		}
-		return "";
+	public function search($str){
+		return array();
 	}
 }
+
+?>

@@ -27,20 +27,18 @@ if (empty($CORE_PATH)){ while(!file_exists($CORE_PATH."css/pos.css")) $CORE_PATH
 if (!function_exists("build_time")) include_once($CORE_PATH."lib/ReceiptLib.php");
 
 /**
-  @class TenderReport
+  @class DefaultTenderReport
   Generate a tender report
 */
-class TenderReport extends LibraryClass {
+class DefaultTenderReport extends TenderReport {
 
 /** 
  Print a tender report
- 
+
  This tender report is based on a single tender tape view
- rather than multiple views (e.g. ckTenders, ckTenderTotal, etc)
- adding a new tender is mostly just a matter of adding it
- to the $DESIRED_TENDERS array (exception being if you want
- special handling in the tender tape view (e.g., three
- tender types are actually compined under EBT)
+ rather than multiple views (e.g. ckTenders, ckTenderTotal, etc).
+ Which tenders to include is defined via checkboxes by the
+ tenders on the install page's "extras" tab.
  */
 static public function get(){
 	global $CORE_LOCAL;
@@ -70,6 +68,7 @@ static public function get(){
 		//$receipt .= chr(27).chr(33).chr(5);
 
 		$titleStr = "";
+		$itemize = 1;
 		for ($i = 0; $i < strlen($DESIRED_TENDERS[$tender_code]); $i++)
 			$titleStr .= $DESIRED_TENDERS[$tender_code][$i]." ";
 		$titleStr = substr($titleStr,0,strlen($titleStr)-1);
@@ -141,13 +140,7 @@ static public function get(){
 	$receipt .= ReceiptLib::centerString("Net Takings: ".number_format($net,2))."\n";
 	$receipt .= str_repeat("\n", 4);
 
-	ReceiptLib::writeLine($receipt.chr(27).chr(105));
-	$db_a->close();
-}
-
-static private function timeStamp($time) {
-
-	return strftime("%I:%M %p", strtotime($time));
+	return $receipt.chr(27).chr(105);
 }
 
 }

@@ -66,7 +66,7 @@ if (!function_exists("socket_create")){
 <tr>
 <td style="width: 30%;">OS: </td><td><select name=OS>
 <?php
-if (isset($_REQUEST['OS'])) $CORE_LOCAL->set('OS',$_REQUEST['OS']);
+if (isset($_REQUEST['OS'])) $CORE_LOCAL->set('OS',$_REQUEST['OS'],True);
 if ($CORE_LOCAL->get('OS') == 'win32'){
 	echo "<option value=win32 selected>Windows</option>";
 	echo "<option value=other>*nix</option>";
@@ -80,7 +80,7 @@ confsave('OS',"'".$CORE_LOCAL->get('OS')."'");
 </select></td></tr>
 <tr><td>Lane number:</td><td>
 <?php
-if (isset($_REQUEST['LANE_NO']) && is_numeric($_REQUEST['LANE_NO'])) $CORE_LOCAL->set('laneno',$_REQUEST['LANE_NO']);
+if (isset($_REQUEST['LANE_NO']) && is_numeric($_REQUEST['LANE_NO'])) $CORE_LOCAL->set('laneno',$_REQUEST['LANE_NO'],True);
 printf("<input type=text name=LANE_NO value=\"%d\" />",
 	$CORE_LOCAL->get('laneno'));
 confsave('laneno',$CORE_LOCAL->get('laneno'));
@@ -90,7 +90,7 @@ confsave('laneno',$CORE_LOCAL->get('laneno'));
 <tr><td>
 Lane database host: </td><td>
 <?php
-if (isset($_REQUEST['LANE_HOST'])) $CORE_LOCAL->set('localhost',$_REQUEST['LANE_HOST']);
+if (isset($_REQUEST['LANE_HOST'])) $CORE_LOCAL->set('localhost',$_REQUEST['LANE_HOST'],True);
 printf("<input type=text name=LANE_HOST value=\"%s\" />",
 	$CORE_LOCAL->get('localhost'));
 confsave('localhost',"'".$CORE_LOCAL->get('localhost')."'");
@@ -99,21 +99,20 @@ confsave('localhost',"'".$CORE_LOCAL->get('localhost')."'");
 Lane database type:</td>
 <td><select name=LANE_DBMS>
 <?php
-if(isset($_REQUEST['LANE_DBMS'])) $CORE_LOCAL->set('DBMS',$_REQUEST['LANE_DBMS']);
-if ($CORE_LOCAL->get('DBMS') == 'mssql'){
-	echo "<option value=mysql>MySQL</option>";
-	echo "<option value=mssql selected>SQL Server</option>";
-}
-else {
-	echo "<option value=mysql selected>MySQL</option>";
-	echo "<option value=mssql>SQL Server</option>";
+$db_opts = array('mysql'=>'MySQL','mssql'=>'SQL Server',
+	'pdomysql'=>'MySQL (PDO)','pdomssql'=>'SQL Server (PDO)');
+if(isset($_REQUEST['LANE_DBMS'])) $CORE_LOCAL->set('DBMS',$_REQUEST['LANE_DBMS'],True);
+foreach($db_opts as $name=>$label){
+	printf('<option %s value="%s">%s</option>',
+		($CORE_LOCAL->get('DBMS')==$name?'selected':''),
+		$name,$label);
 }
 confsave('DBMS',"'".$CORE_LOCAL->get('DBMS')."'");
 ?>
 </select></td></tr>
 <tr><td>Lane user name:</td><td>
 <?php
-if (isset($_REQUEST['LANE_USER'])) $CORE_LOCAL->set('localUser',$_REQUEST['LANE_USER']);
+if (isset($_REQUEST['LANE_USER'])) $CORE_LOCAL->set('localUser',$_REQUEST['LANE_USER'],True);
 printf("<input type=text name=LANE_USER value=\"%s\" />",
 	$CORE_LOCAL->get('localUser'));
 confsave('localUser',"'".$CORE_LOCAL->get('localUser')."'");
@@ -121,7 +120,7 @@ confsave('localUser',"'".$CORE_LOCAL->get('localUser')."'");
 </td></tr><tr><td>
 Lane password:</td><td>
 <?php
-if (isset($_REQUEST['LANE_PASS'])) $CORE_LOCAL->set('localPass',$_REQUEST['LANE_PASS']);
+if (isset($_REQUEST['LANE_PASS'])) $CORE_LOCAL->set('localPass',$_REQUEST['LANE_PASS'],True);
 printf("<input type=password name=LANE_PASS value=\"%s\" />",
 	$CORE_LOCAL->get('localPass'));
 confsave('localPass',"'".$CORE_LOCAL->get('localPass')."'");
@@ -129,7 +128,7 @@ confsave('localPass',"'".$CORE_LOCAL->get('localPass')."'");
 </td></tr><tr><td>
 Lane operational DB:</td><td>
 <?php
-if (isset($_REQUEST['LANE_OP_DB'])) $CORE_LOCAL->set('pDatabase',$_REQUEST['LANE_OP_DB']);
+if (isset($_REQUEST['LANE_OP_DB'])) $CORE_LOCAL->set('pDatabase',$_REQUEST['LANE_OP_DB'],True);
 printf("<input type=text name=LANE_OP_DB value=\"%s\" />",
 	$CORE_LOCAL->get('pDatabase'));
 confsave('pDatabase',"'".$CORE_LOCAL->get('pDatabase')."'");
@@ -193,7 +192,7 @@ else {
 </td></tr><tr><td>
 Lane transaction DB:</td><td>
 <?php
-if (isset($_REQUEST['LANE_TRANS_DB'])) $CORE_LOCAL->set('tDatabase',$_REQUEST['LANE_TRANS_DB']);
+if (isset($_REQUEST['LANE_TRANS_DB'])) $CORE_LOCAL->set('tDatabase',$_REQUEST['LANE_TRANS_DB'],True);
 printf("<input type=text name=LANE_TRANS_DB value=\"%s\" />",
 	$CORE_LOCAL->get('tDatabase'));
 confsave('tDatabase',"'".$CORE_LOCAL->get('tDatabase')."'");
@@ -270,7 +269,7 @@ else {
 </td></tr><tr><td>
 Server database host: </td><td>
 <?php
-if (isset($_REQUEST['SERVER_HOST'])) $CORE_LOCAL->set('mServer',$_REQUEST['SERVER_HOST']);
+if (isset($_REQUEST['SERVER_HOST'])) $CORE_LOCAL->set('mServer',$_REQUEST['SERVER_HOST'],True);
 printf("<input type=text name=SERVER_HOST value=\"%s\" />",
 	$CORE_LOCAL->get('mServer'));
 confsave('mServer',"'".$CORE_LOCAL->get('mServer')."'");
@@ -279,21 +278,20 @@ confsave('mServer',"'".$CORE_LOCAL->get('mServer')."'");
 Server database type:</td><td>
 <select name=SERVER_TYPE>
 <?php
-if (isset($_REQUEST['SERVER_TYPE'])) $CORE_LOCAL->set('mDBMS',$_REQUEST['SERVER_TYPE']);
-if ($CORE_LOCAL->get('mDBMS') == 'mssql'){
-	echo "<option value=mysql>MySQL</option>";
-	echo "<option value=mssql selected>SQL Server</option>";
-}
-else {
-	echo "<option value=mysql selected>MySQL</option>";
-	echo "<option value=mssql>SQL Server</option>";
+$db_opts = array('mysql'=>'MySQL','mssql'=>'SQL Server',
+	'pdomysql'=>'MySQL (PDO)','pdomssql'=>'SQL Server (PDO)');
+if (isset($_REQUEST['SERVER_TYPE'])) $CORE_LOCAL->set('mDBMS',$_REQUEST['SERVER_TYPE'],True);
+foreach($db_opts as $name=>$label){
+	printf('<option %s value="%s">%s</option>',
+		($CORE_LOCAL->get('mDBMS')==$name?'selected':''),
+		$name,$label);
 }
 confsave('mDBMS',"'".$CORE_LOCAL->get('mDBMS')."'");
 ?>
 </select></td></tr><tr><td>
 Server user name:</td><td>
 <?php
-if (isset($_REQUEST['SERVER_USER'])) $CORE_LOCAL->set('mUser',$_REQUEST['SERVER_USER']);
+if (isset($_REQUEST['SERVER_USER'])) $CORE_LOCAL->set('mUser',$_REQUEST['SERVER_USER'],True);
 printf("<input type=text name=SERVER_USER value=\"%s\" />",
 	$CORE_LOCAL->get('mUser'));
 confsave('mUser',"'".$CORE_LOCAL->get('mUser')."'");
@@ -301,7 +299,7 @@ confsave('mUser',"'".$CORE_LOCAL->get('mUser')."'");
 </td></tr><tr><td>
 Server password:</td><td>
 <?php
-if (isset($_REQUEST['SERVER_PASS'])) $CORE_LOCAL->set('mPass',$_REQUEST['SERVER_PASS']);
+if (isset($_REQUEST['SERVER_PASS'])) $CORE_LOCAL->set('mPass',$_REQUEST['SERVER_PASS'],True);
 printf("<input type=password name=SERVER_PASS value=\"%s\" />",
 	$CORE_LOCAL->get('mPass'));
 confsave('mPass',"'".$CORE_LOCAL->get('mPass')."'");
@@ -309,7 +307,7 @@ confsave('mPass',"'".$CORE_LOCAL->get('mPass')."'");
 </td></tr><tr><td>
 Server database name:</td><td>
 <?php
-if (isset($_REQUEST['SERVER_DB'])) $CORE_LOCAL->set('mDatabase',$_REQUEST['SERVER_DB']);
+if (isset($_REQUEST['SERVER_DB'])) $CORE_LOCAL->set('mDatabase',$_REQUEST['SERVER_DB'],True);
 printf("<input type=text name=SERVER_DB value=\"%s\" />",
 	$CORE_LOCAL->get('mDatabase'));
 confsave('mDatabase',"'".$CORE_LOCAL->get('mDatabase')."'");
@@ -533,6 +531,17 @@ function create_op_dbs($db,$type){
 	if (!$db->table_exists('globalvalues',$name)){
 		db_structure_modify($db,'globalvalues',$globalQ,$errors);
 		load_sample_data($db,'globalvalues');
+	}
+
+	$ddQ = "CREATE TABLE drawerowner (
+		drawer_no tinyint,
+		emp_no smallint,
+		PRIMARY KEY (drawer_no)
+		)";
+	if (!$db->table_exists('drawerowner',$name)){
+		db_structure_modify($db,'drawerowner',$ddQ,$errors);
+		$db->query('INSERT INTO drawerowner (drawer_no) VALUES (1)');
+		$db->query('INSERT INTO drawerowner (drawer_no) VALUES (2)');
 	}
 
 	$prodQ = "CREATE TABLE `products` (
@@ -1108,18 +1117,6 @@ function create_trans_dbs($db,$type){
 		db_structure_modify($db,'memdiscountremove',$mRem,$errors);
 	}
 
-	$rplist = "CREATE VIEW rp_list AS
-		SELECT min(datetime) as time,
-		register_no,
-		emp_no,
-		trans_no,
-		sum(CASE WHEN trans_type = 'T' THEN -1*total ELSE 0 END) as total
-		from localtranstoday
-		GROUP BY register_no,emp_no,trans_no";
-	if (!$db->table_exists('rp_list',$name)){
-		db_structure_modify($db,'rp_list',$rplist,$errors);
-	}
-
 	$taxQ = "CREATE TABLE taxrates (
 		id		int,
 		rate		float,
@@ -1534,11 +1531,16 @@ function create_trans_dbs($db,$type){
 		trans_type,
 		unitPrice,
 		voided,
-		trans_id
+		CASE 
+			WHEN upc = 'DISCOUNT' THEN (
+			SELECT MAX(trans_id) FROM localtemptrans WHERE voided=3
+			)-1
+			WHEN trans_type = 'T' THEN trans_id+99999	
+			ELSE trans_id
+		END AS trans_id
 		from localtemptrans
-		where voided <> 5 and UPC <> 'TAX' and UPC <> 'DISCOUNT'
-		AND trans_type <> 'L'
-		order by trans_id";
+		where voided <> 5 and UPC <> 'TAX'
+		AND trans_type <> 'L'";
 	if($type == 'mssql'){
 		$lttR = "CREATE view ltt_receipt as 
 			select
@@ -1583,10 +1585,16 @@ function create_trans_dbs($db,$type){
 			as Status,
 			trans_type,
 			unitPrice,
-			voided,
 			trans_id
+			CASE 
+				WHEN upc = 'DISCOUNT' THEN (
+				SELECT MAX(trans_id) FROM localtemptrans WHERE voided=3
+				)-1
+				WHEN trans_type = 'T' THEN trans_id+99999	
+				ELSE trans_id
+			END AS trans_id
 			from localtemptrans
-			where voided <> 5 and UPC <> 'TAX' and UPC <> 'DISCOUNT'
+			where voided <> 5 and UPC <> 'TAX'
 			AND trans_type <> 'L'
 			order by trans_id";
 	}
@@ -1615,7 +1623,7 @@ function create_trans_dbs($db,$type){
 			when voided = 7 or voided = 17
 				then 	concat(left(concat(Description, space(30)), 30) 
 					, space(14) 
-					, right(concat(space(8), format(UnitPrice, 2)), 8) 
+					, right(concat(space(8), format(unitPrice, 2)), 8) 
 					, right(concat(space(4), status), 4))
 			else
 				concat(left(concat(Description, space(30)), 30)
@@ -1940,7 +1948,7 @@ function create_trans_dbs($db,$type){
 		httpCode int ,
 		validResponse smallint ,
 		xResponseCode varchar (4),
-		xResultCode varchar (4), 
+		xResultCode varchar (8), 
 		xResultMessage varchar (100),
 		xTransactionID varchar (12),
 		xApprovalNumber varchar (20)
@@ -1977,6 +1985,8 @@ function create_trans_dbs($db,$type){
 			expireDay datetime, 
 			refNum varchar(50),
 			token varchar(100),
+			processData varchar(255),
+			acqRefData varchar(255),
 			PRIMARY KEY (refNum)
 		)";
 	if(!$db->table_exists('efsnetTokens',$name)){

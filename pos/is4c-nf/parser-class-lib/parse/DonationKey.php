@@ -33,10 +33,15 @@ class DonationKey extends Parser {
 		$ret = $this->default_json();
 		if ($str == "RU"){
 			Database::getsubtotals();
-			$ttl = $CORE_LOCAL->get("runningTotal");	
+			$ttl = $CORE_LOCAL->get("amtdue");	
 			$next = ceil($ttl);
+<<<<<<< HEAD
 			$amt = ($ttl == $next) ? 1.00 : $next - $ttl;
 			$ret = PrehLib::deptkey($amt*100, 850, $ret);
+=======
+			$amt = sprintf('%.2f',(($ttl == $next) ? 1.00 : ($next - $ttl)));
+			$ret = PrehLib::deptkey($amt*100, 7010, $ret);
+>>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 		}
 		else {
 			$amt = substr($str,0,strlen($str)-2);

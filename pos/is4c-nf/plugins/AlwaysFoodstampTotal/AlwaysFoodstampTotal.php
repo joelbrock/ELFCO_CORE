@@ -1,7 +1,7 @@
 <?php
 /*******************************************************************************
 
-    Copyright 2012 Whole Foods Co-op.
+    Copyright 2012 Whole Foods Co-op
 
     This file is part of IT CORE.
 
@@ -21,38 +21,13 @@
 
 *********************************************************************************/
 
-/**
-  @class TotalFormat
-  Module for print-formatting 
-  total records. 
-*/
-class TotalFormat extends DefaultReceiptFormat {
+class AlwaysFoodstampTotal extends Plugin {
 
-	/**
-	  Formatting function
-	  @param $row a single receipt record
-	  @return a formatted string
-	*/
-	function format($row){
-		switch($row['upc']){
-		case 'SUBTOTAL':
-		case 'TOTAL':
-		case 'TAX':
-			return $this->align($row['upc'],$row['total']);	
-			break;
-		case 'DISCOUNT':
-			$text = sprintf("%d%% Discount Applied",$row['percentDiscount']);
-			return $this->align($text,$row['total']);
-			break;
-		}
-	}
+	public $plugin_description = 'Always display foodstamp total. Provides
+			two new footer boxes. AlwaysFsTotalFooter should probably
+			replace the defaultMultiTotal to show Total/Due/Change.
+			AlwaysFsEligibleFooter can go in one of the other slots
+			to show the foodstamp eligible total.';	
 
-	function align($text,$amount){
-		$amount = sprintf('%.2f',$amount);
-
-		$ret = str_pad($text,44,' ',STR_PAD_LEFT);
-		$ret .= str_pad($amount,8,' ',STR_PAD_LEFT);
-		$ret .= str_repeat(' ',4);
-		return $ret;
-	}
+	public $plugin_settings = array();
 }

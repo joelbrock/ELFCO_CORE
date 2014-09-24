@@ -61,6 +61,7 @@ class pos2 extends BasicPage {
 
 		$json = array();
 		if ($entered != ""){
+<<<<<<< HEAD
 			/* this breaks the model a bit, but I'm putting
 			 * putting the CC parser first manually to minimize
 			 * code that potentially handles the PAN */
@@ -71,6 +72,29 @@ class pos2 extends BasicPage {
 				$entered = "PAYCARD";
 				$CORE_LOCAL->set("strEntered","");
 				$json = $valid;
+=======
+
+			if (in_array("Paycards",$CORE_LOCAL->get("PluginList"))){
+				/* this breaks the model a bit, but I'm putting
+				 * putting the CC parser first manually to minimize
+				 * code that potentially handles the PAN */
+				if($CORE_LOCAL->get("PaycardsCashierFacing")=="1" && substr($entered,0,9) == "PANCACHE:"){
+					/* cashier-facing device behavior; run card immediately */
+					$entered = substr($entered,9);
+					$CORE_LOCAL->set("CachePanEncBlock",$entered);
+				}
+
+				$pe = new paycardEntered();
+				if ($pe->check($entered)){
+					$valid = $pe->parse($entered);
+					$entered = "PAYCARD";
+					$CORE_LOCAL->set("strEntered","");
+					$json = $valid;
+				}
+
+				$CORE_LOCAL->set("quantity",0);
+				$CORE_LOCAL->set("multiple",0);
+>>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 			}
 
 			$CORE_LOCAL->set("quantity",0);
@@ -161,14 +185,20 @@ class pos2 extends BasicPage {
 		<script type="text/javascript">
 		function submitWrapper(){
 			var str = $('#reginput').val();
+<<<<<<< HEAD
 			if (str.indexOf("tw") != -1 || str.indexOf("TW") != -1 || (str.search(/^[0-9]+$/) == 0 && str.length <= 13) || str=='TFS'){
 				$('#reginput').val('');
+=======
+			$('#reginput').val('');
+			//if (str.indexOf("tw") != -1 || str.indexOf("TW") != -1 || (str.search(/^[0-9]+$/) == 0 && str.length <= 13) || str=='TFS'
+			 //   || str == 'U' || str == 'D'){
+>>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 				clearTimeout(screenLockVar);
 				runParser(str,'<?php echo $this->page_url; ?>');
 				enableScreenLock();
 				return false;
-			}
-			return true;
+			//}
+			//return true;
 		}
 		function parseWrapper(str){
 			$('#reginput').val(str);
@@ -193,8 +223,12 @@ class pos2 extends BasicPage {
 				url: '<?php echo $this->page_url; ?>ajax-callbacks/ajax-end.php',
 				type: 'get',
 				data: 'receiptType='+r_type,
+				dataType: 'json',
 				cache: false,
 				success: function(data){
+					if (data.sync){
+						ajaxTransactionSync('<?php echo $this->page_url; ?>');
+					}
 				},
 				error: function(e1){
 				}
@@ -276,6 +310,31 @@ class pos2 extends BasicPage {
 		else
 			echo DisplayLib::printfooter();
 		echo "</div>";
+
+		if ($CORE_LOCAL->get("touchscreen") === True){
+			echo '<div style="text-align: center;">
+			<input type="submit" value="Items"
+				class="quick_button"
+				style="margin: 0 10px 0 0;"
+				onclick="parseWrapper(\'QK0\');" />
+			<input type="submit" value="Total"
+				class="quick_button"
+				style="margin: 0 10px 0 0;"
+				onclick="parseWrapper(\'QK4\');" />
+			<input type="submit" value="Tender"
+				class="quick_button"
+				style="margin: 0 10px 0 0;"
+				onclick="parseWrapper(\'QK2\');" />
+			<input type="submit" value="Member"
+				class="quick_button"
+				style="margin: 0 10px 0 0;"
+				onclick="parseWrapper(\'QK5\');" />
+			<input type="submit" value="Misc"
+				class="quick_button"
+				style="margin: 0 10px 0 0;"
+				onclick="parseWrapper(\'QK6\');" />
+			</div>';
+		}
 
 		$CORE_LOCAL->set("away",0);
 	} // END body_content() FUNCTION
