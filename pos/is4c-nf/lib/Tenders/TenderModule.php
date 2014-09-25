@@ -31,6 +31,7 @@ class TenderModule {
 	var $amount;
 
 	var $name_string;
+	var $change_type;
 	var $change_string;
 	var $min_limit;
 	var $max_limit;
@@ -62,13 +63,12 @@ class TenderModule {
 			$this->max_limit = $row['MaxAmount'];
 		}
 		else {
-			$this->name_string = "";
-			$this->change_string = "";
+			$this->name_string = '';
+			$this->change_string = '';
 			$this->min_limit = 0;
 			$this->max_limit = 0;
+			$this->change_type = 'CA';
 		}
-
-		$db->close();
 	}
 
 	/**
@@ -102,7 +102,7 @@ class TenderModule {
 		global $CORE_LOCAL;
 		if ($this->amount > $this->max_limit && $CORE_LOCAL->get("msgrepeat") == 0){
 			$CORE_LOCAL->set("boxMsg","$".$this->amount." "._("is greater than tender limit for")
-			." ".$row['TenderName']."<p>"
+			." ".$this->name_string."<p>"
 			."<font size='-1'>"._("clear to cancel").", "._("enter to proceed")."</font>");
 			return MiscLib::base_url().'gui-modules/boxMsg2.php';
 		}
@@ -125,17 +125,16 @@ class TenderModule {
 			"", 0, 0, 0, -1*$this->amount, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	}
 
+
 	/**
 	  What type should be used for change records associated with this tender.
 	  @return string tender code
-
-	  Most common override will probably be "return $this->tender_code;" to
-	  give change records a the same code as the tender rather than giving
-	  change as cash.
 	*/
 	function ChangeType(){
 		return "CA";
+		// return $this->change_type;
 	}
+
 
 }
 

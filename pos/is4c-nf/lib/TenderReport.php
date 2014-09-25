@@ -111,32 +111,36 @@ static public function get(){
 	}
 	//	Print itemized equity sales
 	if ($CORE_LOCAL->get("store") == "elfco") {
-		$titleStr = "O w n e r   E q u i t y";
-		$receipt .= ReceiptLib::centerString($titleStr)."\n";
-		$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n";
-		$receipt .= $ref;
-		$receipt .=	ReceiptLib::centerString("------------------------------------------------------");
-
 		$eqQ = "SELECT datetime, register_no, trans_no, description, total
 			FROM dtransactions WHERE emp_no=".$CORE_LOCAL->get("CashierNo")."
 			AND department IN (83,84)";
 		$eqR = $db_a->query($eqQ);
 		$eq_num = $db_a->num_rows($eqR);
 
-		for ($i = 0; $i < $eq_num; $i++) {
-			$eq = $db_a->fetch_array($eqR);
-			$timeStamp = self::timeStamp($eq["datetime"]);
-			$receipt .= "  ".substr($timeStamp.$blank, 0, 12)
-			.substr($eq["register_no"].$blank, 0, 4)
-			.substr($eq["trans_no"].$blank, 0, 4)
-			.substr($eq["description"].$blank, 0, 24)
-			.substr($blank.number_format($eq["total"], 2), -8)."\n";
-			$eq_sum += $eq["total"];
-		}
-		$receipt.= ReceiptLib::centerString("------------------------------------------------------");
+		if ($eq_num > 0) {
 
-		$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($eq_sum,2), -56)."\n";
-		$receipt .= str_repeat("\n", 2);
+			$titleStr = "O w n e r   E q u i t y";
+			$receipt .= ReceiptLib::centerString($titleStr)."\n";
+			$ref = ReceiptLib::centerString(trim($CORE_LOCAL->get("CashierNo"))." ".trim($CORE_LOCAL->get("cashier"))." ".ReceiptLib::build_time(time()))."\n";
+			$receipt .= $ref;
+			$receipt .=	ReceiptLib::centerString("------------------------------------------------------");
+
+
+			for ($i = 0; $i < $eq_num; $i++) {
+				$eq = $db_a->fetch_array($eqR);
+				$timeStamp = self::timeStamp($eq["datetime"]);
+				$receipt .= "  ".substr($timeStamp.$blank, 0, 12)
+				.substr($eq["register_no"].$blank, 0, 4)
+				.substr($eq["trans_no"].$blank, 0, 4)
+				.substr($eq["description"].$blank, 0, 24)
+				.substr($blank.number_format($eq["total"], 2), -8)."\n";
+				$eq_sum += $eq["total"];
+			}
+			$receipt.= ReceiptLib::centerString("------------------------------------------------------");
+
+			$receipt .= substr($blank.$blank.$blank."Count: ".$num_rows."  Total: ".number_format($eq_sum,2), -56)."\n";
+			$receipt .= str_repeat("\n", 2);
+		}
 	}
 	$receipt .= ReceiptLib::centerString("Net Takings: ".number_format($net,2))."\n";
 	$receipt .= str_repeat("\n", 4);

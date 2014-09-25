@@ -30,7 +30,7 @@ if (isset($_POST["submit"])){
 		$ppo = '';
 		if (isset($_POST["ppo"][$i])) $ppo = $_POST["ppo"][$i];
 
-		$queries[$i] = "UPDATE shelftags SET description='$desc',
+		$queries[$i] = "UPDATE shelftags SET description=\"$desc\",
 				normal_price=$price,
 				brand='$brand',
 				sku='$sku',

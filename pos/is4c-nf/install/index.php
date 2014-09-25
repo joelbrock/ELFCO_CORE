@@ -498,6 +498,7 @@ function create_op_dbs($db,$type){
 		dept_fs tinyint,
 		dept_limit real,
 		dept_minimum real,
+		dept_id_enforced tinyint,
 		dept_discount tinyint,
 		modified datetime,
 		modifiedby int,
