@@ -36,8 +36,8 @@
 set_time_limit(0);
 
 $SPINS_SERVER = "ftp.spins.com";
-$SPINS_USER = "est_lnsg";
-$SPINS_PW = "etlsfc540";
+$SPINS_USER = "whole_food_duluth";
+$SPINS_PW = "wfcc\$54*";
 
 include('../config.php');
 include($FANNIE_ROOT.'src/SQLManager.php');
