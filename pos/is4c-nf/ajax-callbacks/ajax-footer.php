@@ -23,9 +23,6 @@
 
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
 
-if ($CORE_LOCAL->get("away") == 1)
-	echo DisplayLib::printfooterb();
-else
-	echo DisplayLib::printfooter();
+echo DisplayLib::printfooter();
 
 ?>

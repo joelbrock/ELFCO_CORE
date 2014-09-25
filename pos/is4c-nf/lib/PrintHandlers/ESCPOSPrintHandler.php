@@ -9,7 +9,7 @@ Notes
 	42 columns with standard 12x24 font, 56 columns with alternate 9x17 font
 */
 
-class ESCPOSPrintHandler {
+class ESCPOSPrintHandler extends PrintHandler {
 	
 	function Tab() {
 		// "\t"
@@ -705,45 +705,53 @@ class ESCPOSPrintHandler {
 	}
 
 	function writeLine($text){
-		global $CORE_LOCAL;
-		if ($CORE_LOCAL->get("print") != 0) {
-
-			/* check fails on LTP1: in PHP4
-			   suppress open errors and check result
-			   instead 
-			*/
-			//if (is_writable($CORE_LOCAL->get("printerPort"))){}
-			$fp = fopen($CORE_LOCAL->get("printerPort"), "w");
-			if ($fp){
-				fwrite($fp, $text);
-				fclose($fp);
-			}
-		}
+        ReceiptLib::writeLine($text);
 	}
 
-	function RenderBitmapFromFile($fn){
+	function RenderBitmapFromFile($fn, $align='C'){
+		return $this->RenderBitmap($fn, $align);
+	}
+
+	/**
+	  Turn bitmap into receipt string
+	  @param $arg string filename OR Bitmap obj
+	  @return receipt-formatted string
+	*/
+	function RenderBitmap($arg, $align='C'){
 		$slip = "";
 
 		if (!class_exists('Bitmap')) return "";
 
-		$bmp = new Bitmap();
-		$bmp->Load($fn);
+		$bmp = null;
+		if (is_object($arg) && is_a($arg, 'Bitmap')){
+			$bmp = $arg;
+		}
+		else if (file_exists($arg)){
+			$bmp = new Bitmap();
+			$bmp->load($arg);
+		}
 
-		$bmpData = $bmp->GetRawData();
-		$bmpWidth = $bmp->GetWidth();
-		$bmpHeight = $bmp->GetHeight();
+		// argument was invalid
+		if ($bmp === null)
+			return "";
+
+		$bmpData = $bmp->getRawData();
+		$bmpWidth = $bmp->getWidth();
+		$bmpHeight = $bmp->getHeight();
 		$bmpRawBytes = (int)(($bmpWidth + 7)/8);
 
 		$stripes = $this->TransposeBitmapData($bmpData, $bmpWidth);
 		for($i=0; $i<count($stripes); $i++)
 			$stripes[$i] = $this->InlineBitmap($stripes[$i], $bmpWidth);
 
-		$slip .= $this->AlignCenter();
+		if ($align == 'C')
+			$slip .= $this->AlignCenter();
 		if (count($stripes) > 1)
 			$slip .= $this->LineSpacing(0);
 		$slip .= implode("\n",$stripes);
 		if (count($stripes) > 1)
-			$slip .= $this->ResetLineSpacing()."\n";
+			$slip .= $this->ResetLineSpacing();
+		if ($align == 'C') $slip .= "\n";
 		$slip .= $this->AlignLeft();
 
 		return $slip;

@@ -41,12 +41,13 @@ class RRR extends Parser {
 		$this->add($qty);
 
 		$ret['output'] = DisplayLib::lastpage();
+		$ret['udpmsg'] = 'goodBeep';
 
 		Database::getsubtotals();
-		if ($CORE_LOCAL->get("runningTotal") == 0){
-			$CORE_LOCAL->set("End",2);
-			$ret['receipt'] = 'none';
+		if ($CORE_LOCAL->get("runningTotal") == 0) {
+            TransRecord::finalizeTransaction(true);
 		}
+
 		return $ret;
 	}
 
@@ -54,7 +55,12 @@ class RRR extends Parser {
 	// quantity is getting shoved into the volume special
 	// column so that basket-size stats aren't skewed
 	function add($qty) {
-		TransRecord::addItem("RRR", "$qty RRR DONATED", "I", "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, $qty, 0, 0, 0);
+        TransRecord::addRecord(array(
+            'upc' => 'RRR',
+            'description' => $qty . ' RRR DONATED',
+            'trans_type' => 'I',
+            'VolSpecial' => $qty,
+        ));
 	}
 
 	function doc(){

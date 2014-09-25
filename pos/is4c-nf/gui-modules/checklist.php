@@ -63,29 +63,10 @@ class checklist extends NoInputPage {
 	  Pretty standard javascript for
 	  catching CL typed in a select box
 	*/
-	function head_content(){
-		global $CORE_LOCAL;
+	function head_content()
+    {
 		?>
-		<script type="text/javascript" >
-		var prevKey = -1;
-		var prevPrevKey = -1;
-		function processkeypress(e) {
-			var jsKey;
-			if (e.keyCode) // IE
-				jsKey = e.keyCode;
-			else if(e.which) // Netscape/Firefox/Opera
-				jsKey = e.which;
-			if (jsKey==13) {
-				if ( (prevPrevKey == 99 || prevPrevKey == 67) &&
-				(prevKey == 108 || prevKey == 76) ){ //CL<enter>
-					$('#search option:selected').val('');
-				}
-				$('#selectform').submit();
-			}
-			prevPrevKey = prevKey;
-			prevKey = jsKey;
-		}
-		</script> 
+        <script type="text/javascript" src="../js/selectSubmit.js"></script>
 		<?php
 	} // END head() FUNCTION
 
@@ -95,7 +76,7 @@ class checklist extends NoInputPage {
 	*/
 	function body_content(){
 		global $CORE_LOCAL;
-		$db = pDataConnect();
+		$db = Database::pDataConnect();
 		$q = "SELECT TenderCode,TenderName FROM tenders WHERE TenderName LIKE '%check%' ORDER BY TenderName";
 		$r = $db->query($q);
 
@@ -116,22 +97,18 @@ class checklist extends NoInputPage {
 		echo "</select>"
 			."</form>"
 			."</div>"
-			."<div class=\"listboxText centerOffset\">"
+			."<div class=\"listboxText coloredText centerOffset\">"
 			."[Clear] to Cancel</div>"
 			."<div class=\"clear\"></div>";
 		echo "</div>";
 
-		if (is_object($db))
-			$db->close();
-		$CORE_LOCAL->set("scan","noScan");
-		$CORE_LOCAL->set("beep","noBeep");
-
-		$this->add_onload_command("\$('#search').keypress(processkeypress);\n");
+        $this->add_onload_command("selectSubmit('#search', '#selectform')\n");
 		$this->add_onload_command("\$('#search').focus();\n");
 	} // END body_content() FUNCTION
 
 }
 
-new checklist();
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF']))
+	new checklist();
 
 ?>

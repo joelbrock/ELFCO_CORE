@@ -26,6 +26,9 @@ include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
 $input = isset($_REQUEST['input'])?$_REQUEST['input']:'';
 $display = DisplayLib::scaledisplaymsg($input);
 
-echo $display;
+if (is_array($display))
+	echo $display['display'];
+else
+	echo $display;
 
 ?>

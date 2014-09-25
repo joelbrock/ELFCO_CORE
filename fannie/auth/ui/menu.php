@@ -21,24 +21,26 @@
 
 *********************************************************************************/
 
+header("Location: AuthIndexPage.php");
+
 require('../login.php');
-$path = guesspath();
-include($path."config.php");
+include("../../config.php");
 $page_title = 'Fannie : Auth : Menu';
 $header = 'Fannie : Auth : Menu';
-include($path."src/header.html");
+include($FANNIE_ROOT."src/header.html");
 
 $name = checkLogin();
 if (!$name){
   echo "You must be <a href=loginform.php>logged in</a> to use this</a>";
 }
 else {
-  $priv = checkAuth($name,'admin');
+  $priv = validateUserQuiet('admin');
   $options = 'all';
   if (!$priv){
-    $options = 'limited';
+        $options = 'limited';
   }
-  
+
+
   /* password change only allowed if not using
      UNIX or LDAP passwords */
   echo "Welcome $name<p />";
@@ -49,31 +51,31 @@ else {
     echo "<li><a href=editClassNotes.php>Edit authorization class</a></li>";
     echo "<li><a href=deleteClass.php>Delete authorization class</a></li>";
     echo "<br />";
-    echo "<li><a href=viewUsers.php>View users</a></li>";
-    echo "<li><a href=createUser.php>Create user</a></li>";
+    echo "<li><a href=viewUsers.php>View Users</a></li>";
+    echo "<li><a href=viewAuths.php>View a User's authorizations</a></li>";
+    echo "<li><a href=createUser.php>Create User</a></li>";
+    echo "<li><a href=addAuth.php>Add authorization to a User</a></li>";
+    echo "<li><a href=deleteUser.php>Delete User</a></li>";
+    echo "<li><a href=deleteAuth.php>Delete a User's authorizations</a></li>";
     if (!$FANNIE_AUTH_SHADOW && !$FANNIE_AUTH_LDAP)
-	echo "<li><a href=resetUserPassword.php>Reset user password</a></li>";
-    echo "<li><a href=deleteUser.php>Delete user</a></li>";
-    echo "<li><a href=viewAuths.php>View a user's authorizations</a></li>";
-    echo "<li><a href=addAuth.php>Add new authorization to a user</a></li>";
-    echo "<li><a href=deleteAuth.php>Delete user's authorizations</a></li>";
+            echo "<li><a href=resetUserPassword.php>Reset a User's password</a></li>";
     echo "<br />";
-    echo "<li><a href=addGroup.php>Add a Group</a></li>";
-    echo "<li><a href=deleteGroup.php>Delete a Group</a></li>";
-    echo "<li><a href=addGroupUser.php>Add User to Group</a></li>";
-    echo "<li><A href=deleteGroupUser.php>Delete User from Group</a></li>";
-    echo "<li><a href=addGroupAuth.php>Add Group authorization</a></li>";
-    echo "<li><A href=deleteGroupAuth.php>Delete Group authorizations</a></li>";
     echo "<li><a href=viewGroups.php>View Groups</a></li>";
-    echo "<li><a href=groupDetail.php>View Group Details</a></li>";
+    echo "<li><a href=groupDetail.php>View Details of a Group</a></li>";
+    echo "<li><a href=addGroup.php>Create a Group</a></li>";
+    echo "<li><a href=addGroupUser.php>Add User to Group</a></li>";
+    echo "<li><a href=addGroupAuth.php>Add authorization to a Group</a></li>";
+    echo "<li><a href=deleteGroup.php>Delete a Group</a></li>";
+    echo "<li><A href=deleteGroupUser.php>Delete User from Group</a></li>";
+    echo "<li><A href=deleteGroupAuth.php>Delete a Group's authorizations</a></li>";
     echo "<br />";
     echo "<li><a href=pose.php>Switch User</a></li>";
   }
   if (!$FANNIE_AUTH_SHADOW && !$FANNIE_AUTH_LDAP)
-	  echo "<li><a href=changepass.php>Change password</a></li>";
+      echo "<li><a href=changepass.php>Change password</a></li>";
   echo "<li><a href=loginform.php?logout=yes>Logout</a></li>";
   echo "</ul>";
 }  
 
-include($path."src/footer.html");
+include($FANNIE_ROOT."src/footer.html");
 ?>

@@ -43,6 +43,8 @@ class BasicPage {
 	*/
 	var $page_url;
 
+	var $body_class='mainBGimage';
+
 	/**
 	  Constructor
 
@@ -121,15 +123,15 @@ class BasicPage {
 		echo "<link rel=\"stylesheet\" type=\"text/css\"
 		    href=\"{$my_url}/css/pos.css\">";
 		// include store css file if it exists
-		if (file_exists(dirname(__FILE__).'/../store.css')){
+		if (file_exists(dirname(__FILE__).'/../css/store.css')){
 			echo "<link rel=\"stylesheet\" type=\"text/css\"
-			    href=\"{$my_url}/store.css\">";
+			    href=\"{$my_url}/css/store.css\">";
 		}
 		echo "<script type=\"text/javascript\"
 			src=\"{$my_url}/js/jquery.js\"></script>";
 		$this->head_content();
 		echo "</head>";
-		echo "<body>";
+		echo '<body class="'.$this->body_class.'">';
 		echo "<div id=\"boundingBox\">";
 		$this->body_content();	
 		echo "</div>";
@@ -160,6 +162,11 @@ class BasicPage {
 		$this->onload_commands .= $str."\n";
 	}
 
+	protected $mask_input = False;
+	function hide_input($bool){
+		$this->mask_input = $bool;
+	}
+
 	/**
 	  Display the standard header with input box
 	  @param $action What the form does
@@ -181,7 +188,7 @@ class BasicPage {
 		$this->add_onload_command("betterDate();\n\$('#reginput').focus();");
 		
 		$inputType = "text";
-		if ($CORE_LOCAL->get("inputMasked") != 0)
+		if ($this->mask_input)
 			$inputType = "password";
 		// this needs to be configurable; just fixing
 		// a giant PHP warning for the moment
@@ -223,7 +230,7 @@ class BasicPage {
 					type="<?php echo $inputType; ?>" id="reginput"  />
 				</form>
 			</div>
-			<div class="notices <?php echo ($CORE_LOCAL->get("training")==1?'training':''); ?>">
+			<div class="notices coloredText <?php echo ($CORE_LOCAL->get("training")==1?'training':''); ?>">
 			<?php
 			if ($CORE_LOCAL->get("training") == 1) {
 				echo "<span class=\"text\">"._("training")." </span>"
@@ -237,19 +244,17 @@ class BasicPage {
 				     ."<img alt=\"standalone\" src='{$my_url}graphics/REDDOT.GIF'>&nbsp;&nbsp;&nbsp;";
 			}
 			if ($CORE_LOCAL->get("receiptToggle")==1){
-				echo "<img alt=\"receipt\" src='{$my_url}graphics/receipt.gif'>&nbsp;&nbsp;&nbsp;";
+				echo "<img id=\"receipticon\" alt=\"receipt\" src='{$my_url}graphics/receipt.gif'>&nbsp;&nbsp;&nbsp;";
 			}
 			else {
-				echo "<img alt=\"no receipt\" src='{$my_url}graphics/noreceipt.gif'>&nbsp;&nbsp;&nbsp;";
+				echo "<img id=\"receipticon\" alt=\"no receipt\" src='{$my_url}graphics/noreceipt.gif'>&nbsp;&nbsp;&nbsp;";
 			}
-			if($CORE_LOCAL->get("CCintegrate") == 1 && 
-				$CORE_LOCAL->get("ccLive") == 1 && $CORE_LOCAL->get("training") == 0){
+			if ($CORE_LOCAL->get("CCintegrate") == 1 && $CORE_LOCAL->get("training") == 0) {
 			   if ($CORE_LOCAL->get("CachePanEncBlock")=="")
 				   echo "<img alt=\"cc mode\" src='{$my_url}graphics/ccIn.gif'>&nbsp;";
 			   else
 				   echo "<img alt=\"cc available\" src='{$my_url}graphics/ccInLit.gif'>&nbsp;";
-			}elseif($CORE_LOCAL->get("CCintegrate") == 1 && 
-				($CORE_LOCAL->get("training") == 1 || $CORE_LOCAL->get("ccLive") == 0)){
+			} elseif ($CORE_LOCAL->get("CCintegrate") == 1 && $CORE_LOCAL->get("training") == 1) {
 			   if ($CORE_LOCAL->get("CachePanEncBlock")=="")
 				   echo "<img alt=\"cc test mode\" src='{$my_url}graphics/ccTest.gif'>&nbsp;";
 			   else
@@ -313,7 +318,7 @@ class BasicPage {
 			<div class="inputform">
 			&nbsp;
 			</div>
-			<div class="notices">
+			<div class="notices coloredText">
 			<?php	
 			if ($CORE_LOCAL->get("training") == 1) {
 				echo "<span class=\"text\">"._("training")." </span>"
@@ -326,12 +331,25 @@ class BasicPage {
 				echo "<span class=\"text\">stand alone</span>"
 				     ."<img alt=\"standalone\" src='{$my_url}graphics/REDDOT.GIF'>&nbsp;&nbsp;&nbsp;";
 			}
+<<<<<<< HEAD
 			if($CORE_LOCAL->get("CCintegrate") == 1 && 
 				$CORE_LOCAL->get("ccLive") == 1 && $CORE_LOCAL->get("training") == 0){
 			   echo "<img alt=\"cc mode\" src='/graphics/ccIn.gif'>&nbsp;";
 			}elseif($CORE_LOCAL->get("CCintegrate") == 1 && 
 				($CORE_LOCAL->get("training") == 1 || $CORE_LOCAL->get("ccLive") == 0)){
 			   echo "<img alt=\"cc test mode\" src='{$my_url}graphics/ccTest.gif'>&nbsp;";
+=======
+			if ($CORE_LOCAL->get("CCintegrate") == 1 && $CORE_LOCAL->get("training") == 0) {
+			   if ($CORE_LOCAL->get("CachePanEncBlock")=="")
+				   echo "<img alt=\"cc mode\" src='{$my_url}graphics/ccIn.gif'>&nbsp;";
+			   else
+				   echo "<img alt=\"cc available\" src='{$my_url}graphics/ccInLit.gif'>&nbsp;";
+			} elseif ($CORE_LOCAL->get("CCintegrate") == 1 && $CORE_LOCAL->get("training") == 1) {
+			   if ($CORE_LOCAL->get("CachePanEncBlock")=="")
+				   echo "<img alt=\"cc test mode\" src='{$my_url}graphics/ccTest.gif'>&nbsp;";
+			   else
+				   echo "<img alt=\"cc available (test)\" src='{$my_url}graphics/ccTestLit.gif'>&nbsp;";
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 			}
 
 			echo "<span id=\"timeSpan\" class=\"time\">".$time."</span>\n";
@@ -350,11 +368,14 @@ class BasicPage {
 	function scale_box(){
 		?>
 		<div id="scalebox">
-			<div id="scaleTop"> 
+			<div id="scaleTop" class="coloredArea"> 
 			<?php echo _("weight"); ?>
 			</div>
 			<div id="scaleBottom">
 			<?php echo DisplayLib::scaledisplaymsg(); ?>	
+			</div>
+			<div id="scaleIconBox">
+			<?php echo DisplayLib::drawNotifications(); ?>
 			</div>
 		</div>
 		<?php
@@ -367,10 +388,20 @@ class BasicPage {
 	  Outputs the javascript used to poll for scale
 	  input and activates it on page load.
 	*/
-	function scanner_scale_polling($include_scans=True){
+	function scanner_scale_polling($include_scans=true)
+    {
+        global $CORE_LOCAL;
+		if (!$include_scans) {
+            return '';
+        }
+        $scaleDriver = $CORE_LOCAL->get("scaleDriver");
+        if ($scaleDriver == '' || !class_exists($scaleDriver)) {
+            return '';
+        }
+        $scaleObj = new $scaleDriver();
 		?>
 		<script type="text/javascript"
-			src="<?php echo $this->page_url; ?>js/poll-scale.js">
+			src="<?php echo $this->page_url; ?>js/<?php echo $scaleObj->javascriptFile(); ?>">
 		</script>
 		<?php
 		$this->add_onload_command("pollScale('".$this->page_url."');\n");
@@ -403,7 +434,8 @@ class BasicPage {
 				echo '<ul><li>';
 				if(!empty($s['class'])) echo $s['class'].'::';
 				echo $s['function'].'()';
-				echo '<li>Line '.$s['line'].', '.$s['file'];
+				if (isset($s['line']))
+					echo '<li>Line '.$s['line'].', '.$s['file'];
 			}
 			foreach($stack as $s) echo '</ul>';
 		}
@@ -411,12 +443,42 @@ class BasicPage {
 			header("Location: ".$url);
 	}
 
+    /**
+      Callback for javascript scanner-scale polling
+      This one sends scan input to a form field on the
+      page and other inputs through the normal parser
+    */
 	function default_parsewrapper_js($input="reginput",$form="formlocal"){
 	?>
+    <script type="text/javascript" src="<?php echo $this->page_url; ?>js/ajax-parser.js"></script>
 	<script type="text/javascript">
-	function parseWrapper(str){
-		$('#<?php echo $input; ?>').val(str);
-		$('#<?php echo $form; ?>').submit();
+	function parseWrapper(str) {
+        if (/^\d+$/.test(str)) {
+            $('#<?php echo $input; ?>').val(str);
+            $('#<?php echo $form; ?>').submit();
+        } else {
+            runParser(str, '<?php echo $this->page_url; ?>');
+        }
+	}
+	</script>
+	<?php
+	}
+
+    /**
+      Callback for javascript scanner-scale polling
+      This one ignores scan input and runs anything
+      else through the parser
+    */
+	function noscan_parsewrapper_js() {
+	?>
+    <script type="text/javascript" src="<?php echo $this->page_url; ?>js/ajax-parser.js"></script>
+	<script type="text/javascript">
+	function parseWrapper(str) {
+        if (/^\d+$/.test(str)) {
+            // do nothing
+        } else {
+            runParser(str, '<?php echo $this->page_url; ?>');
+        }
 	}
 	</script>
 	<?php

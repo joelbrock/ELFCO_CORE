@@ -1,10 +1,24 @@
 <?php
 include('../../config.php');
+<<<<<<< HEAD
 include($FANNIE_ROOT.'src/SQLManager.php');
 include('../db.php');
+=======
+include_once($FANNIE_ROOT.'src/SQLManager.php');
+include_once($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
+$dbc = FannieDB::get($FANNIE_OP_DB);
+$sql = $dbc;
+
+include_once($FANNIE_ROOT.'auth/login.php');
+if (!validateUserQuiet('editmembers') && !validateUserQuiet('editmembers_csc') && !validateUserQuiet('viewmembers')){
+	$url = $FANNIE_URL.'auth/ui/loginform.php?redirect='.$_SERVER['PHP_SELF'];
+	header('Location: '.$url);
+	exit;
+}
+//include('../db.php');
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 include('memAddress.php');
-include('header.html');
 
 $username = validateUserQuiet('editmembers');
 
@@ -20,11 +34,12 @@ if(isset($_GET['memNum'])){
 $uid = getUID($username);
 $auditQ = "insert custUpdate select ".$sql->now().",$uid,1,
 	CardNo,personNum,LastName,FirstName,
-	CashBack,Balance,Discount,MemDiscountLimit,ChargeOK,
+	CashBack,Balance,Discount,ChargeLimit,ChargeOK,
 	WriteChecks,StoreCoupons,Type,memType,staff,SSI,Purchases,
 	NumberOfChecks,memCoupons,blueLine,Shown,id from custdata where cardno=$memID";
 //$auditR = $sql->query($auditQ);
 
+<<<<<<< HEAD
 ?>
 <html>
 <head>
@@ -222,6 +237,49 @@ $delCQ = "delete from custdata where cardno=$memNum and personnum > 1";
 $delMQ = "delete from memnames where memnum=$memNum and personnum > 1";
 $delCR = $sql->query_all($delCQ);
 //$delMR = $sql->query($delMQ);
+=======
+$MI_FIELDS = array();
+
+$memNum = $_POST['memNum'];
+$MI_FIELDS['street'] = $_POST['address1'] . (!empty($_POST['address2']) ? "\n".$_POST['address2'] : '');
+$MI_FIELDS['city'] = $_POST['city'];
+$MI_FIELDS['state'] = $_POST['state'];
+$MI_FIELDS['zip'] = $_POST['zip'];
+$MI_FIELDS['phone'] = $_POST['phone'];
+$MI_FIELDS['email_2'] = $_POST['phone2'];
+$MI_FIELDS['email_1'] = $_POST['email'];
+$MI_FIELDS['ads_OK'] = $_POST['mailflag'];
+
+$cust = new CustdataModel($dbc);
+$cust->CardNo($memNum);
+$cust->personNum(1);
+$cust->load(); // get all current values
+$cust->MemDiscountLimit($_POST['chargeLimit']);
+$cust->ChargeLimit($_POST['chargeLimit']);
+$cust->ChargeOk( $_POST['chargeLimit'] == 0 ? 0 : 1 );
+$cust->memType($_POST['discList']);
+$cust->Type('REG');
+$cust->Staff(0);
+$cust->Discount(0);
+
+MemberCardsModel::update($memNum,$_REQUEST['cardUPC']);
+
+$mcP = $sql->prepare("UPDATE memContact SET pref=? WHERE card_no=?");
+$sql->execute($mcP, array($MI_FIELDS['ads_OK'], $memNum));
+
+if ($cust->memType() == 1 || $cust->memType() == 3){
+	$cust->Type('PC');
+}
+if ($cust->memType() == 3 || $cust->memType() == 9){
+	$cust->Discount(12);
+	$cust->Staff(1);
+}
+
+$cust->FirstName($_POST['fName']);
+$cust->LastName($_POST['lName']);
+$cust->BlueLine( $cust->CardNo().' '.$cust->LastName() );
+$cust->save(); // save personNum=1
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 $lnames = $_REQUEST['hhLname'];
 $fnames = $_REQUEST['hhFname'];
@@ -229,6 +287,7 @@ $count = 2;
 for($i=0;$i<count($lnames);$i++){
 	if (empty($lnames[$i]) && empty($fnames[$i])) continue;
 
+<<<<<<< HEAD
 	$fname1 = $sql->escape($fnames[$i]);
 	$lname1 = $sql->escape($lnames[$i]);
 	$blue1 = $sql->escape($memNum.' '.$lnames[$i]);
@@ -243,10 +302,23 @@ for($i=0;$i<count($lnames);$i++){
 
 	$sql->query_all($houseCustUpQ1);
 	//$sql->query($houseMemUpQ1);
+=======
+	$cust->personNum($count);
+	$cust->FirstName($fnames[$i]);
+	$cust->LastName($lnames[$i]);
+	$cust->BlueLine( $cust->CardNo().' '.$cust->LastName() );
+	$cust->save(); // save next personNum
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 	$count++;
 }
+// remove names that were blank on the form
+for($i=$count;$i<5;$i++){
+	$cust->personNum($i);
+	$cust->delete();
+}
 
+<<<<<<< HEAD
 $mbrQ =    "UPDATE mbrmastr SET zipCode = '$zip',phone ='$phone',address1='$address1',address2='$address2',arLimit=$arLimit,city='$city',state='$state',startdate='$startDate',enddate = '$enddate',notes='$phone2',emailaddress='$email'  WHERE memNum = $memNum";
 //$result=$sql->query($mbrQ);
 $meminfoQ = sprintf("UPDATE meminfo SET street='%s',city='%s',state='%s',zip='%s',phone='%s',email_1='%s',email_2='%s'
@@ -257,6 +329,10 @@ $sql->query_all($meminfoQ);
 
 $datesQ = "UPDATE memDates SET start_date='$startDate',end_date='$enddate' WHERE card_no=$memNum";
 $sql->query_all($datesQ);
+=======
+MeminfoModel::update($memNum, $MI_FIELDS);
+MemDatesModel::update($memNum, $_POST['startDate'], $_POST['endDate']);
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 // FIRE ALL UPDATE
 include('custUpdates.php');
@@ -266,43 +342,12 @@ updateCustomerAllLanes($memNum);
 $notetext = $_POST['notetext'];
 $notetext = preg_replace("/\n/","<br />",$notetext);
 $notetext = preg_replace("/\'/","''",$notetext);
-$checkQ = "select * from memberNotes where note='$notetext' and cardno=$memNum";
-$checkR = $sql->query($checkQ);
+$checkQ = $sql->prepare("select * from memberNotes where note=? and cardno=?");
+$checkR = $sql->execute($checkQ, array($notetext, $memNum));
 if ($sql->num_rows($checkR) == 0){
-	$noteQ = "insert into memberNotes values ($memNum,'$notetext',".$sql->now().",'$username')";
-	$noteR = $sql->query($noteQ);
+	$noteQ = $sql->prepare("insert into memberNotes (cardno, note, stamp, username) VALUES (?, ?, ".$sql->now().", ?)");
+	$noteR = $sql->execute($noteQ, array($memNum, $notetext, $username));
 }
 
-addressList($memNum);
+header('Location: memGen.php?memNum='.$memNum);
 
-?>
-
-<table>
-<tr>
-<?php
-if (!$username){
-  echo "<td><a href=\"{$FANNIE_URL}auth/ui/loginform.php?redirect={$FANNIE_URL}legacy/members/memGen.php?memNum=$memID\">Login to edit</a> | </td>";
-}
-else {
-  echo "<td><a href=testEdit.php?memnum=$memID>[ Logged in ] Edit Info</a> | </td>";
-}
-?>
-<td>
-
-</td>
-<td>
-&nbsp;
-</td>
-<td>
-<a href="memGen.php?memNum=<?php echo ($memID-1); ?> ">
-Prev Mem</a>
-</td>
-<td>
-<a href="memGen.php?memNum=<?php echo ($memID+1); ?> ">
-Next Mem
-</a>
-</td>
-</tr>
-</table>
-</body>
-</html>

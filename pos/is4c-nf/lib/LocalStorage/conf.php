@@ -35,11 +35,20 @@ ini_set('error_log',$elog);
 
 $LOCAL_STORAGE_MECHANISM = 'SessionStorage';
 
-if (!class_exists($LOCAL_STORAGE_MECHANISM)){
-	include(realpath(dirname(__FILE__).'/'.$LOCAL_STORAGE_MECHANISM.".php"));
+if (!class_exists($LOCAL_STORAGE_MECHANISM)) {
+    include(realpath(dirname(__FILE__).'/'.$LOCAL_STORAGE_MECHANISM.".php"));
 }
 
 $CORE_LOCAL = new $LOCAL_STORAGE_MECHANISM();
 global $CORE_LOCAL;
+
+/**
+  Settings in ini.php are (or should be) immutable. They're not
+  necessarily saved in the session or session replacement mechanism.
+  Include these settings every time.
+*/
+if (file_exists(dirname(__FILE__).'/../../ini.php')) {
+    include_once(realpath(dirname(__FILE__).'/../../ini.php'));
+}
 
 ?>

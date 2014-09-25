@@ -21,6 +21,7 @@
 
 *********************************************************************************/
 
+<<<<<<< HEAD:fannie/sync/special/customReceipt.php
 // Run DTS to export server data to a CSV file
 $dbc->query("exec master..xp_cmdshell 'dtsrun /S IS4CSERV\IS4CSERV /U $FANNIE_SERVER_USER /P $FANNIE_SERVER_PW /N CSV_products',no_output",$FANNIE_OP_DB);
 
@@ -41,6 +42,33 @@ foreach($FANNIE_LANES as $lane){
 			products FIELDS TERMINATED BY ',' OPTIONALLY
 			ENCLOSED BY '\"' LINES TERMINATED BY '\\r\\n'",$lane['op']);
 	}
+=======
+require('../../config.php');
+include($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
+$dbc = FannieDB::get($FANNIE_OP_DB);
+
+$page_title = 'Fannie - Sale Signs';
+$header = 'Sale Signs';
+include($FANNIE_ROOT.'src/header.html');
+
+if (!isset($_REQUEST['signtype'])){
+    echo '<ul>';
+    $dh = opendir('enabled');
+    while(($file=readdir($dh)) !== False){
+        if ($file[0] == ".") continue;
+        if (substr($file,-4) != ".php") continue;
+        printf('<li><a href="index.php?action=start&signtype=%s">%s</a></li>',
+            substr($file,0,strlen($file)-4),
+            substr($file,0,strlen($file)-4)
+        );
+    }
+    echo '</ul>';
+}
+else {
+    $class = $_REQUEST['signtype'];
+    include('enabled/'.$class.'.php');
+    $obj = new $class();
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d:fannie/admin/signs/index.php
 }
 
 echo "<li>customReceipt table synched</li>";

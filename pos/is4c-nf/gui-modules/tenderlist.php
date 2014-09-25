@@ -64,32 +64,8 @@ class tenderlist extends NoInputPage {
 	  catching CL typed in a select box
 	*/
 	function head_content(){
-		global $CORE_LOCAL;
 		?>
-		<script type="text/javascript" >
-		var prevKey = -1;
-		var prevPrevKey = -1;
-		function processkeypress(e) {
-			var jsKey;
-			if (e.keyCode) // IE
-				jsKey = e.keyCode;
-			else if(e.which) // Netscape/Firefox/Opera
-				jsKey = e.which;
-			if (jsKey==13) {
-				if ( (prevPrevKey == 99 || prevPrevKey == 67) &&
-				(prevKey == 108 || prevKey == 76) ){ //CL<enter>
-					$('#search option:selected').val('');
-				}
-				else if ( (prevPrevKey == 116 || prevPrevKey == 84) &&
-				(prevKey == 116 || prevKey == 84) ){ //TT<enter>
-					$('#search option:selected').val('');
-				}
-				$('#selectform').submit();
-			}
-			prevPrevKey = prevKey;
-			prevKey = jsKey;
-		}
-		</script> 
+        <script type="text/javascript" src="../js/selectSubmit.js"></script>
 		<?php
 	} // END head() FUNCTION
 
@@ -100,7 +76,9 @@ class tenderlist extends NoInputPage {
 	function body_content(){
 		global $CORE_LOCAL;
 		$db = Database::pDataConnect();
-		$q = "SELECT TenderCode,TenderName FROM tenders ORDER BY TenderName";
+		$q = "SELECT TenderCode,TenderName FROM tenders 
+			WHERE MaxAmount > 0
+			ORDER BY TenderName";
 		$r = $db->query($q);
 
 		echo "<div class=\"baseHeight\">"
@@ -120,7 +98,7 @@ class tenderlist extends NoInputPage {
 		echo "</select>"
 			."</form>"
 			."</div>"
-			."<div class=\"listboxText centerOffset\">";
+			."<div class=\"listboxText coloredText centerOffset\">";
 		if ($CORE_LOCAL->get("tenderTotal") >= 0)
 			echo _("tendering").' $';
 		else
@@ -131,17 +109,13 @@ class tenderlist extends NoInputPage {
 			."<div class=\"clear\"></div>";
 		echo "</div>";
 
-		if (is_object($db))
-			$db->close();
-		$CORE_LOCAL->set("scan","noScan");
-		$CORE_LOCAL->set("beep","noBeep");
-
-		$this->add_onload_command("\$('#search').keypress(processkeypress);\n");
+        $this->add_onload_command("selectSubmit('#search', '#selectform')\n");
 		$this->add_onload_command("\$('#search').focus();\n");
 	} // END body_content() FUNCTION
 
 }
 
-new tenderlist();
+if (basename(__FILE__) == basename($_SERVER['PHP_SELF']))
+	new tenderlist();
 
 ?>

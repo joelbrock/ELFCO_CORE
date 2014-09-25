@@ -33,11 +33,17 @@ class ScrollItems extends Parser {
 
 	function parse($str){
 		global $CORE_LOCAL;
+
+        $lines = $CORE_LOCAL->get('screenLines');
+        if (!$lines === '' || !is_numeric($lines)) {
+            $lines = 11;
+        }
+
 		$ret = $this->default_json();
 		if ($str == "U")
-			$ret["output"] = DisplayLib::listitems($CORE_LOCAL->get("currenttopid"), $CORE_LOCAL->get("currentid") -1);
+			$ret["output"] = DisplayLib::listItems($CORE_LOCAL->get("currenttopid"), $this->next_valid($CORE_LOCAL->get("currentid"),True));
 		elseif ($str == "D")
-			$ret["output"] = DisplayLib::listitems($CORE_LOCAL->get("currenttopid"), $CORE_LOCAL->get("currentid") +1);
+			$ret["output"] = DisplayLib::listItems($CORE_LOCAL->get("currenttopid"), $this->next_valid($CORE_LOCAL->get("currentid"),False));
 		else {
 			$change = (int)substr($str,1);
 			$curID = $CORE_LOCAL->get("currenttopid");
@@ -46,12 +52,47 @@ class ScrollItems extends Parser {
 				$newID -= $change;
 			else
 				$newID += $change;
-			if ($newID == $curID || $newID == $curID+11)
+			if ($newID == $curID || $newID == $curID+$lines)
 				$curID = $newID-5;
 			if ($curID < 1) $curID = 1;
-			$ret["output"] = DisplayLib::listitems($curID, $newID);
+			$ret["output"] = DisplayLib::listItems($curID, $newID);
 		}
 		return $ret;
+	}
+
+	/**
+	  New function: log rows don't appear in screendisplay
+	  so scrolling by simplying incrementing trans_id
+	  can land on a "blank" line. It still works if you
+	  keep scrolling but the cursor disappears from the screen.
+	  This function finds the next visible line instead.
+	 
+	  @param $id the current id
+	  @param $up bool
+	    [True] => scroll towards top of screen
+	    [False] => scroll towards bottom of screen
+	*/
+	function next_valid($id,$up=True){
+		$db = Database::tDataConnect();
+		$next = $id;
+		while(True){
+			$prev = $next;
+			$next = ($up) ? $next-1 : $next+1;
+			if ($next <= 0) return $prev;
+
+			$r = $db->query("SELECT MAX(trans_id) as max,
+					SUM(CASE WHEN trans_id=$next THEN 1 ELSE 0 END) as present
+					FROM screendisplay");
+			if ($db->num_rows($r) == 0) return 1;
+			$w = $db->fetch_row($r);
+			if ($w['max']=='') return 1;
+			if ($w['present'] > 0) return $next;
+			if ($w['max'] <= $next) return $w['max'];
+
+			// failsafe; shouldn't happen
+			if ($next > 1000) break;
+		}
+		return $id;
 	}
 
 	function doc(){

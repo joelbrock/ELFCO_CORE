@@ -25,92 +25,103 @@
    settings, which may have changed since the order was imported */
 
 /* configuration for your module - Important */
-include("../../config.php");
-include($FANNIE_ROOT.'classlib2.0/FanniePage.php');
-include($FANNIE_ROOT.'classlib2.0/data/FannieDB.php');
-include($FANNIE_ROOT.'classlib2.0/lib/FormLib.php');
+include(dirname(__FILE__) . '/../../config.php');
+if (!class_exists('FannieAPI')) {
+    include_once($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
+}
 
 class RecalculateVendorSRPs extends FanniePage {
-	protected $title = "Fannie - Vendor SRPs";
-	protected $header = "Recalculate SRPs from Margins";
+    protected $title = "Fannie - Vendor SRPs";
+    protected $header = "Recalculate SRPs from Margins";
 
-	private $mode = 'form';
+    public $description = '[Calculate Vendor SRPs] recalculates item SRPs based on vendor
+    specific margin goals.';
 
-	function preprocess(){
-		if(FormLib::get_form_value('vendorID') !== '')
-			$this->mode = 'results';
-		return True;
-	}
+    private $mode = 'form';
 
-	function body_content(){
-		if ($this->mode == 'form')
-			return $this->form_content();
-		else if ($this->mode == 'results')
-			return $this->results_content();
-	}
+    function preprocess(){
+        if(FormLib::get_form_value('vendorID') !== '')
+            $this->mode = 'results';
+        return True;
+    }
 
-	function results_content(){
-		$id = FormLib::get_form_value('vendorID',0);
+    function body_content(){
+        if ($this->mode == 'form')
+            return $this->form_content();
+        else if ($this->mode == 'results')
+            return $this->results_content();
+    }
 
-		$delQ = $dbc->prepare_statement("DELETE FROM vendorSRPs WHERE vendorID=?");
-		$delR = $dbc->exec_statement($delQ,array($id));
+    function results_content(){
+        global $FANNIE_OP_DB;
+        $dbc = FannieDB::get($FANNIE_OP_DB);
 
-		$fetchQ = $dbc->prepare_statement("select v.upc,v.cost,
-			case when d.margin is not null then d.margin
-			     when m.margin is not null then m.margin
-			     else 0 end as margin
-			from 
-			vendorItems as v left join
-			vendorDepartments as d
-			on v.vendorID=d.vendorID
-			and v.vendorDept=d.deptID
-			left join products as p
-			on v.upc=p.upc
-			left join deptMargin as m
-			on p.department=m.dept_ID
-			where v.vendorID=?
-			and (d.margin is not null or m.margin is not null)");
-		$fetchR = $dbc->exec_statement($fetchQ,array($id));
-		$insP = $dbc->prepare_statement('INSERT INTO vendorSRPs VALUES (?,?,?)');
-		while ($fetchW = $dbc->fetch_array($fetchR)){
-			// calculate a SRP from unit cost and desired margin
-			$srp = round($fetchW['cost'] / (1 - $fetchW['margin']),2);
+        $id = FormLib::get_form_value('vendorID',0);
 
-			// prices should end in 5 or 9, so add a cent until that's true
-			while (substr($srp,strlen($srp)-1,strlen($srp)) != "5" and
-			       substr($srp,strlen($srp)-1,strlen($srp)) != "9")
-				$srp+=.01;
+        $delQ = $dbc->prepare_statement("DELETE FROM vendorSRPs WHERE vendorID=?");
+        $delR = $dbc->exec_statement($delQ,array($id));
 
-			$insR = $dbc->exec_statement($insP,array($id,$fetchW['upc'],$srp));
-		}
+        $query = 'select v.upc,v.cost,
+            case when d.margin is not null then d.margin
+                 when m.margin is not null then m.margin
+                 else 0 end as margin
+            from 
+            vendorItems as v left join
+            vendorDepartments as d
+            on v.vendorID=d.vendorID
+            and v.vendorDept=d.deptID
+            left join products as p
+            on v.upc=p.upc ';
+        $departments = $dbc->tableDefinition('departments');
+        if (isset($departments['margin'])) {
+            $query .= ' LEFT JOIN departments AS m
+                        ON p.department = m.dept_no ';
+        } else if ($dbc->tableExists('deptMargin')) {
+            $query .= ' left join deptMargin as m
+                        on p.department=m.dept_ID ';
+        }
+        $query .= ' where v.vendorID=?
+            and (d.margin is not null or m.margin is not null)';
+        $fetchP = $dbc->prepare($query);
+        $fetchR = $dbc->exec_statement($fetchP, array($id));
+        $insP = $dbc->prepare_statement('INSERT INTO vendorSRPs VALUES (?,?,?)');
+        while ($fetchW = $dbc->fetch_array($fetchR)) {
+            // calculate a SRP from unit cost and desired margin
+            $srp = round($fetchW['cost'] / (1 - $fetchW['margin']),2);
 
-		$ret = "<b>SRPs have been updated</b><br />";
-		$ret .= "<a href=index.php>Main Menu</a>";
-		return $ret;
-	}
+            // prices should end in 5 or 9, so add a cent until that's true
+            while (substr($srp,strlen($srp)-1,strlen($srp)) != "5" and
+                   substr($srp,strlen($srp)-1,strlen($srp)) != "9")
+                $srp+=.01;
 
-	function form_content(){
-		global $FANNIE_OP_DB;
-		$dbc = FannieDB::get($FANNIE_OP_DB);
-		$q = $dbc->prepare_statement("SELECT vendorID,vendorName FROM vendors");
-		$r = $dbc->exec_statement($q);
-		$opts = "";
-		while($w = $dbc->fetch_row($r))
-			$opts .= "<option value=$w[0]>$w[1]</option>";
-		ob_start();
-		?>
-		<form action=RecalculateVendorSRPs.php method=get>
-		Recalculate SRPs from margins for which vendor?<br />
-		<select name=vendorID><?php echo $opts; ?></select>
-		<input type=submit value="Recalculate" />
-		</form>
-		<?php
-		return ob_get_clean();
-	}
+            $insR = $dbc->exec_statement($insP,array($id,$fetchW['upc'],$srp));
+        }
+
+        $ret = "<b>SRPs have been updated</b><br />";
+        $ret .= "<a href=index.php>Main Menu</a>";
+        return $ret;
+    }
+
+    function form_content(){
+        global $FANNIE_OP_DB;
+        $dbc = FannieDB::get($FANNIE_OP_DB);
+        $q = $dbc->prepare_statement("SELECT vendorID,vendorName FROM vendors");
+        $r = $dbc->exec_statement($q);
+        $opts = "";
+        while($w = $dbc->fetch_row($r))
+            $opts .= "<option value=$w[0]>$w[1]</option>";
+        ob_start();
+        ?>
+        <form action=RecalculateVendorSRPs.php method=get>
+        Recalculate SRPs from margins for which vendor?<br />
+        <select name=vendorID><?php echo $opts; ?></select>
+        <input type=submit value="Recalculate" />
+        </form>
+        <?php
+        return ob_get_clean();
+    }
 }
 
-if (basename($_SERVER['PHP_SELF']) == basename(__FILE__)){
-	$obj = new RecalculateVendorSRPs();
-	$obj->draw_page();
-}
+FannieDispatch::conditionalExec(false);
+
 ?>

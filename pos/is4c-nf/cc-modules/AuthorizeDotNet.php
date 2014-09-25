@@ -23,7 +23,7 @@
 
 if (!class_exists("BasicCCModule")) include_once(realpath(dirname(__FILE__)."/BasicCCModule.php"));
 if (!class_exists("xmlData")) include_once(realpath(dirname(__FILE__)."/lib/xmlData.php"));
-if (!class_exists("PaycardLib")) include_once(realpath(dirname(__FILE__)."/lib/paycardLib.php"));
+if (!class_exists("PaycardLib")) include_once(realpath(dirname(__FILE__)."/lib/PaycardLib.php"));
 
 if (!isset($CORE_LOCAL)){
 	include(realpath(dirname(__FILE__)."/lib/LS_Access.php"));
@@ -64,12 +64,8 @@ class AuthorizeDotNet extends BasicCCModule {
 			$cashier = $CORE_LOCAL->get("CashierNo");
 			$lane = $CORE_LOCAL->get("laneno");
 			$trans = $CORE_LOCAL->get("transno");
-			$sql = "SELECT transID FROM efsnetRequest WHERE [date]='".$today."' AND (PAN LIKE '%".$pan4."') " .
+			$sql = "SELECT transID FROM efsnetRequest WHERE ".$dbTrans->identifier_escape('date')."='".$today."' AND (PAN LIKE '%".$pan4."') " .
 				"AND cashierNo=".$cashier." AND laneNo=".$lane." AND transNo=".$trans;
-			if ($CORE_LOCAL->get("DBMS") == "mysql"){
-				$sql = str_replace("[","",$sql);
-				$sql = str_replace("]","",$sql);
-			}
 			$search = PaycardLib::paycard_db_query($sql, $dbTrans);
 			$num = PaycardLib::paycard_db_num_rows($search);
 			if( $num < 1) {
@@ -150,12 +146,8 @@ class AuthorizeDotNet extends BasicCCModule {
 	
 		// look up the request using transID (within this transaction)
 		$sql = "SELECT live,PAN,mode,amount,name FROM efsnetRequest 
-			WHERE [date]='".$today."' AND cashierNo=".$cashier." 
+			WHERE ".$dbTrans->identifier_escape('date')."='".$today."' AND cashierNo=".$cashier." 
 			AND laneNo=".$lane." AND transNo=".$trans." AND transID=".$transID;
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
 		$search = PaycardLib::paycard_db_query($sql, $dbTrans);
 		$num = PaycardLib::paycard_db_num_rows($search);
 		if( $num < 1) {
@@ -173,12 +165,8 @@ class AuthorizeDotNet extends BasicCCModule {
 
 		// look up the response
 		$sql = "SELECT commErr,httpCode,validResponse,xResponseCode,
-			xTransactionID FROM efsnetResponse WHERE [date]='".$today."' 
+			xTransactionID FROM efsnetResponse WHERE ".$dbTrans->identifier_escape('date')."='".$today."' 
 			AND cashierNo=".$cashier." AND laneNo=".$lane." AND transNo=".$trans." AND transID=".$transID;
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
 		$search = PaycardLib::paycard_db_query($sql, $dbTrans);
 		$num = PaycardLib::paycard_db_num_rows($search);
 		if( $num < 1) {
@@ -195,12 +183,11 @@ class AuthorizeDotNet extends BasicCCModule {
 		$response = $dbTrans->fetch_array($search);
 
 		// look up any previous successful voids
-		$sql = "SELECT transID FROM efsnetRequestMod WHERE [date]=".$today." AND cashierNo=".$cashier." AND laneNo=".$lane." AND transNo=".$trans." AND transID=".$transID
+		$sql = "SELECT transID FROM efsnetRequestMod WHERE "
+				.$dbTrans->identifier_escape('date')."=".$today
+				." AND cashierNo=".$cashier." AND laneNo=".$lane
+				." AND transNo=".$trans." AND transID=".$transID
 				." AND mode='void' AND xResponseCode=0";
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
 		$search = PaycardLib::paycard_db_query($sql, $dbTrans);
 		$voided = PaycardLib::paycard_db_num_rows($search);
 		// look up the transaction tender line-item
@@ -272,8 +259,13 @@ class AuthorizeDotNet extends BasicCCModule {
 		$CORE_LOCAL->set("paycard_name",$request["name"]);
 	
 		// display FEC code box
+<<<<<<< HEAD:pos/is4c-nf/cc-modules/AuthorizeDotNet.php
 		$CORE_LOCAL->set("inputMasked",1);
 		$json['main_frame'] = MiscLib::base_url().'gui-modules/paycardboxMsgVoid.php';
+=======
+		$plugin_info = new Paycards();
+		$json['main_frame'] = $plugin_info->plugin_url().'/gui/paycardboxMsgVoid.php';
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d:pos/is4c-nf/plugins/Paycards/AuthorizeDotNet.php
 		return $json;
 	}
 
@@ -297,10 +289,11 @@ class AuthorizeDotNet extends BasicCCModule {
 		$laneNo = $CORE_LOCAL->get("laneno");
 		$transNo = $CORE_LOCAL->get("transno");
 		$transID = $CORE_LOCAL->get("paycard_id");
+		$dbTrans = PaycardLib::paycard_db();
 		$sqlColumns =
-			"[date],cashierNo,laneNo,transNo,transID," .
-			"[datetime]," .
-			"seconds,commErr,httpCode";
+			$dbTrans->identifier_escape('date').",cashierNo,laneNo,transNo,transID," .
+			$dbTrans->identifier_escape('datetime').
+			",seconds,commErr,httpCode";
 		$sqlValues =
 			sprintf("%d,%d,%d,%d,%d,",  $today, $cashierNo, $laneNo, $transNo, $transID) .
 			sprintf("'%s',",            $now ) .
@@ -343,12 +336,13 @@ class AuthorizeDotNet extends BasicCCModule {
 		$sqlColumns .= ",validResponse";
 		$sqlValues .= sprintf(",%d",$validResponse);
 
-		$dbTrans = PaycardLib::paycard_db();
+        $table_def = $dbTrans->table_definition('efsnetResponse');
+        if (isset($table_def['efsnetRequestID'])) {
+            $sqlColumns .= ', efsnetRequestID';
+            $sqlValues .= sprintf(', %d', $this->last_req_id);
+        }
+
 		$sql = "INSERT INTO efsnetResponse (" . $sqlColumns . ") VALUES (" . $sqlValues . ")";
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
 		PaycardLib::paycard_db_query($sql, $dbTrans);
 
 		if( $authResult['curlErr'] != CURLE_OK || $authResult['curlHTTP'] != 200){
@@ -405,9 +399,11 @@ class AuthorizeDotNet extends BasicCCModule {
 		$amountText = number_format(abs($amount), 2, '.', '');
 
 		// prepare some fields to store the request and the parsed response; we'll add more as we verify it
+		$dbTrans = PaycardLib::paycard_db();
 		$sqlColumns =
-			"[date],cashierNo,laneNo,transNo,transID,[datetime]," .
-			"origAmount,mode,altRoute," .
+			$dbTrans->identifier_escape('date').",cashierNo,laneNo,transNo,transID,".
+			$dbTrans->identifier_escape('datetime').
+			",origAmount,mode,altRoute," .
 			"seconds,commErr,httpCode";
 		$sqlValues =
 			sprintf("%d,%d,%d,%d,%d,'%s',",  $today, $cashierNo, $laneNo, $transNo, $transID, $now) .
@@ -445,12 +441,7 @@ class AuthorizeDotNet extends BasicCCModule {
 		$sqlColumns .= ",validResponse";
 		$sqlValues .= sprintf(",%d",$validResponse);
 
-		$dbTrans = PaycardLib::paycard_db();
 		$sql = "INSERT INTO efsnetRequestMod (" . $sqlColumns . ") VALUES (" . $sqlValues . ")";
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
 		PaycardLib::paycard_db_query($sql, $dbTrans);
 
 		if( $authResult['curlErr'] != CURLE_OK || $authResult['curlHTTP'] != 200){
@@ -489,12 +480,23 @@ class AuthorizeDotNet extends BasicCCModule {
 		global $CORE_LOCAL;
 		switch($CORE_LOCAL->get("paycard_mode")){
 		case PaycardLib::PAYCARD_MODE_AUTH:
-			$CORE_LOCAL->set("ccTender",1); 
 			// cast to string. tender function expects string input
 			// numeric input screws up parsing on negative values > $0.99
 			$amt = "".($CORE_LOCAL->get("paycard_amount")*100);
-			PrehLib::tender("CC", $amt);
+			$t_type = 'CC';
+			if ($CORE_LOCAL->get('paycard_issuer') == 'American Express')
+				$t_type = 'AX';
+            // if the transaction has a non-zero efsnetRequestID,
+            // include it in the tender line
+            $record_id = $this->last_req_id;
+            $charflag = ($record_id != 0) ? 'RQ' : '';
+			TransRecord::addFlaggedTender("Credit Card", $t_type, $amt, $record_id, $charflag);
 			$CORE_LOCAL->set("boxMsg","<b>Approved</b><font size=-1><p>Please verify cardholder signature<p>[enter] to continue<br>\"rp\" to reprint slip<br>[clear] to cancel and void</font>");
+            if ($CORE_LOCAL->get("paycard_amount") <= $CORE_LOCAL->get("CCSigLimit") && $CORE_LOCAL->get("paycard_amount") >= 0) {
+                $CORE_LOCAL->set("boxMsg","<b>Approved</b><font size=-1><p>No signature required<p>[enter] to continue<br>[void] to cancel and void</font>");
+            } else if ($CORE_LOCAL->get('PaycardsSigCapture') != 1) {
+                $json['receipt'] = 'ccSlip';
+            }
 			break;
 		case PaycardLib::PAYCARD_MODE_VOID:
 			$v = new Void();
@@ -503,8 +505,7 @@ class AuthorizeDotNet extends BasicCCModule {
 			break;	
 		}
 		$CORE_LOCAL->set("ccCustCopy",0);
-		if ($CORE_LOCAL->get("SigCapture") == "" && $CORE_LOCAL->get("paycard_amount") > $CORE_LOCAL->get("CCSigLimit"))
-			$json['receipt'] = "ccSlip";
+
 		return $json;
 	}
 
@@ -586,21 +587,22 @@ class AuthorizeDotNet extends BasicCCModule {
 
 		// store request in the database before sending it
 		$sqlCols .= "," . // already defined some sent* columns
-			"[date],cashierNo,laneNo,transNo,transID," .
-			"[datetime],refNum,live,mode,amount," .
+			$dbTrans->identifier_escape('date').",cashierNo,laneNo,transNo,transID," .
+			$dbTrans->identifier_escape('datetime').",refNum,live,mode,amount," .
 			"PAN,issuer,manual,name";
 		$sqlVals .= "," . // already defined some sent* values
 			sprintf("%d,%d,%d,%d,%d,",        $today, $cashierNo, $laneNo, $transNo, $transID) .
 			sprintf("'%s','%s',%d,'%s',%s,",  $now, $refNum, $live, $mode, $amountText) .
 			sprintf("'%s','%s',%d,'%s'",           $cardPANmasked, $cardIssuer, $manual, $name);
 		$sql = "INSERT INTO efsnetRequest (" . $sqlCols . ") VALUES (" . $sqlVals . ")";
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
+        $table_def = $dbTrans->table_definition('efsnetRequest');
 
 		if( !PaycardLib::paycard_db_query($sql, $dbTrans) ) 
 			return $this->setErrorMsg(PaycardLib::PAYCARD_ERR_NOSEND); // internal error, nothing sent (ok to retry)
+
+        if (isset($table_def['efsnetRequestID'])) {
+            $this->last_req_id = $dbTrans->insert_id();
+        }
 
 		$postData = $this->array2post($postValues);
 		$this->GATEWAY = "https://test.authorize.net/gateway/transact.dll";
@@ -655,12 +657,8 @@ class AuthorizeDotNet extends BasicCCModule {
 		);
 
 		// look up the TransactionID from the original response (card number and amount should already be in session vars)
-		$sql = "SELECT xTransactionID FROM efsnetResponse WHERE [date]='".$today."'" .
+		$sql = "SELECT xTransactionID FROM efsnetResponse WHERE ".$dbTrans->identifier_escape('date')."='".$today."'" .
 			" AND cashierNo=".$cashierNo." AND laneNo=".$laneNo." AND transNo=".$transNo." AND transID=".$transID;
-		if ($CORE_LOCAL->get("DBMS") == "mysql"){
-			$sql = str_replace("[","",$sql);
-			$sql = str_replace("]","",$sql);
-		}
 		$result = PaycardLib::paycard_db_query($sql, $dbTrans);
 		if( !$result || PaycardLib::paycard_db_num_rows($result) != 1)
 			return $this->setErrorMsg(PaycardLib::PAYCARD_ERR_NOSEND); 

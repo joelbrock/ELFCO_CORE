@@ -22,24 +22,30 @@
 *********************************************************************************/
 
 require('../login.php');
-$path = guesspath();
-$page_title = 'Fannie : Auth : Group Details';
-$header = 'Fannie : Auth : Group Details';
+include("../../config.php");
+if (isset($_GET['group'])){
+    $group=$_GET['group'];
+    $groupHeading=" : $group";
+} else {
+    $group="";
+    $groupHeading="";
+}
+$page_title = "Fannie : Auth : Group Details$groupHeading";
+$header = "Fannie : Auth : Group Details$groupHeading";
 
-include($path."src/header.html");
+include($FANNIE_ROOT."src/header.html");
 
 if (!validateUser('admin')){
   return;
 }
 
 if (isset($_GET['group'])){
-  $group=$_GET['group'];
   detailGroup($group);
 }
 echo "<form method=get action=groupDetail.php>";
-echo "Group name:<select name=group>";
+echo "Group name to view: <select name=group>";
 foreach(getGroupList() as $uid => $name)
-	echo "<option>".$name."</option>";
+    echo "<option>".$name."</option>";
 echo "</select>";
 echo '&nbsp;&nbsp;&nbsp;<input type="submit" value="View" />';
 echo '</form>';
@@ -48,5 +54,5 @@ echo '</form>';
 <p />
 <a href=menu.php>Main menu</a>
 <?php
-include($path."src/footer.html");
+include($FANNIE_ROOT."src/footer.html");
 ?>

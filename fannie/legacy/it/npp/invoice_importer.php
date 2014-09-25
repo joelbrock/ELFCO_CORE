@@ -1,8 +1,6 @@
 <?php
 include('../../../config.php');
 
-require($FANNIE_ROOT.'src/csv_parser.php');
-
 /*
 	read an invoice csv file and parse out the cost of each item
 	the cost of each item is updated in prodExtra
@@ -25,10 +23,10 @@ function import_invoice(){
 	if (!class_exists("SQLManager")) require_once($FANNIE_ROOT."src/SQLManager.php");
 	include('../../db.php');
 
+    $upQ = $sql->prepare("update prodExtra set cost=? where upc=?");
 	while(!feof($fp)){
-		$line = fgets($fp);
+		$data = fgetcsv($fp);
 		if ($line_num > $SKIP_LINES){
-			$data = csv_parser($line);
 			$upc = $data[$UPC];
 			$cost = $data[$COST];
 			// stop when the shipping line or a non-UPC is hit
@@ -39,8 +37,7 @@ function import_invoice(){
 				continue;
 			$wupc = UNFItoWFC($upc);
 			echo $wupc." ".$cost."<br />";
-			$upQ = "update prodExtra set cost=$cost where upc='$wupc'";
-			$upR = $sql->query($upQ);
+			$upR = $sql->execute($upQ, array($cost,$wupc));
 		}
 		$line_num++;
 	}

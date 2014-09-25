@@ -3,29 +3,41 @@
 Table: PurchaseOrder
 
 Columns:
-	name varchar(100)
-	stamp datetime
-	id int (auto increment)
+    orderID int
+    vendorID int
+    creationDate datetime
+    placed tinyint
+    placedDate datetime
+    userID int
+    vendorOrderID varchar
+    vendorInvoiceID varchar
 
 Depends on:
-	PurchaseOrderItems
+    none
 
 Use:
-This table is used for storing purchase orders.
-Each order gets assigned an id here and a separate
-table, PurchaseOrderItems, stores line items
-from the order. 
+Stores general an order from a vendor.
+One or more records in purchaseOrderItems
+should go with this record to list the
+individual items to order.
 
-Fannie doesn't really do perpetual inventory, so
-this table isn't used much yet.
+vendorOrderID and vendorInvoiceID are memo
+fields. If the vendor puts numbers or other
+identifiers on orders and/or invoices those
+values can be saved here for reference.
 */
-$poQ = "CREATE TABLE PurchaseOrder (
-	name varchar(100),
-	stamp datetime,";
-if ($dbms == "MSSQL")
-	$poQ .= "id int IDENTITY (1,1) NOT NULL, primary key(id))";
-else
-	$poQ .= "id int auto_increment NOT NULL, primary key(id))";
-
-$CREATE['op.PurchaseOrder'] = $poQ;
+$CREATE['op.PurchaseOrder'] = "
+    create table PurchaseOrder (
+        orderID INT NOT NULL AUTO_INCREMENT,
+        vendorID INT,
+        creationDate DATETIME,
+        placed TINYINT DEFAULT 0,
+        placedDate DATETIME,
+        userID INT,
+        vendorOrderID VARCHAR(25),
+        vendorInvoiceID VARCHAR(25),
+        primary key (orderID),
+        INDEX(placed)
+    )
+";
 ?>

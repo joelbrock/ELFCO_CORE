@@ -64,15 +64,25 @@ class PaycardProcessPage extends BasicPage {
 				type: 'post',
 				dataType: 'json',
 				success: function(data){
+					var destination = data.main_frame;
 					if (data.receipt){
 						$.ajax({url: '<?php echo $this->page_url; ?>ajax-callbacks/ajax-end.php',
 							cache: false,
 							type: 'post',
-							data: 'receiptType='+data.receipt,
-							success: function(data){}
+                            data: 'receiptType='+data.receipt+'&ref=<?php echo ReceiptLib::receiptNumber(); ?>',
+							error: function(){
+								location = destination;
+							},
+							success: function(data){
+								location = destination;
+							}
 						});
 					}
-					location = data.main_frame;
+					else
+						location = destination;
+				},
+				error: function(){
+					location = '<?php echo $plugin_info->plugin_url(); ?>/gui/paycardboxMsgAuth.php';
 				}
 			});
 			paycard_processingDisplay();
@@ -112,7 +122,7 @@ class PaycardProcessPage extends BasicPage {
 		$this->paycard_jscript_functions();
 		$this->head_content();
 		echo "</head>";
-		echo "<body>";
+		echo '<body class="'.$this->body_class.'">';
 		echo "<div id=\"boundingBox\">";
 		$this->input_header($this->action);
 		$this->body_content();	

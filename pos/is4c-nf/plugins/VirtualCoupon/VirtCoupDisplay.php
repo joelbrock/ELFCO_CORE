@@ -141,6 +141,7 @@ class VirtCoupDisplay extends NoInputPage {
 				."<select name=\"search\" size=\"15\" "
 				."onblur=\"\$('#search').focus();\" ondblclick=\"document.forms['selectform'].submit();\" id=\"search\">";
 
+			$selectFlag = (isset($selectFlag)?$selectFlag:0);
 			for ($i = 0; $i < $num_rows; $i++) {
 				$row = $db->fetch_array($result);
 				if( $i == 0 && $selectFlag == 0) {
@@ -152,7 +153,7 @@ class VirtCoupDisplay extends NoInputPage {
 					.$row["description"]."\n";
 			}
 			echo "</select></div>"
-				."<div class=\"listboxText centerOffset\">"
+				."<div class=\"listboxText coloredText centerOffset\">"
 				._("use arrow keys to navigate")."<p>"._("clear to cancel")."</div>"
 				."<div class=\"clear\"></div>";
 		}

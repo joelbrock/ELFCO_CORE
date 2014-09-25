@@ -20,7 +20,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 *********************************************************************************/
+header('Location: TrendsReport.php');
 
+<<<<<<< HEAD
 include('../../config.php');
 include($FANNIE_ROOT.'src/mysql_connect.php');
 include($FANNIE_ROOT.'src/select_dlog.php');
@@ -341,3 +343,5 @@ Excel <input type=checkbox name=excel /><br />
 	include($FANNIE_ROOT.'src/footer.html');
 }
 ?>
+=======
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d

@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 /*******************************************************************************
 
     Copyright 2009,2010 Whole Foods Co-op
@@ -1193,51 +1194,7 @@ $header = 'Item Batcher';
 include('../../src/header.html');
 */
 
+=======
+header('Location: BatchManagementTool.php');
+>>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 ?>
-
-<html>
-<head><title>Batch Management</title>
-<script type="text/javascript" src="index.js"></script>
-<script src="../../src/CalendarControl.js"
-        language="javascript"></script>
-<link rel="stylesheet" type="text/css" href="index.css">
-<link rel="stylesheet" type="text/css" href="../../src/style.css">
-</head>
-<body>
-
-<div id="inputarea">
-<?php echo newBatchInput(); ?>
-</div>
-<div id="displayarea">
-<?php echo batchListDisplay(); ?>
-</div>
-<input type=hidden id=uid value="<?php echo $user; ?>" />
-<input type=hidden id=isAudited value="<?php echo $audited; ?>" />
-<?php
-	$typestr = "";
-	foreach($batchtypes as $b)
-		$typestr .= $b."`";
-	$typestr = substr($typestr,0,strlen($typestr)-1);
-
-	$tidstr = "";
-	foreach($batchtypes as $tid=>$b)
-		$tidstr .= $tid."`";
-	$tidstr = substr($tidstr,0,strlen($tidstr)-1);
-
-	$ownerstr = "";
-	foreach($owners as $o)
-		$ownerstr .= $o."`";
-	$ownerstr = substr($ownerstr,0,strlen($ownerstr)-1);	
-
-	echo "<input type=hidden id=passtojstypes value=\"$typestr\" />";
-	echo "<input type=hidden id=passtojstypeids value=\"$tidstr\" />";
-	echo "<input type=hidden id=passtojsowners value=\"$ownerstr\" />";
-	echo "<input type=hidden id=buttonimgpath value=\"{$FANNIE_URL}src/img/buttons/\" />";
-?>
-
-<?php
-/* html footer */
-//include('../../src/footer.html');
-?>
-</body>
-</html>

@@ -51,13 +51,16 @@ class InputPage extends BasicPage {
 			src=\"{$my_url}js/jquery.js\"></script>";
 		$this->head_content();
 		echo "</head>";
-		echo "<body>";
+		echo '<body class="'.$this->body_class.'">';
+		echo "<div id=\"boundingBox\">";
 		$this->input_header();
 		echo DisplayLib::printheaderb();
 		$this->body_content();	
 		echo "<div id=\"footer\">";
 		echo DisplayLib::printfooter();
 		echo "</div>\n";
+		echo "</div>\n";
+		$this->scale_box();
 		if (!empty($this->onload_commands)){
 			echo "<script type=\"text/javascript\">\n";
 			echo "\$(document).ready(function(){\n";

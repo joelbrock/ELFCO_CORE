@@ -100,15 +100,19 @@ private static String MAGELLAN_OUTPUT_DIR = "ss-output/";
 
 	override public void Read(){
 		string buffer = "";
-		System.Console.WriteLine("Reading serial data");
+		if (this.verbose_mode > 0)
+			System.Console.WriteLine("Reading serial data");
 		sp.Write("S14\r");
 		while(SPH_Running){
 			try {
 				int b = sp.ReadByte();
 				if (b == 13){
+					if (this.verbose_mode > 0)
+						System.Console.WriteLine("RECV FROM SCALE: "+buffer);
 					buffer = this.ParseData(buffer);
 					if (buffer != null){
-						System.Console.WriteLine(buffer);
+						if (this.verbose_mode > 0)
+							System.Console.WriteLine("PASS TO POS: "+buffer);
 						this.PushOutput(buffer);
 					}
 					buffer = "";
@@ -133,6 +137,7 @@ private static String MAGELLAN_OUTPUT_DIR = "ss-output/";
 		 *    move the finished files to the output directory
 		 *    (i.e., so they aren't read too early)
 		 */
+         /*
 		int ticks = Environment.TickCount;
 		char sep = System.IO.Path.DirectorySeparatorChar;
 		while(File.Exists(MAGELLAN_OUTPUT_DIR+sep+ticks))
@@ -144,6 +149,8 @@ private static String MAGELLAN_OUTPUT_DIR = "ss-output/";
 		sw.Close();
 		File.Move(MAGELLAN_OUTPUT_DIR+sep+"tmp"+sep+ticks,
 			  MAGELLAN_OUTPUT_DIR+sep+ticks);
+              */
+        parent.MsgSend(s);
 	}
 
 	private string ParseData(string s){
@@ -162,6 +169,7 @@ private static String MAGELLAN_OUTPUT_DIR = "ss-output/";
 		}
 		else if(s.Substring(0,4) == "S143"){
 			sp.Write("S11\r");
+			got_weight = false;
 			return "S110000";
 		}
 		else if(s.Substring(0,4) == "S144"){
