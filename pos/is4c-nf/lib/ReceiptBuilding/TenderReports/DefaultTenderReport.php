@@ -87,11 +87,7 @@ static public function get(){
 		$sum = 0;
 
 		for ($i = 0; $i < $num_rows; $i++) {
-<<<<<<< HEAD
-			if (($CORE_LOCAL->get("store") == "harvest") && ($tender_code == "CC" || $tender_code == "DC" || $tender_code == "CK" || $tender_code == "TV")) $itemize = 1;
-=======
 			if ((($CORE_LOCAL->get("store") == "harvest-cb") || ($CORE_LOCAL->get("store") == "harvest-jp")) && ($tender_code == "PE" || $tender_code == "BU" || $tender_code == "EL" || $tender_code == "PY" || $tender_code == "TV")) $itemize = 1;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 			else $itemize = 0;
 			$row = $db_a->fetch_array($result);
 			$timeStamp = self::timeStamp($row["tdate"]);

@@ -21,8 +21,6 @@
 
 *********************************************************************************/
 
-<<<<<<< HEAD
-=======
 /**
  @deprecated 11Mar14 Andy
 
@@ -34,7 +32,7 @@
 */
 
 ini_set('display_errors','Off');
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
+
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
 
 /** $termDriver is a subclass of ScaleDriverWrapper 

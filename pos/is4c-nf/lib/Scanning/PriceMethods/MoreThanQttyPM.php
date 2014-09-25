@@ -32,108 +32,6 @@
 
 class MoreThanQttyPM extends PriceMethod {
 
-<<<<<<< HEAD
-	function addItem($row,$quantity,$priceObj){
-		if ($quantity == 0) return false;
-
-		$pricing = $priceObj->priceInfo($row,$quantity);
-
-		/* group definition: number of items
-		   that make up a group, price for a
-		   full set. Use "special" rows if the
-		   item is on sale */
-		$groupQty = $row['quantity'];
-		$groupPrice = $row['groupprice'];
-		if ($priceObj->isSale()){
-			$groupQty = $row['specialquantity'];
-			$groupPrice = $row['specialgroupprice'];	
-		}
-
-		/* count items in the transaction
-		   from the given group 
-
-		   Also note the total of items already
-		   rung in that did not receive a discount
-		*/
-		$mixMatch  = $row["mixmatchcode"];
-		$queryt = "select sum(ItemQtty) as mmqtty, 
-			sum(CASE WHEN discount=0 THEN total ELSE 0 END) as unDiscountedTotal,
-			mixMatch from localtemptrans 
-			where trans_status <> 'R' AND 
-			mixMatch = '".$mixMatch."' group by mixMatch";
-		if (!$mixMatch || $mixMatch == '0') {
-			$mixMatch = 0;
-			$queryt = "select sum(ItemQtty) as mmqtty, 
-				sum(CASE WHEN discount=0 THEN total ELSE 0 END) as unDiscountedTotal,
-				from "
-				."localtemptrans where trans_status<>'R' AND "
-				."upc = '".$row['upc']."' group by upc";
-		}
-		$dbt = Database::tDataConnect();
-		$resultt = $dbt->query($queryt);
-		$num_rowst = $dbt->num_rows($resultt);
-
-		$trans_qty = 0;
-		$undisc_ttl = 0;
-		if ($num_rowst > 0){
-			$rowt = $dbt->fetch_array($resultt);
-			$trans_qty = floor($rowt['mmqtty']);
-			$undisc_ttl = $rowt['unDiscountedTotal'];
-		}
-		/* include the items in this ring */
-		$trans_qty += $quantity;
-
-		/* if purchases exceed then requirement, apply
-		   the discount */
-		if ($trans_qty >= $groupQty){
-			$discountAmt = $pricing['unitPrice'] * $groupPrice;
-
-			if ( ($trans_qty - $quantity) < $groupQty){
-				/* this ring puts us over the threshold.
-				   extra math to account for discount on
-				   previously rung items */
-				$totalDiscount = ($undisc_ttl * $groupPrice) + ($discountAmt * $quantity);
-				$actualTotal = ($pricing['unitPrice']*$quantity) - $totalDiscount;
-				$pricing['discount'] = $totalDiscount;
-				$pricing['unitPrice'] = $actualTotal / $quantity;
-			}
-			else {
-				$pricing['discount'] = $discountAmt * $quantity;
-				$pricing['unitPrice'] -= $discountAmt;
-			}
-		}
-	
-		/* add the item */
-		TransRecord::addItem($row['upc'],
-			$row['description'],
-			'I',
-			' ',
-			' ',
-			$row['department'],
-			$quantity,
-			$pricing['unitPrice'],
-			MiscLib::truncate2($pricing['unitPrice'] * $quantity),
-			$pricing['regPrice'],
-			$row['scale'],
-			$row['tax'],
-			$row['foodstamp'],
-			$pricing['discount'],		
-			0,	
-			$row['discount'],
-			$row['discounttype'],
-			$quantity,
-			($priceObj->isSale() ? $row['specialpricemethod'] : $row['pricemethod']),
-			($priceObj->isSale() ? $row['specialquantity'] : $row['quantity']),
-			($priceObj->isSale() ? $row['specialgroupprice'] : $row['groupprice']),
-			$row['mixmatchcode'],
-			($trans_qty == $groupQty) ? 1 : 0,
-			0,
-			(isset($row['cost'])?$row['cost']*$quantity:0.00),
-			(isset($row['numflag'])?$row['numflag']:0),
-			(isset($row['charflag'])?$row['charflag']:'')
-		);
-	}
-=======
     function addItem($row,$quantity,$priceObj){
         global $CORE_LOCAL;
         if ($quantity == 0) return false;
@@ -239,7 +137,6 @@ class MoreThanQttyPM extends PriceMethod {
 
         return True;
     }
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 ?>

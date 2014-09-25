@@ -22,14 +22,11 @@
 *********************************************************************************/
 
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
-<<<<<<< HEAD
-=======
 AutoLoader::LoadMap();
 CoreState::loadParams();
 
 class login2 extends BasicPage 
 {
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 	private $box_css_class;
 	private $msg;
@@ -132,13 +129,8 @@ class login2 extends BasicPage
 		<div id="loginTopBar">
 			<div class="name">I S 4 C</div>
 			<div class="version">P H P &nbsp; D E V E L O P M E N T
-<<<<<<< HEAD
-			&nbsp; V E R S I O N &nbsp; 2 .0 .0 (beta)</div>
-			<div class="welcome"><?php echo _("W E L C O M E"); ?></div>
-=======
 			&nbsp; V E R S I O N &nbsp; 2 .0 .0</div>
 			<div class="welcome coloredArea"><?php echo _("W E L C O M E"); ?></div>
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 		</div>
 		<div id="loginCenter">
 		<div class="box <?php echo $this->box_css_class; ?>">

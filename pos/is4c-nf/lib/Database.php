@@ -21,8 +21,6 @@
 
 *********************************************************************************/
 
-<<<<<<< HEAD
-=======
 /* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     * 27Feb2013 Andy Theuninck singleton connection for local databases
@@ -30,7 +28,6 @@
 
 */
 
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 /**
   @class Database
   Functions related to the database
@@ -426,77 +423,6 @@ static public function testremote()
 */
 static public function uploadtoServer()
 {
-<<<<<<< HEAD
-	global $CORE_LOCAL;
-
-	$uploaded = 0;
-
-	// new upload method makes use of SQLManager's transfer method
-	// to simulate cross-server queries
-	$connect = self::tDataConnect();
-	$connect->add_connection($CORE_LOCAL->get("mServer"),
-				$CORE_LOCAL->get("mDBMS"),
-				$CORE_LOCAL->get("mDatabase"),
-				$CORE_LOCAL->get("mUser"),
-				$CORE_LOCAL->get("mPass"),
-				False);
-	if (!isset($connect->connections[$CORE_LOCAL->get("mDatabase")]) ||
-		$connect->connections[$CORE_LOCAL->get("mDatabase")] === False){
-		$CORE_LOCAL->set("standalone",1);
-		return 0;	
-	}
-
-	$dt_matches = self::getMatchingColumns($connect,"dtransactions");
-
-	if ($connect->transfer($CORE_LOCAL->get("tDatabase"),
-		"select {$dt_matches} from dtransactions",
-		$CORE_LOCAL->get("mDatabase"),"insert into dtransactions ({$dt_matches})")){
-
-		$al_matches = self::getMatchingColumns($connect,"alog");
-		// interval is a mysql reserved word
-		// so it needs to be escaped
-		$local_columns = str_replace('Interval',
-					$connect->identifier_escape('Interval',$CORE_LOCAL->get('tDatabase')),
-					$al_matches);
-		$server_columns = str_replace('Interval',
-					$connect->identifier_escape('Interval',$CORE_LOCAL->get('mDatabase')),
-					$al_matches);
-		$al_success = $connect->transfer($CORE_LOCAL->get("tDatabase"),
-			"select $local_columns FROM alog",
-			$CORE_LOCAL->get("mDatabase"),
-			"insert into alog ($server_columns)");
-
-		$su_matches = self::getMatchingColumns($connect,"suspended");
-		$su_success = $connect->transfer($CORE_LOCAL->get("tDatabase"),
-			"select {$su_matches} from suspended",
-			$CORE_LOCAL->get("mDatabase"),
-			"insert into suspended ({$su_matches})");
-
-		$connect->query("truncate table dtransactions",
-			$CORE_LOCAL->get("tDatabase"));
-		if ($al_success){
-			$connect->query("truncate table alog",
-				$CORE_LOCAL->get("tDatabase"));
-		}
-		if ($su_success){
-			$connect->query("truncate table suspended",
-				$CORE_LOCAL->get("tDatabase"));
-		}
-
-		$uploaded = 1;
-		$CORE_LOCAL->set("standalone",0);
-	}
-	else {
-		$uploaded = 0;
-		$CORE_LOCAL->set("standalone",1);
-	}
-
-	$connect->close($CORE_LOCAL->get("mDatabase"),True);
-
-	self::uploadCCdata();
-
-	return $uploaded;
-=======
     global $CORE_LOCAL;
 
     $uploaded = 0;
@@ -554,7 +480,6 @@ static public function uploadtoServer()
     }
 
     return $uploaded;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 /** 
@@ -852,8 +777,6 @@ static public function setglobalflags($value)
     $db->query("update globalvalues set TTLFlag = ".$value.", FntlFlag = ".$value);
 }
 
-<<<<<<< HEAD
-=======
 /**
   Change one tax code in all items of localtemptrans to a different one.
   Parameters are the names of the taxes, as in taxrates.description
@@ -915,9 +838,6 @@ static public function changeLttTaxCode($fromName, $toName)
 // changeLttTaxCode
 }
 
-<<<<<<< HEAD
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
-=======
 /**
   Rotate current transaction data
   Current data in translog.localtemptrans is inserted into:
@@ -1000,6 +920,5 @@ static public function clearTempTables()
     return ($ret) ? true : false;
 }
 
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 } // end Database class
 

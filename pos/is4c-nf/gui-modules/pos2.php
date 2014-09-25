@@ -21,18 +21,6 @@
 
 *********************************************************************************/
 
-<<<<<<< HEAD
-/* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	18Sep2012 Eric Lee Added CORE_LOCAL[store]-based option to change style of items.
-	                    Needed for expanded comments for scaled items.
-
-*/
-
-ini_set('display_errors','1');
- 
-=======
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 session_cache_limiter('nocache');
 
 include_once(dirname(__FILE__).'/../lib/AutoLoader.php');
@@ -66,18 +54,6 @@ class pos2 extends BasicPage {
 
 		$json = array();
 		if ($entered != ""){
-<<<<<<< HEAD
-			/* this breaks the model a bit, but I'm putting
-			 * putting the CC parser first manually to minimize
-			 * code that potentially handles the PAN */
-			include_once(realpath(dirname(__FILE__)."/../cc-modules/lib/paycardEntered.php"));
-			$pe = new paycardEntered();
-			if ($pe->check($entered)){
-				$valid = $pe->parse($entered);
-				$entered = "PAYCARD";
-				$CORE_LOCAL->set("strEntered","");
-				$json = $valid;
-=======
 
 			if (in_array("Paycards",$CORE_LOCAL->get("PluginList"))){
 				/* this breaks the model a bit, but I'm putting
@@ -99,11 +75,7 @@ class pos2 extends BasicPage {
 
 				$CORE_LOCAL->set("quantity",0);
 				$CORE_LOCAL->set("multiple",0);
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 			}
-
-			$CORE_LOCAL->set("quantity",0);
-			$CORE_LOCAL->set("multiple",0);
 
 			/* FIRST PARSE CHAIN:
 			 * Objects belong in the first parse chain if they
@@ -213,27 +185,11 @@ class pos2 extends BasicPage {
 		<script type="text/javascript">
 		function submitWrapper(){
 			var str = $('#reginput').val();
-<<<<<<< HEAD
-			if (str.indexOf("tw") != -1 || str.indexOf("TW") != -1 || (str.search(/^[0-9]+$/) == 0 && str.length <= 13) || str=='TFS'){
-				$('#reginput').val('');
-=======
 			$('#reginput').val('');
-<<<<<<< HEAD
-			//if (str.indexOf("tw") != -1 || str.indexOf("TW") != -1 || (str.search(/^[0-9]+$/) == 0 && str.length <= 13) || str=='TFS'
-			 //   || str == 'U' || str == 'D'){
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
-				clearTimeout(screenLockVar);
-				runParser(str,'<?php echo $this->page_url; ?>');
-				enableScreenLock();
-				return false;
-			//}
-			//return true;
-=======
             clearTimeout(screenLockVar);
             runParser(str,'<?php echo $this->page_url; ?>');
             enableScreenLock();
             return false;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 		}
 		function parseWrapper(str){
 			$('#reginput').val(str);

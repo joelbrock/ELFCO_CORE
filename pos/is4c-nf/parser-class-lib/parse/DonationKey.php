@@ -45,24 +45,11 @@ class DonationKey extends Parser
 			Database::getsubtotals();
 			$ttl = $CORE_LOCAL->get("amtdue");	
 			$next = ceil($ttl);
-<<<<<<< HEAD
-			$amt = ($ttl == $next) ? 1.00 : $next - $ttl;
-			$ret = PrehLib::deptkey($amt*100, 850, $ret);
-=======
 			$amt = sprintf('%.2f',(($ttl == $next) ? 1.00 : ($next - $ttl)));
-<<<<<<< HEAD
-			$ret = PrehLib::deptkey($amt*100, 7010, $ret);
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
-		}
-		else {
-			$amt = substr($str,0,strlen($str)-2);
-			$ret = PrehLib::deptkey($amt, 850, $ret);
-=======
 			$ret = PrehLib::deptkey($amt*100, $dept.'0', $ret);
 		} else {
 			$amt = substr($str,0,strlen($str)-2);
 			$ret = PrehLib::deptkey($amt, $dept.'0', $ret);
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 		}
 
 		return $ret;
@@ -84,4 +71,3 @@ class DonationKey extends Parser
 			</table>";
 	}
 }
-

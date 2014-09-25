@@ -188,29 +188,6 @@ class UPC extends Parser {
 			}
 			// no match; not a product, not special
 			
-<<<<<<< HEAD
-			/*
-			if ($CORE_LOCAL->get("requestType")!="badscan"){
-				$CORE_LOCAL->set("requestType","badscan");
-				$CORE_LOCAL->set("requestMsg",_("not a valid item").'<br />'._("enter description"));
-				$ret['main_frame'] = $my_url.'gui-modules/requestInfo.php';
-				return $ret;
-			}
-			else {
-				$ret['output'] = DisplayLib::lastpage();
-				TransRecord::addQueued($upc,$CORE_LOCAL->get("requestMsg"),0,'BS');
-				$CORE_LOCAL->set("requestMsg","");
-				$CORE_LOCAL->set("requestType","");
-				return $ret; 
-			}
-			*/
-			//TransRecord::addQueued($upc,'BADSCAN');
-			$opts = array('upc'=>$upc,'description'=>'BADSCAN');
-			TransRecord::add_log_record($opts);
-			$CORE_LOCAL->set("boxMsg",_("not a valid item"));
-			$ret['udpmsg'] = 'errorBeep';
-			$ret['main_frame'] = $my_url."gui-modules/boxMsg2.php";
-=======
             $handler = $CORE_LOCAL->get('ItemNotFound');
             if ($handler === '' || !class_exists($handler)) {
                 $handler = 'ItemNotFound';
@@ -218,7 +195,6 @@ class UPC extends Parser {
             $obj = new $handler();
             $ret = $obj->handle($upc, $ret);
 
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 			return $ret;
 		}
 
@@ -252,9 +228,6 @@ class UPC extends Parser {
 			}
 		}
 
-<<<<<<< HEAD
-		if (($row["idEnforced"] > 0) || (substr($upc,-3) == "500") || (substr($upc,-3) == "510")){
-=======
 		/**
 		  Apply special department handlers
 		  based on item's department
@@ -293,7 +266,6 @@ class UPC extends Parser {
 		}
 
 		if ($row["idEnforced"] > 0){
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 
 			$restrictQ = "SELECT upc,dept_ID FROM dateRestrict WHERE
 				( upc='{$row['upc']}' AND
@@ -319,22 +291,10 @@ class UPC extends Parser {
 				return $ret;
 			}
 
-<<<<<<< HEAD
-			// if ($CORE_LOCAL->get("cashierAge") < 18 && $CORE_LOCAL->get("cashierAgeOverride") != 1){
-			// 	$CORE_LOCAL->set("adminRequest",$my_url."gui-modules/pos2.php");
-			// 	$CORE_LOCAL->set("adminRequestLevel",30);
-			// 	$CORE_LOCAL->set("adminLoginMsg",_("Login to approve sale"));
-			// 	$CORE_LOCAL->set("away",1);
-			// 	$CORE_LOCAL->set("cashierAgeOverride",2);
-			// 	$ret['main_frame'] = $my_url."gui-modules/adminlogin.php";
-			// 	return $ret;
-			// }
-=======
 			if ($CORE_LOCAL->get("cashierAge") < 18 && $CORE_LOCAL->get("cashierAgeOverride") != 1){
 				$ret['main_frame'] = $my_url."gui-modules/adminlogin.php?class=AgeApproveAdminLogin";
 				return $ret;
 			}
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 			if ($CORE_LOCAL->get("memAge")=="") {
 				$CORE_LOCAL->set("memAge",date('Ymd'));
@@ -345,15 +305,7 @@ class UPC extends Parser {
 			$today = strtotime( date('Y-m-d') );
 			if ($of_age_on_day > $today) {
 				$ret['udpmsg'] = 'twoPairs';
-<<<<<<< HEAD
-				// $current = date("m/d/y",strtotime($CORE_LOCAL->get("memAge")));
-				$current = date("Ymd",strtotime(date('Ymd') - 210000));
-				$CORE_LOCAL->set("requestType","customer age");
-				$CORE_LOCAL->set("requestMsg","Type customer birthdate YYYYMMDD<br />(born after $current)");
-				$ret['main_frame'] = $my_url.'gui-modules/requestInfo.php';
-=======
 				$ret['main_frame'] = $my_url.'gui-modules/requestInfo.php?class=UPC';
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 				return $ret;
 			}
 		}

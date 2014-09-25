@@ -130,13 +130,8 @@ class fsTotalConfirm extends NoInputPage
 		<?php if (empty($this->tendertype)) { ?>
 			<select size="2" name="selectlist" 
 				id="selectlist" onblur="$('#selectlist').focus();">
-<<<<<<< HEAD
-			<option value='EF' selected>Food Portion
-			<option value='EC'>Cash Portion
-=======
 			<option value='EC' <?php echo ($default == 'EC') ? 'selected' : ''; ?>>Cash Portion
 			<option value='EF' <?php echo ($default == 'EF') ? 'selected' : ''; ?>>Food Portion
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 			</select>
 		<?php } else { ?>
 			<input type="text" id="tenderamt" 

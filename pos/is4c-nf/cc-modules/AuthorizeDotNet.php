@@ -259,13 +259,8 @@ class AuthorizeDotNet extends BasicCCModule {
 		$CORE_LOCAL->set("paycard_name",$request["name"]);
 	
 		// display FEC code box
-<<<<<<< HEAD:pos/is4c-nf/cc-modules/AuthorizeDotNet.php
-		$CORE_LOCAL->set("inputMasked",1);
-		$json['main_frame'] = MiscLib::base_url().'gui-modules/paycardboxMsgVoid.php';
-=======
 		$plugin_info = new Paycards();
 		$json['main_frame'] = $plugin_info->plugin_url().'/gui/paycardboxMsgVoid.php';
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d:pos/is4c-nf/plugins/Paycards/AuthorizeDotNet.php
 		return $json;
 	}
 

@@ -614,20 +614,7 @@ static public function paycard_db_num_rows($result){
 }
 
 static public function paycard_db_fetch_row($result){
-<<<<<<< HEAD:pos/is4c-nf/cc-modules/lib/PaycardLib.php
-	global $CORE_LOCAL;
-	switch($CORE_LOCAL->get("DBMS")){
-	case 'mysql':
-		return mysql_fetch_row($result);
-		break;
-	case 'mssql':
-		return mssql_fetch_row($result);
-		break;
-	}
-	return False;
-=======
 	return self::$paycardDB->fetch_row($result);
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588:pos/is4c-nf/plugins/Paycards/lib/PaycardLib.php
 }
 
 static public function paycard_db_escape($str, $link){

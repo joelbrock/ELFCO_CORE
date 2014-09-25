@@ -240,28 +240,6 @@ static public function printReceiptHeader($dateTimeStamp, $ref) {
 	$img_cache = $CORE_LOCAL->get('ImageCache');
 	if (!is_array($img_cache)) $img_cache = array();
 
-<<<<<<< HEAD
-	$i = 2; // for headers below
-	if ($CORE_LOCAL->get("newReceipt")==1 && $CORE_LOCAL->get("store") != "wfc"){
-		if ($CORE_LOCAL->get("ReceiptHeaderImage") != ""){
-			$img = self::$PRINT_OBJ->RenderBitmapFromFile(MiscLib::base_url()."graphics/" . $CORE_LOCAL->get("ReceiptHeaderImage"));
-			$receipt .= $img."\n";
-			$receipt .= "\n";
-		} 
-		else {
-			$receipt .= self::$PRINT_OBJ->TextStyle(True, False, True);
-			$receipt .= self::$PRINT_OBJ->centerString($CORE_LOCAL->get("receiptHeader1"),True);
-			$receipt .= self::$PRINT_OBJ->TextStyle(True);
-			$receipt .= "\n\n";
-		}
-	}
-	else if ($CORE_LOCAL->get("newReceipt")>=1 && $CORE_LOCAL->get("store") == "wfc"){
-		// cache the receipt-formatted bitmap so it's
-		// not re-rendered every single time
-		$img_file = MiscLib::base_url()."graphics/WFC_Logo.bmp";
-		if (isset($img_cache[basename($img_file)])){
-			$receipt .= $img_cache[basename($img_file)]."\n";
-=======
 	for ($i=1; $i <= $CORE_LOCAL->get("receiptHeaderCount"); $i++){
 
 		/**
@@ -285,7 +263,6 @@ static public function printReceiptHeader($dateTimeStamp, $ref) {
 				$CORE_LOCAL->set('ImageCache',$img_cache);
 				$receipt .= "\n";
 			}
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 		}
 		else {
 			$bold = ($i==1) ? True : False;
@@ -655,35 +632,16 @@ static public function printCCSigSlip($dateTimeStamp,$ref,$storeCopy=True,$rp=0)
 	} else {		// else if current transaction, just grab most recent 
 		if ($storeCopy){
 			$idclause = " and transID = ".$CORE_LOCAL->get("paycard_id");
-<<<<<<< HEAD
-			$limit = " TOP 1 ";
-=======
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 		}
 		$sort = " desc ";
 		$db = Database::tDataConnect();
 	}
 	// query database for cc receipt info 
-<<<<<<< HEAD
-	$query = "select ".$limit." tranType, amount, PAN, entryMethod, issuer, xResultMessage, xApprovalNumber, xTransactionID, name, "
-		." datetime from ccReceiptView where [date]=".date('Ymd',$dateTimeStamp)
-		." and cashierNo = ".$emp." and laneNo = ".$reg
-		." and transNo = ".$trans ." ".$idclause
-		." order by datetime, cashierNo, laneNo, transNo, xTransactionID, transID ".$sort.", sortorder ".$sort;
-	if ($CORE_LOCAL->get("DBMS") == "mysql" && $rp == 0){
-		$query = str_replace("[date]","date",$query);
-		if ($limit != ""){
-			$query = str_replace($limit,"",$query);
-			$query .= " LIMIT 1";
-		}
-	}
-=======
 	$query = "select  tranType, amount, PAN, entryMethod, issuer, xResultMessage, xApprovalNumber, xTransactionID, name, "
 		." datetime from ccReceiptView where date=".date('Ymd',$dateTimeStamp)
 		." and cashierNo = ".$emp." and laneNo = ".$reg
 		." and transNo = ".$trans ." ".$idclause
 		." order by datetime, cashierNo, laneNo, transNo, xTransactionID, transID ".$sort.", sortorder ".$sort;
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 	$result = $db->query($query);
 	$num_rows = $db->num_rows($result);
 
@@ -1213,26 +1171,7 @@ static public function printReceipt($arg1, $ref, $second=False, $email=False) {
                     $emp, $reg, $trans);
 
 	/**
-<<<<<<< HEAD
-	  Moved to ajax-end.php to avoid hanging on printer errors
-	$kicker_class = ($CORE_LOCAL->get("kickerModule")=="") ? 'Kicker' : $CORE_LOCAL->get('kickerModule');
-	$kicker_obj = new $kicker_class();
-	if (!is_object($kicker_object)) $kicker_object = new Kicker();
-<<<<<<< HEAD
-	$dokick = $kicker_obj->doKick();
-	$receipt = "";
-=======
-	$dokick = $kicker_object->doKick();
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
-
-	if ($arg1 == "full" && $dokick) {	// ---- apbw 03/29/05 Drawer Kick Patch
-		$kick_cmd = self::$PRINT_OBJ->DrawerKick(2,48*2,30*2);
-		self::$PRINT_OBJ->writeLine($kick_cmd);
-		//self:::writeLine(chr(27).chr(112).chr(0).chr(48)."0");
-	}
-=======
 	  This block deprecates ReceiptLib::reprintReceipt()
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 	*/
 	if ($reprint) {
 		$arg1 = 'full';
@@ -1458,12 +1397,6 @@ static public function printReceipt($arg1, $ref, $second=False, $email=False) {
 		
 		} /***** jqh end big if statement change *****/
 	}
-<<<<<<< HEAD
-	else {
-		$receipt = self::chargeBalance($receipt);
-	}
-=======
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
 
 	/* --------------------------------------------------------------
 	  print store copy of charge slip regardless of receipt print setting - apbw 2/14/05 

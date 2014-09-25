@@ -1,7 +1,6 @@
 <?php
 
 $my_menu = array(
-<<<<<<< HEAD
 	"Grocery" => "DP10",
 	"Perishable Grocery" => "DP20",
 	"Dairy" => "DP30",
@@ -18,13 +17,6 @@ $my_menu = array(
 	"General Merchandise" => "DP160",
 	"Garden Supply" => "DP190",
 	"Taxable Grocery" => "DP200"
-=======
-	"Charge Available Card" => "CCFROMCACHE",
-	"Reset Terminal (Quick)" => "TERMRESET",
-	"Tender External CC" => "MANUALCC",
-    "Lookup Transaction" => "PCLOOKUP",
-	"Reboot Terminal (Slow)" => "TERMREBOOT",
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 );
 
 ?>

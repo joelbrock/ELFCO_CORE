@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 
 $my_menu = array(
@@ -10,15 +9,3 @@ $my_menu = array(
 );
 
 ?>
-=======
-<?php
-
-$my_menu = array(
-	"Bakery Other" => "99000",
-	"Bakery Bread" => "99001",
-	"Bakery Granola" => "99002",
-	"Bakery Sweets" => "99003"
-);
-
-?>
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d

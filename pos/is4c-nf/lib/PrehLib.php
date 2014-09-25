@@ -21,15 +21,6 @@
 
 *********************************************************************************/
 
-<<<<<<< HEAD
-/* --COMMENTS - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-	18Sep2012 Eric Lee In setMember support for not displaying subtotal.
-
-*/
-
-=======
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 /**
   @class PrehLib
   A horrible, horrible catch-all clutter of functions
@@ -113,15 +104,10 @@ static public function memberID($member_number)
 	if (empty($ret['output']) && $ret['main_frame'] == false) {
 		$ret['main_frame'] = MiscLib::base_url()."gui-modules/memlist.php?idSearch=".$member_number;
     }
-	
-<<<<<<< HEAD
-	$CORE_LOCAL->set("beep","goodBeep");
-	$ret['udpmsg'] = 'goodBeep';
-=======
+
 	if ($CORE_LOCAL->get("verifyName") != 1) {
 		$ret['udpmsg'] = 'goodBeep';
 	}
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 	return $ret;
 }

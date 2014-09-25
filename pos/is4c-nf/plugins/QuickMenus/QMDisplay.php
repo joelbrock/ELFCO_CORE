@@ -180,11 +180,8 @@ class QMDisplay extends NoInputPage {
         }
 
 		echo '<br /><br />';
-<<<<<<< HEAD
+
 		echo '<select name="ddQKselect" id="ddQKselect" style="width:350px;" size="10"
-=======
-		echo '<select name="ddQKselect" id="ddQKselect" style="width:380px;" size="10"
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 			onblur="$(\'#ddQKselect\').focus();" >';
 		$i=1;
 		foreach($my_menu as $label => $value){

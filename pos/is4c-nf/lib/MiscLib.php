@@ -115,12 +115,8 @@ static public function pingport($host, $dbms)
 	socket_set_block($sock);
 	$test = socket_connect($sock,$host,$port);
 	socket_close($sock);
-<<<<<<< HEAD
-	return ($test ? 1 : 0);	
-=======
 
 	return ($test ? 1 : 0);
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 /**

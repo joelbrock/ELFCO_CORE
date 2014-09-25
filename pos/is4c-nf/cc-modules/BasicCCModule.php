@@ -260,13 +260,8 @@ class BasicCCModule
 		curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION,false);
 		curl_setopt($curl_handle, CURLOPT_FRESH_CONNECT,true);
 		curl_setopt($curl_handle, CURLOPT_TIMEOUT,30);
-<<<<<<< HEAD:pos/is4c-nf/cc-modules/BasicCCModule.php
-		curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 1);
-		if($CORE_LOCAL->get("OS")=="win32")
-=======
 		curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, 0);
         if (MiscLib::win32()) {
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d:pos/is4c-nf/plugins/Paycards/BasicCCModule.php
 			curl_setopt($curl_handle, CURLOPT_CAINFO, LOCAL_CERT_PATH);
         }
 		if ($type == 'SOAP') {

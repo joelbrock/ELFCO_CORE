@@ -49,15 +49,9 @@
 NAME=posdriver-sph-debian
 LHOME=/var/run/${NAME}
 KILL=/bin/kill
-<<<<<<< HEAD
-DHOME=/pos/ELFCO_CORE/pos/is4c-nf/scale-drivers/drivers/NewMagellan
-=======
 DHOME=/var/www/IS4C/pos/is4c-nf/scale-drivers/drivers/NewMagellan
 # Use '-v' for driver to log activity.
 VERBOSE=
-# upstream version with PFC_CORE
-#DHOME=/var/www/PFC_CORE/pos/is4c-nf/scale-drivers/drivers/NewMagellan
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 # --FUNCTIONS - - - - - - - - - - - - - - - - - - - - - - - - -
 

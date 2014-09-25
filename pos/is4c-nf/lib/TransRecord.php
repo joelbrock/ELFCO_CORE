@@ -642,10 +642,6 @@ static public function addCoupon($strupc, $intdepartment, $dbltotal, $foodstamp=
   @param $dbltotal coupon amount (should be negative)
   @param $foodstamp reduce FS total
 */
-<<<<<<< HEAD
-static public function addhousecoupon($strupc, $intdepartment, $dbltotal, $foodstamp=1) {
-	self::addItem($strupc, " * Store Coupon", "I", "IC", "C", $intdepartment, 1, $dbltotal, $dbltotal, $dbltotal, 0, 0, $foodstamp, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0);
-=======
 static public function addhousecoupon($strupc, $intdepartment, $dbltotal, $description='') 
 {
 	global $CORE_LOCAL;
@@ -670,7 +666,6 @@ static public function addhousecoupon($strupc, $intdepartment, $dbltotal, $descr
         'total' => $dbltotal,
         'regPrice' => $dbltotal,
     ));
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 /**

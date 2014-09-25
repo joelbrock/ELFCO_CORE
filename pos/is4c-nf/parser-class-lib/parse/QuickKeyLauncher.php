@@ -24,13 +24,6 @@
 class QuickKeyLauncher extends Parser {
 	
 	function check($str){
-<<<<<<< HEAD:pos/is4c-nf/parser-class-lib/parse/QuickKeyLauncher.php
-		if (strstr($str,"QK")){
-			$tmp = explode("QK",$str);
-			$ct = count($tmp);
-			if ($ct <= 2 && is_numeric($tmp[$ct-1]))
-				return True;
-=======
 		global $CORE_LOCAL;
 		if ($str == "CC"){
 //			$this->remainder = "QM1";
@@ -39,7 +32,6 @@ class QuickKeyLauncher extends Parser {
 		elseif ($str == "MANUALCC"){
 			$this->remainder = ("".$CORE_LOCAL->get("runningTotal") * 100)."CC";
 			return True;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d:pos/is4c-nf/parser-class-lib/preparse/CCMenu.php
 		}
 		return False;
 	}

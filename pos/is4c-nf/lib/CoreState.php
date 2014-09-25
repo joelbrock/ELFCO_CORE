@@ -428,17 +428,12 @@ static public function transReset()
 	  - EBTCASH
 	*/
 	$CORE_LOCAL->set("CacheCardType","");
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
 
 	/**
 	  @var CacheCardCashBack
 	  Stores the select cashback amount.
 	  Similar to CachePanEncBlock.
 	*/
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 	$CORE_LOCAL->set("CacheCardCashBack",0);
 
 	/**
@@ -474,13 +469,6 @@ static public function transReset()
 	*/
 	$CORE_LOCAL->set("ebt_vnum","");
 
-<<<<<<< HEAD
-	foreach($CORE_LOCAL->get('PluginList') as $p){
-		$obj = new $p();
-		$obj->plugin_transaction_reset();
-	}
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588
-=======
 	/**
 	  @var paycard_keyed
 	  - True => card number was hand keyed
@@ -515,7 +503,6 @@ static public function transReset()
     }
 
     FormLib::clearTokens();
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 /**
@@ -641,27 +628,6 @@ static public function memberReset()
 }
 
 /**
-<<<<<<< HEAD
-  Get member information line for a given member
-  @param $row a record from custdata
-  @return string
-  @deprecated
-  Just define blueLine in custdata.
-*/
-static public function blueLine($row) {
-	$status = array('Non-Mem', 'Owner PIF', 'Owner Instl', 'Annual', 'ON HOLD', 'REFUND', 'EXPIRED', 'Co-op', 'INACTIVE', 'STAFF', 'WORKER OWNER', 'BOARD', 'OWN SR', 'OWN INS SR');
-	if ($row["blueLine"]) {			// custom blueLine as defined by db
-		return $row["blueLine"];
-	} elseif (isset($row["blueLine"])) {	// 0 - default blueLine with out name
-		return '#'.$row['CardNo'].' - '.$row['Discount'].'% - '.$status[$row['memType']];
-	} else {				// NULL - default blueLine including name
-		return '#'.$row['CardNo'].' - '.substr($status[$row['memType']],0,5).': '.ucwords(strtolower($row['FirstName'])).' '.ucwords(substr(strtolower($row['LastName']),0,1).'.');
-	}
-}
-
-/**
-=======
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
   If there are records in localtemptrans, get the 
   member number and initialize $CORE_LOCAL member
   variables.
@@ -853,4 +819,3 @@ static public function loadParams(){
 }
 
 }
-

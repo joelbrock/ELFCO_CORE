@@ -152,8 +152,6 @@ class paycardEntered extends Parser {
 		// determine card issuer and type
 		$CORE_LOCAL->set("paycard_type",PaycardLib::paycard_type($CORE_LOCAL->get("paycard_PAN")));
 		$CORE_LOCAL->set("paycard_issuer",PaycardLib::paycard_issuer($CORE_LOCAL->get("paycard_PAN")));
-<<<<<<< HEAD:pos/is4c-nf/cc-modules/lib/paycardEntered.php
-=======
 
 		/* check card type. Credit is default. */
 		$type = $CORE_LOCAL->get("CacheCardType");
@@ -189,7 +187,6 @@ class paycardEntered extends Parser {
 			$CORE_LOCAL->set('paycard_amount',
 				$CORE_LOCAL->get('amtdue') + $CORE_LOCAL->get('CacheCardCashBack'));
 		}
->>>>>>> 6ef701b7099b88df44d419903824240e3f91a588:pos/is4c-nf/plugins/Paycards/lib/paycardEntered.php
 	
 		// if we knew the type coming in, make sure it agrees
 		if( $type != PaycardLib::PAYCARD_TYPE_UNKNOWN && $type != $CORE_LOCAL->get("paycard_type")) {
