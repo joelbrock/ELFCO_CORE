@@ -74,8 +74,7 @@ static public function get(){
 		$sum = 0;
 
 		for ($i = 0; $i < $num_rows; $i++) {
-			if (($CORE_LOCAL->get("store") == "harvest") && ($tender_code == "CC" || $tender_code == "DC" || $tender_code == "CK" || $tender_code == "TV")) $itemize = 1;
-			else $itemize = 0;
+			$itemize = 0;
 			$row = $db_a->fetch_array($result);
 			$timeStamp = self::timeStamp($row["tdate"]);
 			if ($itemize == 1) {
@@ -127,12 +126,8 @@ static public function get(){
 	$receipt .= ReceiptLib::centerString("Net Takings: ".number_format($net,2))."\n";
 	$receipt .= str_repeat("\n", 4);
 
-	ReceiptLib::writeLine($receipt.chr(27).chr(105));
-	$db_a->close();
-
-	return $receipt;
 }
-
+return $receipt.chr(27).chr(105);
 }
 
 ?>
