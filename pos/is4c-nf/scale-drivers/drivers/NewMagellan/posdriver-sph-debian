@@ -49,7 +49,7 @@
 NAME=posdriver-sph-debian
 LHOME=/var/run/${NAME}
 KILL=/bin/kill
-DHOME=/var/www/IS4C/pos/is4c-nf/scale-drivers/drivers/NewMagellan
+DHOME=/var/www/is4c-nf/scale-drivers/drivers/NewMagellan
 # Use '-v' for driver to log activity.
 VERBOSE=
 
