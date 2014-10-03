@@ -133,4 +133,6 @@ static public function get(){
 	return $receipt;
 }
 
+}
+
 ?>
