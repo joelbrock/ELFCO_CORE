@@ -23,12 +23,13 @@
 
 /**
   @class ELFCO_Kicker
-  Opens drawer for cash, debit w/ cashback, and 
-  checks w/ cashback
-*/
-class ELFCO_Kicker extends Kicker {
 
-    function doKick(){
+*/
+class ELFCO_Kicker extends Kicker 
+{
+
+    public function doKick()
+    {
         global $CORE_LOCAL;
         $db = Database::tDataConnect();
 
@@ -39,10 +40,38 @@ class ELFCO_Kicker extends Kicker {
 
         $result = $db->query($query);
         $num_rows = $db->num_rows($result);
-        $db->close();
 
-        return ($num_rows > 0) ? True : False;
+        $ret = ($num_rows > 0) ? true : false;
+
+        // use session to override default behavior
+        // based on specific cashier actions rather
+        // than transaction state
+        $override = $CORE_LOCAL->get('kickOverride');
+        $CORE_LOCAL->set('kickOverride',false);
+        if ($override === true) $ret = true;
+
+        return $ret;
+    }
+
+    public function kickOnSignIn() 
+	{
+        global $CORE_LOCAL;
+        if($CORE_LOCAL->get('training') == 1) {
+            return false;
+        }
+
+        return true;
+    }
+    public function kickOnSignOut()
+    {
+        global $CORE_LOCAL;
+        if($CORE_LOCAL->get('training') == 1) {
+            return false;
+        }
+
+        return true;
     }
 }
+
 
 ?>
