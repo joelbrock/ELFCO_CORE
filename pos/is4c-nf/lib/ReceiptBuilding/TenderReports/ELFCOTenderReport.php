@@ -125,9 +125,9 @@ static public function get(){
 	}
 	$receipt .= ReceiptLib::centerString("Net Takings: ".number_format($net,2))."\n";
 	$receipt .= str_repeat("\n", 4);
-
+	
+	return $receipt.chr(27).chr(105);
 }
-return $receipt.chr(27).chr(105);
 }
 
 ?>
