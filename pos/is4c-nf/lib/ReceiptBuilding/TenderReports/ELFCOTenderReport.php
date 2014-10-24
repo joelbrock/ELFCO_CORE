@@ -87,6 +87,15 @@ static public function get(){
 				.substr($blank.number_format($row["tender"], 2), -14)."\n";
 			}
 			if ($tender_code == 'CA') $row['tender'] = $row['tender'] * -1;
+            if ($tender_code == 'CA') {
+                    $cashbackR = $db_a->query("SELECT SUM(total) FROM dlog
+                      WHERE emp_no = " . $CORE_LOCAL->Get('CashierNo') . "
+                      AND trans_subtype IN ('DCCB', 'CKCB')");
+                    if ($cashbackR && $db_a->num_rows($cashbackR) > 0) {
+                      $cashbackW = $db_a->fetch_row($cashbackR);
+                      $sum += $cashbackW[0];
+                    }
+            }
 			$sum += $row["tender"];
 		}
 		$net += $sum;
