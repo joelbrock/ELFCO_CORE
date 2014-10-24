@@ -49,6 +49,7 @@ static public function get(){
 	foreach(array_keys($DESIRED_TENDERS) as $tender_code){
 		$query = "select tdate from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
 			" and trans_subtype = '".$tender_code."' order by tdate";
+
 		$result = $db_a->query($query);
 		$num_rows = $db_a->num_rows($result);
 		if ($num_rows <= 0) continue;
@@ -67,6 +68,14 @@ static public function get(){
 		$query = "select tdate,register_no,trans_no,tender
 		       	from TenderTapeGeneric where emp_no=".$CORE_LOCAL->get("CashierNo").
 			" and trans_subtype = '".$tender_code."' order by tdate";
+		switch($tender_code){
+		case 'CA':
+			$query = "select tdate,register_no,trans_no,-total AS tender
+				from dlog where emp_no=".$CORE_LOCAL->get("CashierNo").
+				" and trans_type='T' AND trans_subtype IN ('CA','DCCB','CKCB')
+				  ORDER BY tdate";
+			break;
+		}
 		$result = $db_a->query($query);
 		$num_rows = $db_a->num_rows($result);
 
