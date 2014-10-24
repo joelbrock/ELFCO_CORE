@@ -28,30 +28,34 @@
 class ELFCO_Kicker extends Kicker 
 {
 
-    public function doKick()
+    public function doKick($trans_num)
     {
         global $CORE_LOCAL;
+        if($CORE_LOCAL->get('training') == 1) {
+            return false;
+        }
         $db = Database::tDataConnect();
 
-        $query = "select trans_id from localtemptrans where 
-            (trans_subtype = 'CA' and total <> 0) or 
-            (trans_subtype = 'DCCB' AND total <> 0) or
-            (trans_subtype = 'CKCB' AND total <> 0)";
+        $query = "SELECT trans_id   
+                  FROM localtranstoday 
+                  WHERE 
+                    (trans_subtype = 'CA' and total <> 0) OR
+					(trans_subtype = 'DCCB' AND total <> 0) OR
+		            (trans_subtype = 'CKCB' AND total <> 0)
+                    AND " . $this->refToWhere($trans_num);
 
         $result = $db->query($query);
         $num_rows = $db->num_rows($result);
 
-        $ret = ($num_rows > 0) ? true : false;
-
-        // use session to override default behavior
-        // based on specific cashier actions rather
-        // than transaction state
-        $override = $CORE_LOCAL->get('kickOverride');
-        $CORE_LOCAL->set('kickOverride',false);
-        if ($override === true) $ret = true;
-
-        return $ret;
+        return ($num_rows > 0) ? true : false;
     }
+
+    protected function refToWhere($ref)
+    {
+        list($e, $r, $t) = explode('-', $ref, 3);
+        return sprintf(' emp_no=%d AND register_no=%d AND trans_no=%d ',
+                        $e, $r, $t);
+    }    
 
     public function kickOnSignIn() 
 	{
