@@ -38,11 +38,11 @@ class ELFCO_Kicker extends Kicker
 
         $query = "SELECT trans_id   
                   FROM localtranstoday 
-                  WHERE 
-                    (trans_subtype = 'CA' and total <> 0) OR
-					(trans_subtype = 'DCCB' AND total <> 0) OR
-		            (trans_subtype = 'CKCB' AND total <> 0)
-                    AND " . $this->refToWhere($trans_num);
+                  WHERE (
+					  (trans_subtype = 'CA' and total <> 0) OR
+					  (trans_subtype = 'DCCB' AND total <> 0) OR
+					  (trans_subtype = 'CKCB' AND total <> 0)	
+				  ) AND " . $this->refToWhere($trans_num);
 
         $result = $db->query($query);
         $num_rows = $db->num_rows($result);
