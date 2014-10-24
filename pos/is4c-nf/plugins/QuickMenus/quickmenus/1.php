@@ -10,6 +10,7 @@ $my_menu = array(
 	"Bulk Spice & Tea" => "DP70",
 	"Bread" => "DP80",
 	"Deli & Prepared Food" => "DP90",
+	"Deli Made In-House" => "DP100",
 	"Cheese" => "DP120",
 	"Meat & Seafood" => "DP130",
 	"Vitamins & Supplements" => "DP140",
