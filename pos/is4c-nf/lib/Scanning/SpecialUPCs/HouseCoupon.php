@@ -568,6 +568,14 @@ class HouseCoupon extends SpecialUPC
                 $value = 0;
                 $description = $couponPD . ' % Discount Coupon';
                 break;
+            case "%O": // percent discount on all items, overrides members discount
+                Database::getsubtotals();
+                $couponPD = 0;
+                $CORE_LOCAL->set('percentDiscount', $couponPD);
+                $transDB = Database::tDataConnect();
+                $transDB->query(sprintf('UPDATE localtemptrans SET percentDiscount=%f', $couponPD));
+                $value = $infoW["discountValue"] * $CORE_LOCAL->get("discountableTotal");
+                break;
         }
 
         return array('value' => $value, 'department' => $infoW['department'], 'description' => $description);
