@@ -55,7 +55,6 @@ class BarterTender extends TenderModule
     public function add()
     {
         parent::add();
-        TransRecord::addfsTaxExempt();
     }
 
     public function allowDefault()
