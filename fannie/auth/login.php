@@ -105,44 +105,18 @@ function shadow_login($name,$passwd){
  * 
  * Tested against openldap 2.3.27
  */
-function ldap_login($name,$passwd){
-<<<<<<< HEAD
-	global $FANNIE_LDAP_SERVER, $FANNIE_LDAP_PORT, $FANNIE_LDAP_DN, $FANNIE_LDAP_SEARCH_FIELD, $FANNIE_LDAP_UID_FIELD, $FANNIE_LDAP_RN_FIELD;
-	if (!isAlphanumeric($name))
-		return false;
-	if ($passwd == "") return false;
-
-	$conn = ldap_connect($FANNIE_LDAP_SERVER,$FANNIE_LDAP_PORT);
-	if (!$conn) return false;
-
-	$search_result = ldap_search($conn,$FANNIE_LDAP_DN,
-				     $FANNIE_LDAP_SEARCH_FIELD."=".$name);
-	if (!$search_result) return false;
-
-	$ldap_info = ldap_get_entries($conn,$search_result);
-	if (!$ldap_info) return false;
-
-	$user_dn = $ldap_info[0]["dn"];
-	$uid = $ldap_info[0][$FANNIE_LDAP_UID_FIELD][0];
-	$fullname = $ldap_info[0][$FANNIE_LDAP_RN_FIELD];
-
-	if (ldap_bind($conn,$user_dn,$passwd)){
-		syncUserLDAP($name,$uid,$fullname);	
-		doLogin($name);
-		return true;
-	}	
-	return false;
-=======
-    global $FANNIE_LDAP_SERVER, $FANNIE_LDAP_PORT, $FANNIE_LDAP_DN, $FANNIE_LDAP_SEARCH_FIELD, $FANNIE_LDAP_UID_FIELD, $FANNIE_LDAP_RN_FIELD;
+function ldap_login($name,$passwd)
+{
+    $config = FannieConfig::factory();
     if (!isAlphanumeric($name))
         return false;
     if ($passwd == "") return false;
 
-    $conn = ldap_connect($FANNIE_LDAP_SERVER,$FANNIE_LDAP_PORT);
+    $conn = ldap_connect($config->get('LDAP_SERVER'), $config->get('LDAP_PORT'));
     if (!$conn) return false;
 
-    $search_result = ldap_search($conn,$FANNIE_LDAP_DN,
-                     $FANNIE_LDAP_SEARCH_FIELD."=".$name);
+    $search_result = ldap_search($conn,$config->get('LDAP_DN'),
+                     $config->get('LDAP_SEARCH_FIELD')."=".$name);
     if (!$search_result) return false;
 
     $ldap_info = ldap_get_entries($conn,$search_result);
@@ -153,16 +127,16 @@ function ldap_login($name,$passwd){
     }
 
     $user_dn = $ldap_info[0]["dn"];
-    $uid = $ldap_info[0][$FANNIE_LDAP_UID_FIELD][0];
-    $fullname = $ldap_info[0][$FANNIE_LDAP_RN_FIELD][0];
+    $uid = $ldap_info[0][$config->get('LDAP_UID_FIELD')][0];
+    $fullname = $ldap_info[0][$config->get('LDAP_RN_FIELD')][0];
 
     if (ldap_bind($conn,$user_dn,$passwd)){
         syncUserLDAP($name,$uid,$fullname); 
         doLogin($name);
         return true;
-    }   
+    }
+
     return false;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 /*
@@ -325,7 +299,7 @@ function showUsers(){
     return false;
   }
   echo "Displaying current users";
-  echo "<table cellspacing=2 cellpadding=2 border=1>";
+  echo "<table class=\"table\">";
   echo "<tr><th>Name</th><th>User ID</th></tr>";
   $sql = dbconnect();
   $usersQ = $sql->prepare_statement("select name,uid from Users order by name");
@@ -381,6 +355,7 @@ function changePassword($name,$oldpassword,$newpassword){
 }
 
 function changeAnyPassword($name,$newpassword){
+  $sql = dbconnect();
   if (!validateUser('admin')){
     return false;
   }

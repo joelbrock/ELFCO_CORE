@@ -1,6 +1,3 @@
 config.php.bak
-<<<<<<< HEAD
-=======
 auth/shadowread/shadowread
-src/javascript/linea
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
+src/javascript/composer-components/
