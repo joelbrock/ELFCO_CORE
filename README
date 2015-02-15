@@ -1,14 +1,10 @@
-<<<<<<< HEAD
 ===========================================
 CORE-POS Branch for East Lansing Food Co-op
 ===========================================
 
-IS4C - The POS, the backend, the movie, the book, reporting system
-=======
 CORE-POS is the point of sale oriented project under Co-operative
 Operational Retail Environment (CORE). The code is based heavily 
 on IS4C with a focus on greater modularity and collaboration.
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 In this directory you'll find:
 
