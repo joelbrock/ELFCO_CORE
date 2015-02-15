@@ -70,29 +70,6 @@ if ($FANNIE_SERVER_DBMS == 'MSSQL'){
 $sql->query($miQ);
 
 $mdQ = "UPDATE memDates AS d
-<<<<<<< HEAD
-	INNER JOIN {$TRANS}newBalanceStockToday_test AS s
-	ON d.card_no=s.memnum
-	INNER JOIN custdata AS c ON c.CardNo=s.memnum
-	SET d.start_date=s.startdate,
-	d.end_date=CASE WHEN s.payments >= 100 
-		THEN '0000-00-00 00:00:00' 
-		ELSE DATE_ADD(s.startdate,INTERVAL 2 YEAR) END
-	WHERE (d.start_date IS null OR d.start_date = '0000-00-00 00:00:00'
-		OR d.end_date > '1900-01-01 00:00:00')
-	AND s.payments > 0
-	AND c.Type='PC'";
-if ($FANNIE_SERVER_DBMS == 'MSSQL'){
-	$mdQ = "UPDATE memDates SET start_date=s.startdate,
-		end_date=CASE WHEN s.payments >=100 
-			THEN '1900-01-01 00:00:00'
-			ELSE dateadd(yy,2,s.startdate) END
-		FROM {$TRANS}newbalancestocktoday_test s
-		left join custdata as c on c.cardno=s.memnum
-		left join memDates as d on d.card_no=s.memnum
-		where d.start_date is null and s.payments > 0
-		and c.type='PC'";
-=======
     INNER JOIN {$TRANS}equity_live_balance AS s
     ON d.card_no=s.memnum
     INNER JOIN custdata AS c ON c.CardNo=s.memnum
@@ -119,23 +96,12 @@ if ($FANNIE_SERVER_DBMS == 'MSSQL'){
         left join memDates as d on d.card_no=s.memnum
         where d.start_date is null and s.payments > 0
         and c.type='PC'";
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 $sql->query($mdQ);
 
 $sql->query("DELETE FROM custReceiptMessage WHERE msg_text LIKE 'EQUITY BALANCE% == %'");
 
 $msgQ = "INSERT custReceiptMessage
-<<<<<<< HEAD
-	SELECT s.memnum,CONCAT('EQUITY BALANCE \$',s.payments,' == '
-		,'DUE DATE ',MONTH(d.end_date),'/',DAY(d.end_date),'/',YEAR(d.end_date)),
-		'WfcEquityMessage'
-	FROM {$TRANS}newBalanceStockToday_test AS s
-	INNER JOIN memDates as d ON s.memnum=d.card_no
-	WHERE s.payments < 100
-	AND d.end_date >= CURDATE()";
-//$msgR = $sql->query($msgQ);
-=======
     SELECT s.memnum,CONCAT('EQUITY OWED \$',100-s.payments,' == '
         ,'DUE DATE ',MONTH(d.end_date),'/',DAY(d.end_date),'/',YEAR(d.end_date)),
         'WfcEquityMessage'
@@ -143,5 +109,4 @@ $msgQ = "INSERT custReceiptMessage
     INNER JOIN memDates as d ON s.memnum=d.card_no
     WHERE s.payments < 100";
 $msgR = $sql->query($msgQ);
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 

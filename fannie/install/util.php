@@ -22,24 +22,6 @@
 *********************************************************************************/
 
 // set a variable in the config file
-<<<<<<< HEAD
-function confset($key, $value){
-	global $FILEPATH;
-	$lines = array();
-	$found = False;
-	$fp = fopen($FILEPATH.'config.php','r');
-	while($line = fgets($fp)){
-		if (strpos($line,"\$$key ") === 0){
-			$lines[] = "\$$key = $value;\n";
-			$found = True;
-		}
-		elseif (strpos($line,"?>") === 0 && $found == False){
-			$lines[] = "\$$key = $value;\n";
-			$lines[] = "?>\n";
-		}
-		else
-			$lines[] = $line;
-=======
 function confset($key, $value)
 {
     $FILEPATH = realpath(dirname(__FILE__).'/../');
@@ -112,7 +94,6 @@ function check_db_host($host,$dbms)
         case 'PGSQL':
             $port = 5432;
             break;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 	}
 
 	if (strstr($host,":")) {

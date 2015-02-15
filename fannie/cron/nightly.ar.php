@@ -85,60 +85,6 @@ if ($rslt === False) {
 
 /* turnover view/cache base tables for WFC end-of-month reports */
 if (date("j")==1 && $sql->table_exists("ar_history_backup")){
-<<<<<<< HEAD
-	$sql->query("TRUNCATE TABLE ar_history_backup");
-	$sql->query("INSERT INTO ar_history_backup SELECT * FROM ar_history");
-
-	$AR_EOM_Summary_Q = "
-	INSERT INTO AR_EOM_Summary
-	SELECT c.CardNo,"
-	.$sql->concat("c.FirstName","' '","c.LastName",'')." AS memName,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -4
-	THEN charges ELSE 0 END)
-	- SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -4
-	THEN payments ELSE 0 END) AS priorBalance,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." = -3
-		THEN a.charges ELSE 0 END) AS threeMonthCharges,
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." = -3
-		THEN a.payments ELSE 0 END) AS threeMonthPayments,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -3
-	THEN charges ELSE 0 END)
-	- SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -3
-	THEN payments ELSE 0 END) AS threeMonthBalance,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." = -2
-		THEN a.charges ELSE 0 END) AS twoMonthCharges,
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." = -2
-		THEN a.payments ELSE 0 END) AS twoMonthPayments,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -2
-	THEN charges ELSE 0 END)
-	- SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -2
-	THEN payments ELSE 0 END) AS twoMonthBalance,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." = -1
-		THEN a.charges ELSE 0 END) AS lastMonthCharges,
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." = -1
-		THEN a.payments ELSE 0 END) AS lastMonthPayments,
-
-	SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql->now())." <= -1
-	THEN charges ELSE 0 END)
-	- SUM(CASE WHEN ".$sql->monthdiff('a.tdate',$sql())." <= -1
-	THEN payments ELSE 0 END) AS lastMonthBalance
-
-	FROM ar_history_backup AS a LEFT JOIN"
-	.$FANNIE_OP_DB.$sql->sep()."custdata AS c 
-	ON a.card_no=c.CardNo AND c.personNum=1
-	GROUP BY c.CardNo,c.LastName,c.FirstName";
-
-	if ($sql->table_exists("AR_EOM_Summary")){
-		$sql->query("TRUNCATE TABLE AR_EOM_Summary");
-		$sql->query($AR_EOM_Summary_Q);
-	}
-=======
     $query="TRUNCATE TABLE ar_history_backup";
     $rslt = $sql->query($query);
     if ($rslt === False) {
@@ -206,7 +152,6 @@ if (date("j")==1 && $sql->table_exists("ar_history_backup")){
             echo cron_msg("Failed: $AR_EOM_Summary_Q");
         }
     }
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 
 echo cron_msg("Done.");

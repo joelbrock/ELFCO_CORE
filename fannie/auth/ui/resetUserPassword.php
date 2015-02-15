@@ -25,18 +25,12 @@
 <body bgcolor=cabb1e>
 <?php
 
-<<<<<<< HEAD
-$DEFAULT_PASSWORD = 'password';
-
-require('../login.php');
-=======
 require('../login.php');
 include("../../config.php");
 $page_title = 'Fannie : Auth : Reset Password';
 $header = 'Fannie : Auth : Reset Password';
 
 include($FANNIE_ROOT."src/header.html");
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
 if (!validateUser('admin')){
   return;
@@ -44,9 +38,6 @@ if (!validateUser('admin')){
 
 if (isset($_GET['name'])){
   $name = $_GET['name'];
-<<<<<<< HEAD
-  if (changeAnyPassword($name,$DEFAULT_PASSWORD)){
-=======
   $newpass = '';
   srand();
   for($i=0;$i<8;$i++){
@@ -63,17 +54,11 @@ if (isset($_GET['name'])){
     }
   }
   if (changeAnyPassword($name,$newpass)){
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
     echo "User $name's password reset succesfully<p />";
   }
 }
 else {
   echo "<form method=get action=resetUserPassword.php>";
-<<<<<<< HEAD
-  echo "User name: <input type=text name=name /><br />";
-  echo "<input type=submit value=Submit /></form>";  
-}
-=======
   echo "User name: <select name=name>";
   foreach(getUserList() as $uid => $name)
     echo "<option>".$name."</option>";
@@ -83,7 +68,7 @@ else {
 echo '<p />';
 echo '<a href="menu.php">Main menu</a>';
 include($FANNIE_ROOT."src/footer.html");
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
+
 ?>
 <p />
 <a href=menu.php>Main menu</a>

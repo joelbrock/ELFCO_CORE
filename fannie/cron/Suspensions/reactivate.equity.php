@@ -68,21 +68,12 @@ if (!isset($custdata['ChargeLimit'])) {
 $sql->query($custQ);
 
 $histQ = "insert into suspension_history
-<<<<<<< HEAD
-	    select 'automatic',".$sql->now().",
-	    'Account reactivated',c.CardNo,0 from
-	    suspensions as s left join
-	    custdata as c on s.cardno=c.CardNo
-	    and c.personNum=1
-	    where c.Type not in ('INACT','INACT2') and s.type='I'";
-=======
         select 'equity paid',".$sql->now().",
         'Account reactivated',c.CardNo,0 from
         suspensions as s left join
         custdata as c on s.cardno=c.CardNo
         and c.personNum=1
         where c.Type not in ('INACT','INACT2') and s.type='I'";
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $sql->query($histQ);
 
 $clearQ = "select c.CardNo from

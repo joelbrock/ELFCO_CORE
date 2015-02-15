@@ -58,16 +58,6 @@ $TRANS = $FANNIE_TRANS_DB . ($FANNIE_SERVER_DBMS=="MSSQL" ? 'dbo.' : '.');
 $custdata = $sql->table_definition('custdata');
 
 $meminfoQ = "UPDATE meminfo AS m LEFT JOIN
-<<<<<<< HEAD
-	    custdata AS c ON m.card_no=c.CardNo
-	    LEFT JOIN {$TRANS}ar_live_balance AS s
-	    ON c.cardno=s.card_no LEFT JOIN suspensions AS p
-	    ON c.cardno=p.cardno LEFT JOIN {$TRANS}AR_EOM_SummaryAS a
-	    ON m.card_no=a.cardno
-	    SET m.ads_OK=p.mailflag
-	    WHERE c.Type = 'INACT' and p.reasoncode IN (1)
-				AND s.balance < a.twoMonthBalance";
-=======
         custdata AS c ON m.card_no=c.CardNo
         LEFT JOIN {$TRANS}ar_live_balance AS s
         ON c.cardno=s.card_no LEFT JOIN suspensions AS p
@@ -76,7 +66,6 @@ $meminfoQ = "UPDATE meminfo AS m LEFT JOIN
         SET m.ads_OK=p.mailflag
         WHERE c.Type = 'INACT' and p.reasoncode IN (1)
         AND s.balance < a.twoMonthBalance";
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $sql->query($meminfoQ);
 
 $custQ = "UPDATE custdata AS c LEFT JOIN {$TRANS}ar_live_balance AS s
@@ -94,21 +83,12 @@ if (!isset($custdata['ChargeLimit'])) {
 $sql->query($custQ);
 
 $histQ = "insert into suspension_history
-<<<<<<< HEAD
-	    select 'automatic',".$sql->now().",
-	    'Account reactivated',c.CardNo,0 from
-	    suspensions as s left join
-	    custdata as c on s.cardno=c.CardNo
-	    and c.personNum=1
-	    where c.Type not in ('INACT','INACT2') and s.type='I'";
-=======
         select 'AR paid',".$sql->now().",
         'Account reactivated',c.CardNo,0 from
         suspensions as s left join
         custdata as c on s.cardno=c.CardNo
         and c.personNum=1
         where c.Type not in ('INACT','INACT2') and s.type='I'";
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $sql->query($histQ);
 
 $clearQ = "select c.CardNo from

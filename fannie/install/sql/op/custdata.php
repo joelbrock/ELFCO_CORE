@@ -104,36 +104,6 @@ Maintenance:
 
 */
 $CREATE['op.custdata'] = "
-<<<<<<< HEAD
-	CREATE TABLE `custdata` (
-	  `CardNo` int(8) default NULL,
-	  `personNum` tinyint(4) NOT NULL default '1',
-	  `LastName` varchar(30) default NULL,
-	  `FirstName` varchar(30) default NULL,
-	  `CashBack` double NOT NULL default '60',
-	  `Balance` double NOT NULL default '0',
-	  `Discount` smallint(6) default NULL,
-	  `MemDiscountLimit` double NOT NULL default '0',
-	  `ChargeOk` tinyint(4) NOT NULL default '1',
-	  `WriteChecks` tinyint(4) NOT NULL default '1',
-	  `StoreCoupons` tinyint(4) NOT NULL default '1',
-	  `Type` varchar(10) NOT NULL default 'pc',
-	  `memType` tinyint(4) default NULL,
-	  `staff` tinyint(4) NOT NULL default '0',
-	  `SSI` tinyint(4) NOT NULL default '0',
-	  `Purchases` double NOT NULL default '0',
-	  `NumberOfChecks` smallint(6) NOT NULL default '0',
-	  `memCoupons` int(11) NOT NULL default '1',
-	  `blueLine` varchar(50) default NULL,
-	  `Shown` tinyint(4) NOT NULL default '1',
-	  `LastChange` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-	  `id` int(11) NOT NULL auto_increment,
-	  PRIMARY KEY  (`id`),
-	  KEY `CardNo` (`CardNo`),
-	  KEY `LastName` (`LastName`),
-	  KEY `LastChange` (`LastChange`)
-	)
-=======
     CREATE TABLE `custdata` (
       `CardNo` int(11) default NULL,
       `personNum` tinyint(4) NOT NULL default '1',
@@ -163,7 +133,6 @@ $CREATE['op.custdata'] = "
       KEY `LastName` (`LastName`),
       KEY `LastChange` (`LastChange`)
     )
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 ";
 
 if ($dbms == "MSSQL"){

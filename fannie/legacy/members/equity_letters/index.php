@@ -186,8 +186,6 @@ function upgradeDisplays($subtype){
 	return $ret;
 }
 
-<<<<<<< HEAD
-=======
 function paidInFullDisplays($subtype){
 	global $sql,$TRANS;
 	$ret = "<form name=myform action=postcards.php method=post>";
@@ -251,7 +249,6 @@ function paidInFullDisplays($subtype){
 	return $ret;
 }
 
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 function termDisplays($subtype){
 	global $sql;
 	$ret = "<form name=myform action=term.php method=post>";

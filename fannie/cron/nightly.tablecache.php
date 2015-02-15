@@ -100,13 +100,10 @@ if ($sql->tableExists('CashPerformDay_cache')) {
         echo cron_msg("Could not load data for CashPerformDay_cache");
 }
 
-<<<<<<< HEAD
-=======
 $sql->query("USE ".$FANNIE_ARCHIVE_DB);
 if ($sql->table_exists("reportDataCache")){
     $sql->query("DELETE FROM reportDataCache WHERE expires < ".$sql->now());
 }
 
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 echo cron_msg("Success");
 ?>

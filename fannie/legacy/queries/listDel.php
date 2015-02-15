@@ -20,12 +20,8 @@ if (isset($_POST['Yes'])){
   $args = array();
   if (isset($_POST['description'])){
     $desc = base64_decode($_POST['description']);
-<<<<<<< HEAD
-    $gatherQ = "select upc,description,normal_price,department,tax,foodstamp,scale,modified,qttyenforced,discount,inuse from products where upc='$upc' and description=\"$desc\"";
-=======
     $sql->prepare($gatherQ = "select upc,description,normal_price,department,tax,foodstamp,scale,modified,qttyenforced,discount,inuse from products where upc=? and description=?");
     $args = array($upc, $desc);
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
   }
   else {
     $gatherQ = $sql->prepare("select upc,description,normal_price,department,tax,foodstamp,scale,modified,qttyenforced,discount,inuse from products where upc=?");
@@ -38,12 +34,8 @@ if (isset($_POST['Yes'])){
   $args = array();
   if (isset($_POST['description'])){
     $desc = base64_decode($_POST['description']);
-<<<<<<< HEAD
-    $query = "delete from products where upc = '$upc' and description=\"$desc\"";
-=======
     $query = $sql->prepare("delete from products where upc = ? and description=?");
     $args = array($upc, $desc);
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
     //echo $query;
     //return;
   }
@@ -86,13 +78,8 @@ else {
           case when tax = 1 then 'Reg' else case when tax = 2 then 'Deli' else 'NoTax' end end as t,
           case when foodstamp = 1 then 'Yes' else 'No' end as fs,
           case when scale = 1 then 'Yes' else 'No' end as s
-<<<<<<< HEAD
-          from products where upc='$upc' and description=\"$d\"";
-    $r = $sql->query($q);
-=======
           from products where upc=? and description=?");
     $r = $sql->execute($q, array($upc, $d));
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
     $row = $sql->fetch_row($r);
     echo "<table cellspacing=2 cellpadding=2>";
     echo "<tr><th>Normal price</th><th>Special price</th><th>Tax</th><th>Foodstamp</th><th>Scale</th></tr>";

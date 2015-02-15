@@ -48,43 +48,6 @@ if ($errors == "" && $query != ""){
     if (!empty($dtrans))
         $query = str_ireplace(" dtransactions "," ".$dtrans." ",$query);
 
-<<<<<<< HEAD
-	$prep = $dbc->prepare_statement($query);
-	$result = $dbc->exec_statement($query);
-	if (!$result){
-		echo "<i>Error occured</i>: ".$dbc->error();
-		echo "<hr />";
-		echo "<i>Your query</i>: ".$query;	
-	}
-	else if ($dbc->num_rows($result) == 0){
-		echo "<i>Query returned zero results</i><hr />";
-		echo "<i>Your query</i>: ".$query;	
-	}
-	else {
-		if (isset($_REQUEST['excel'])){
-			header('Content-Type: application/ms-excel');
-			header('Content-Disposition: attachment; filename="resultset.xls"');
-		}
-		echo '<table cellspacing="0" cellpadding="4" border="1">';
-		echo '<tr>';
-		$num = $dbc->num_fields($result);
-		for($i=0;$i<$num;$i++){
-			echo '<th>'.$dbc->field_name($result,$i)."</th>";
-		}
-		echo '</tr>';
-		while($row = $dbc->fetch_row($result)){
-			echo '<tr>';
-			for($i=0;$i<$num;$i++)
-				echo '<td>'.$row[$i].'</td>';
-			echo '</tr>';
-		}
-		echo '</table>';
-
-		if (!empty($_REQUEST['repName'])){
-			$name = $_REQUEST['repName'];
-			echo "Report saved as $name";
-			$saveableQ = base64_encode($_REQUEST['query']);
-=======
     $prep = $dbc->prepare_statement($query);
     $result = $dbc->exec_statement($query);
     if (!$result){
@@ -130,7 +93,6 @@ if ($errors == "" && $query != ""){
         if (!empty($_REQUEST['repName'])){
             $name = $_REQUEST['repName'];
             $saveableQ = base64_encode($_REQUEST['query']);
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
             $chkQ = $dbc->prepare_statement("SELECT reportID FROM customReports WHERE reportName=?");
             $chkR = $dbc->exec_statement($chkQ,array($name));
