@@ -1,6 +1,9 @@
 <?php
 
 $my_menu = array(
+	"Equity Investment/Installment" => "DP830",
+	"New Equity Investment" => "DP840",
+	"" => "",
 	"FULL SHARE PMT - \$60" => "499099",
 	"LOW-INCOME JOIN FEE - \$5" => "2892",
 	"STUDENT JOIN FEE - \$12" => "2893",
