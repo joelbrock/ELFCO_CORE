@@ -760,7 +760,7 @@ static public function addTransDiscount()
     self::addRecord(array(
         'upc' => 'DISCOUNT',
         'description' => 'Discount',
-        'trans_type' => 'I',
+        'trans_type' => 'S',
         'quantity' => 1,
         'unitPrice' => MiscLib::truncate2(-1 * $CORE_LOCAL->get('transDiscount')),
         'total' => MiscLib::truncate2(-1 * $CORE_LOCAL->get('transDiscount')),
@@ -824,7 +824,7 @@ static public function addLogRecord($opts)
         'description' => $desc,
         'trans_type' => 'L',
         'trans_subtype' => 'OG',
-        'trans_status' => 'X',
+        'trans_status' => 'D',
         'department' => $dept,
         'total' => $total,
         'regPrice' => $regPrice,
@@ -871,6 +871,7 @@ static public function finalizeTransaction($incomplete=false)
                 'amount2' => $tax['amount'],
             ));
         }
+        DiscountModule::lineItems();
     }
 
     if (Database::rotateTempData()) { // rotate data

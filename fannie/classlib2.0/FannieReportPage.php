@@ -200,6 +200,29 @@ class FannieReportPage extends FanniePage
 
     function bodyContent()
     {
+        $plugins = $this->config->get('PLUGIN_LIST');
+        if (is_array($plugins) && in_array('CoreWarehouse', $plugins)) {
+            $reflector = new ReflectionClass($this);
+            $source = \COREPOS\Fannie\Plugin\CoreWarehouse\CwReportDataSource::getDataSource($reflector->getName());
+            if ($source !== false) {
+                $source_select = '
+                    <div class="col-sm-12" id="data-source-fields">
+                        <div class="form-group">
+                            <label>Data Source</label> <select name="data-source" class="form-control" id="select-data-source">
+                                <option>Standard</option>
+                                <option>CoreWarehouse</option>
+                            </select>
+                        </div>';
+                foreach ($source->additionalFields() as $field) {
+                    $source_select .= '<div class="form-group">' . $field->toHTML() . '</div>';
+                }
+                $source_select .= '</div>';
+                $source_select = preg_replace('/\s\s+/', '', $source_select);
+                $this->addOnloadCommand("\$('#primary-content form').prepend('$source_select');\n");
+                $this->addOnloadCommand("\$('#primary-content .cw-field').attr('disabled', true);\n");
+                $this->addOnloadCommand("\$('#select-data-source').change(function(){ if ($(this).val()=='CoreWarehouse') { $('#primary-content .cw-field').attr('disabled', false); } else { $('#primary-content .cw-field').attr('disabled', true); } });\n");
+            }
+        }
         return $this->form_content();
     }
 
@@ -234,7 +257,27 @@ class FannieReportPage extends FanniePage
                 $this->freshenCache($data);
             }
         } else {
-            $data = $this->fetch_report_data();
+            /**
+              Use CoreWarehouse data source if requested & available
+              Fail back to FannieReportPage::fetch_report_data()
+              if a data source cannot be found or data source fails
+              to handle the request
+            */
+            $plugins = $this->config->get('PLUGIN_LIST');
+            if (FormLib::get('data-source') === 'CoreWarehouse' && is_array($plugins) && in_array('CoreWarehouse', $plugins)) {
+                $reflector = new ReflectionClass($this);
+                $source = \COREPOS\Fannie\Plugin\CoreWarehouse\CwReportDataSource::getDataSource($reflector->getName());
+                if ($source != false) {
+                    $data = $source->fetchReportData($reflector->getName(), $this->config, $this->connection);
+                    if ($data === false) {
+                        $data = $this->fetch_report_data();
+                    }
+                } else {
+                    $data = $this->fetch_report_data();
+                }
+            } else {
+                $data = $this->fetch_report_data();
+            }
             $this->freshenCache($data);
         }
         $output = '';
@@ -591,14 +634,12 @@ class FannieReportPage extends FanniePage
                         $ret .= (substr($line,0,1)=='<'?'':'<br />').$line;
                     }
                 }
-                $class = 'mySortableTable';
-                if ($this->sortable) {
-                    $class .= ' tablesorter';
-                } else if ($this->no_sort_but_style) {
-                    $class .= ' tablesorter';
+                if ($this->sortable || $this->no_sort_but_style) {
+                    $ret .= '<table class="mySortableTable tablesorter">';
+                } else {
+                    $ret .= '<table class="mySortableTable" cellspacing="0" 
+                        cellpadding="4" border="0">' . "\n";
                 }
-                $ret .= '<table class="'.$class.'" cellspacing="0" 
-                    cellpadding="4" border="1">';
                 break;
             case 'csv':
                 foreach ($this->defaultDescriptionContent() as $line) {
@@ -618,9 +659,9 @@ class FannieReportPage extends FanniePage
             }
             switch(strtolower($format)) {
                 case 'html':
-                    $ret .= '<thead>';
+                    $ret .= '<thead>' . "\n";
                     $ret .= $this->htmlLine($headers1, True);
-                    $ret .= '</thead>';
+                    $ret .= '</thead>' . "\n";
                     break;
                 case 'csv':
                     $ret .= $this->csvLine($headers1);
@@ -633,9 +674,13 @@ class FannieReportPage extends FanniePage
         for ($i=0;$i<count($data);$i++) {
             switch(strtolower($format)) {
                 case 'html':
-                    if ($i==0) $ret .= '<tbody>';
+                    if ($i==0) {
+                        $ret .= "<tbody>\n";
+                    }
                     $ret .= $this->htmlLine($data[$i]);
-                    if ($i==count($data)-1) $ret .= '</tbody>';
+                    if ($i==count($data)-1) {
+                        $ret .= "</tbody>\n";
+                    }
                     break;
                 case 'csv':
                     $ret .= $this->csvLine($data[$i]);
@@ -784,29 +829,29 @@ class FannieReportPage extends FanniePage
             unset($row['meta']);
         }
 
-        $ret = '<tr';
+        $ret = "\t<tr";
         if (($meta & self::META_CHART_DATA) != 0) {
             $ret .= ' class="d3ChartData"';
         }
-        $ret .= '>';
+        $ret .= ">\n";
 
         $tag = $header ? 'th' : 'td';
 
         if (($meta & self::META_BOLD) != 0) {
-            $ret = '</tbody><tbody>' . $ret;
+            $ret = "</tbody>\n<tbody>\n" . $ret;
             $tag = 'th';
         }
         if (($meta & self::META_BLANK) != 0) {
-            $ret = '</tbody><tbody><tr>';
+            $ret = "</tbody>\n<tbody>\n\t<tr>\n";
             $row = array();
             $header1 = $this->select_headers(False);
             // just using headers as a column count
-            foreach($header1 as $h) {
+            foreach ($header1 as $h) {
                 $row[] = null;
             }
         }
         if (($meta & self::META_REPEAT_HEADERS) != 0) {
-            $ret = '<thead><tr>';
+            $ret = "</tbody>\n<tbody>\n\t<tr>\n";
             $tag = 'th';
             $row = array();
             $header1 = $this->select_headers(True);
@@ -877,14 +922,16 @@ class FannieReportPage extends FanniePage
             }
             $class .= '"';
 
-            $ret .= '<'.$tag.' '.$class.' style="'.$styles.'" colspan="'.$span.'">'.$row[$i].'</'.$tag.'>';
+            $ret .= "\t\t<" . $tag . ' ' . $class . ' style="' . $styles . '" colspan="' . $span . '">' . "\n"
+                . "\t\t\t" . $row[$i] . "\n"
+                . "\t\t</" . $tag . ">\n";
             $i += $span;
         }
-        $ret .= '</tr>';
+        $ret .= "\t</tr>\n";
         if (($meta & self::META_REPEAT_HEADERS) != 0) {
-            $ret .= '</thead>';
+            $ret .= "</tbody>\n<tbody>\n";
         } elseif (($meta & self::META_BLANK) != 0) {
-            $ret .= '</tbody>';
+            $ret .= "</tbody>\n";
         }
 
         return $ret;
@@ -1068,8 +1115,12 @@ class FannieReportPage extends FanniePage
                     echo '<script type="text/javascript">';
                     echo $js_content;
                     echo "\n\$(document).ready(function(){\n";
-                    foreach($this->onload_commands as $oc)
+                    foreach ($this->onload_commands as $oc) {
+                        if (strstr($oc, 'standardFieldMarkup()')) {
+                            continue;
+                        }
                         echo $oc."\n";
+                    }
                     echo "});\n";
                     echo '</script>';
                 }

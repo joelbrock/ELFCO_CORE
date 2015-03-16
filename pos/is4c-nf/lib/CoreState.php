@@ -503,6 +503,7 @@ static public function transReset()
     }
 
     FormLib::clearTokens();
+    DiscountModule::transReset();
 }
 
 /**

@@ -308,7 +308,7 @@ class UIGTask extends FannieTask
                 fclose($fp);
 
                 $this->cronMsg("Importing invoices for " . $date->Text, FannieLogger::INFO);
-                if (UIGLib::import($filename, $repeat) === true) {
+                if (UIGLib::import($filename, 1, $repeat) === true) {
                     unlink($filename);
                 } else {
                     $this->cronMsg("ERROR: IMPORT FAILED!", FannieLogger::ERROR);

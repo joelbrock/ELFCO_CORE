@@ -41,7 +41,13 @@
         "core-pos/sql-manager": "dev-master",
         "php-xpdf/php-xpdf" : "dev-master",
         "phpmailer/phpmailer": "~5.2",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "sabre/vobject": "~3.4",
+        "videlalvaro/php-amqplib": "~2.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.5.*",
+        "squizlabs/php_codesniffer": "2.*"
     },
     "config": {
         "component-dir": "fannie/src/javascript/composer-components/"

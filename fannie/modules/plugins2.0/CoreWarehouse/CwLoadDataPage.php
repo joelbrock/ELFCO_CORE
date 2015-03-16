@@ -22,8 +22,9 @@
 *********************************************************************************/
 
 include(dirname(__FILE__).'/../../../config.php');
-if (!class_exists('FannieAPI'))
+if (!class_exists('FannieAPI')) {
     include($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
+}
 
 class CwLoadDataPage extends FanniePage {
 
@@ -61,7 +62,8 @@ class CwLoadDataPage extends FanniePage {
             if ($file == 'CoreWarehouseModel.php') continue;
             $ret[] = substr($file,0,strlen($file)-4);
         }
-        sort($ret);
+        rsort($ret);
+
         return $ret;
     }
 
@@ -241,6 +243,7 @@ if (basename(__FILE__) == basename($_SERVER['PHP_SELF'])){
         if ($file){
             $models = array(substr($file,0,strlen($file)-4));
         }
+        rsort($models);
 
         $con = FannieDB::get($FANNIE_PLUGIN_SETTINGS['WarehouseDatabase']);
         foreach($models as $class){

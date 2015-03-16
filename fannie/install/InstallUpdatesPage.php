@@ -99,7 +99,13 @@ class InstallUpdatesPage extends \COREPOS\Fannie\API\InstallPage {
         echo showInstallTabs('Updates');
 ?>
 
-<h1 class="install"><?php echo $this->header; ?></h1>
+<h1 class="install">
+    <?php 
+    if (!$this->themed) {
+        echo "<h1 class='install'>{$this->header}</h1>";
+    }
+    ?>
+</h1>
 <p class="ichunk">Database Updates.</p>
 <?php
         if (FormLib::get_form_value('mupdate') !== ''){
@@ -231,7 +237,7 @@ class InstallUpdatesPage extends \COREPOS\Fannie\API\InstallPage {
             echo 'cd "' . $dir . '"<br />';
             echo 'git log -n1 --pretty=oneline<br />';
             echo 'git fetch upstream<br />';
-            echo 'git merge upstream/' . $tags[count($tags)-1] . '<br />';
+            echo 'git merge ' . $tags[count($tags)-1] . '<br />';
             echo '</code></p>';
             echo '<h3>Troubleshooting</h3>';
             echo '<p>Error message: <i>fatal: \'upstream\' does not appear to be a repository</i><br />';

@@ -123,7 +123,9 @@ class InstallIndexPage extends \COREPOS\Fannie\API\InstallPage {
         $self = basename($_SERVER['PHP_SELF']);
 
         echo "<form action='$self' method='post'>";
-        echo "<h1 class='install'>{$this->header}</h1>";
+        if (!$this->themed) {
+            echo "<h1 class='install'>{$this->header}</h1>";
+        }
 
         // Path detection: Establish ../../
         $FILEPATH = rtrim(__FILE__,"$self");
@@ -541,6 +543,10 @@ class InstallIndexPage extends \COREPOS\Fannie\API\InstallPage {
 
         echo '<tr><td>Corrections Dept#</td>'
             . '<td>' . installTextField('FANNIE_CORRECTION_DEPT', $FANNIE_CORRECTION_DEPT, 800, false)
+            . '</td></tr>';
+
+        echo '<tr><td>Patronage Transfer Dept#</td>'
+            . '<td>' . installTextField('FANNIE_PATRONAGE_DEPT', $FANNIE_PATRONAGE_DEPT, 800, false)
             . '</td></tr>';
 
         echo '<tr><td>Catch-all Dept#</td>'
