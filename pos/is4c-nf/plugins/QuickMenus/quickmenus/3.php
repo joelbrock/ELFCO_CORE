@@ -1,7 +1,7 @@
 <?php
 
 $my_menu = array(
-	"Equity Investment/Installment" => "DP830",
+	"Additional Equity Investment" => "DP830",
 	"New Equity Investment" => "DP840",
 	"" => "",
 	"FULL SHARE PMT - \$60" => "499099",
