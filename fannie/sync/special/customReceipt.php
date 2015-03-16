@@ -21,28 +21,6 @@
 
 *********************************************************************************/
 
-<<<<<<< HEAD:fannie/sync/special/customReceipt.php
-// Run DTS to export server data to a CSV file
-$dbc->query("exec master..xp_cmdshell 'dtsrun /S IS4CSERV\IS4CSERV /U $FANNIE_SERVER_USER /P $FANNIE_SERVER_PW /N CSV_products',no_output",$FANNIE_OP_DB);
-
-// on each MySQL lane, load the CSV file
-foreach($FANNIE_LANES as $lane){
-
-	if ($lane['type'] != 'MYSQL') continue;
-
-	$dbc->add_connection($lane['host'],$lane['type'],$lane['op'],
-			$lane['user'],$lane['pw']);
-	if ($dbc->connections[$lane['op']] !== False){
-
-		if (!is_readable('/pos/csvs/customReceipt.csv')) break;
-		
-		$dbc->query("TRUNCATE TABLE customReceipt",$lane['op']);
-
-		$dbc->query("LOAD DATA LOCAL INFILE '/pos/csvs/customReceipt.csv' INTO TABLE
-			products FIELDS TERMINATED BY ',' OPTIONALLY
-			ENCLOSED BY '\"' LINES TERMINATED BY '\\r\\n'",$lane['op']);
-	}
-=======
 require('../../config.php');
 include($FANNIE_ROOT.'classlib2.0/FannieAPI.php');
 $dbc = FannieDB::get($FANNIE_OP_DB);
@@ -68,7 +46,6 @@ else {
     $class = $_REQUEST['signtype'];
     include('enabled/'.$class.'.php');
     $obj = new $class();
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d:fannie/admin/signs/index.php
 }
 
 echo "<li>customReceipt table synched</li>";

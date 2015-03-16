@@ -22,24 +22,6 @@
 *********************************************************************************/
 
 // set a variable in the config file
-<<<<<<< HEAD
-function confset($key, $value){
-	global $FILEPATH;
-	$lines = array();
-	$found = False;
-	$fp = fopen($FILEPATH.'config.php','r');
-	while($line = fgets($fp)){
-		if (strpos($line,"\$$key ") === 0){
-			$lines[] = "\$$key = $value;\n";
-			$found = True;
-		}
-		elseif (strpos($line,"?>") === 0 && $found == False){
-			$lines[] = "\$$key = $value;\n";
-			$lines[] = "?>\n";
-		}
-		else
-			$lines[] = $line;
-=======
 function confset($key, $value)
 {
     $FILEPATH = realpath(dirname(__FILE__).'/../');
@@ -112,7 +94,6 @@ function check_db_host($host,$dbms)
         case 'PGSQL':
             $port = 5432;
             break;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 	}
 
 	if (strstr($host,":")) {
@@ -358,6 +339,11 @@ function installTextField($name, &$current_value, $default_value='', $quoted=tru
     if (!isset($attributes['type'])) {
         $attributes['type'] = 'text';
     }
+    if (isset($attributes['class'])) {
+        $attributes['class'] .= ' form-control';
+    } else {
+        $attributes['class'] = 'form-control';
+    }
     foreach ($attributes as $name => $value) {
         if ($name == 'name' || $name == 'value') {
             continue;
@@ -395,6 +381,14 @@ function installSelectField($name, &$current_value, $options, $default_value='',
     // sanitize values:
     if (!$quoted) {
         // unquoted must be a number or boolean
+        // convert booleans to strings for writing to config.php
+        if (count($options) == 2 && is_bool($default_value)) {
+            if ($current_value) {
+                $current_value = 'true';
+            } else {
+                $current_value = 'false';
+            }
+        }
         if (!is_numeric($current_value) && strtolower($current_value) !== 'true' && strtolower($current_value) !== 'false') {
             $current_value = (int)$current_value;
         }
@@ -413,7 +407,16 @@ function installSelectField($name, &$current_value, $options, $default_value='',
 
     confset($name, ($quoted ? "'" . $current_value . "'" : $current_value));
 
-    $ret = '<select name="' . $name . '">' . "\n";
+    // convert boolean back from strings after writing config.php
+    if (!$quoted && count($options) == 2 && is_bool($default_value)) {
+        if (strtolower($current_value) == 'true') {
+            $current_value = true;
+        } elseif (strtolower($current_value) == 'false') {
+            $current_value = false;
+        }
+    }
+
+    $ret = '<select name="' . $name . '" class="form-control">' . "\n";
     // array has non-numeric keys
     // if the array has meaningful keys, use the key value
     // combination to build <option>s with labels

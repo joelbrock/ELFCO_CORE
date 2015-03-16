@@ -22,19 +22,6 @@
 *********************************************************************************/
 
 function scan_layouts(){
-<<<<<<< HEAD
-	global $FANNIE_ROOT;
-	$layouts = array();
-	$dh = opendir($FANNIE_ROOT.'admin/labels/pdf_layouts/');
-	while( ($file=readdir($dh)) !== False){
-		if ($file[0] == ".") continue;
-		if (substr(strtolower($file),-4) == ".php")
-			$layouts[] = str_replace("_"," ",substr($file,0,strlen($file)-4));
-	}
-	sort($layouts);
-
-	return $layouts;
-=======
     $layouts = array();
     $dh = opendir(dirname(__FILE__).'/pdf_layouts/');
     while( ($file=readdir($dh)) !== False){
@@ -45,5 +32,4 @@ function scan_layouts(){
     sort($layouts);
 
     return $layouts;
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }

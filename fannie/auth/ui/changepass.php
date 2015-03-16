@@ -26,11 +26,8 @@ include("../../config.php");
 $page_title = 'Fannie : Auth : Change Password';
 $header = 'Fannie : Auth : Change Password';
 
-<<<<<<< HEAD
-=======
 include($FANNIE_ROOT."src/header.html");
 
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $name = checkLogin();
 if (!$name){
   echo "<html><body bgcolor=cabb1e>";
@@ -73,11 +70,8 @@ else {
   }
 }
 
-<<<<<<< HEAD
-=======
 include($FANNIE_ROOT."src/footer.html");
 
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 ?>
 
 </body>

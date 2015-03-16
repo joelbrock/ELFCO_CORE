@@ -41,60 +41,6 @@ $sql = new SQLManager($FANNIE_SERVER,$FANNIE_SERVER_DBMS,$FANNIE_OP_DB,
 $TRANS = ($FANNIE_SERVER_DBMS == "MSSQL") ? $FANNIE_TRANS_DB.".dbo." : $FANNIE_TRANS_DB.".";
 
 // create a temp table to hold info about recently used coupons
-<<<<<<< HEAD
-// if (!$sql->table_exists("TempVirtCoupon")){
-// 	$sql->query("CREATE TABLE TempVirtCoupon (card_no int, coupID int, quantity double,PRIMARY KEY(card_no,coupID))");
-// }
-// else
-// 	$sql->query("TRUNCATE TABLE TempVirtCoupon");
-
-// echo cron_msg("Create / Truncate table TempVirtCoupon<br />");
-
-// select number of coupons used by each member in
-// the applicable period
-// $insQ = "INSERT INTO TempVirtCoupon
-// 	select d.card_no, h.coupID, sum(quantity) as quantity
-// 	from {$TRANS}dlog_90_view as d, houseVirtualCoupons as h
-// 	WHERE d.upc=0049999911111
-// 	AND d.card_no=h.card_no
-// 	AND d.tdate BETWEEN h.start_date AND h.end_date";
-// $insR = $sql->query($insQ,$FANNIE_OP_DB);
-
-// remove expired or already-used coupons
-// $sqlQ = "DELETE h FROM houseVirtualCoupons AS h
-// 	LEFT JOIN TempVirtCoupon AS t ON
-// 	h.card_no=t.card_no AND h.coupID=t.coupID
-// 	WHERE ".$sql->now()." > h.end_date
-// 	OR (t.card_no IS NOT NULL AND t.coupID IS NOT NULL)";
-
-$sqlQ = "DELETE FROM houseVirtualCoupons WHERE card_no IN(
-		SELECT card_no FROM " . $TRANS . "houseCouponThisMonth)";
-// if ($FANNIE_SERVER_DBMS == "MSSQL"){
-// 	$sqlQ = "DELETE FROM houseVirtualCoupons 
-// 		FROM houseVirtualCoupons AS h
-// 		LEFT JOIN TempVirtCoupon AS t ON
-// 		h.card_no=t.card_no AND h.coupID=t.coupID
-// 		WHERE ".$sql->now()." > h.end_date
-// 		OR (t.card_no IS NOT NULL AND t.coupID IS NOT NULL)";
-// }
-$sql->query($sqlQ);
-// if ($delR == false) 
-// 	echo cron_msg("Delete query failed<br />" . $sqlQ);
-// else
-// 	echo cron_msg("Successfully removed redeemed houseVirtualCoupons";
-
-// set custdata.memcoupons equal to the number
-// of available coupons (in theory)
-$sql->query("UPDATE custdata SET memCoupons = 0");  // set memCoupons = 0 first
-
-$upQ = "UPDATE custdata AS c, houseVirtualCoupons AS h
-	SET c.memCoupons=1
-	WHERE c.CardNo=h.card_no 
-	AND ".$sql->now()." >= h.start_date 
-	AND ".$sql->now()."<= h.end_date
-	AND c.memType <> 0";
-
-=======
 if (!$sql->table_exists("TempVirtCoupon")){
     $sql->query("CREATE TABLE TempVirtCoupon (card_no int, coupID int, quantity double,PRIMARY KEY(card_no,coupID))");
 }
@@ -134,7 +80,6 @@ $upQ = "UPDATE custdata AS c LEFT JOIN
     SET c.memCoupons=(CASE WHEN c.personNum=1 THEN 1 ELSE 0 END)
     WHERE ".$sql->now()." >= h.start_date 
     AND ".$sql->now()." <= h.end_date";
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 if ($FANNIE_SERVER_DBMS == "MSSQL"){
     $upQ = "UPDATE custdata SET 
         c.memCoupons=SUM(CASE WHEN c.personNum=1 THEN 1 ELSE 0)
@@ -151,16 +96,9 @@ $sql->query($upQ);
 // 	echo cron_msg("Successfully updated custdata field: memCoupons<br />");
 
 // update blueline to match memcoupons
-<<<<<<< HEAD
-$blueLineQ = "UPDATE custdata SET blueLine="
-	.$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
-		$sql->convert('memCoupons','CHAR'),"')'",'')
-	. "WHERE memType <> 0";
-=======
 $blueLineQ = "UPDATE custdata SET memCoupons="
     .$sql->concat($sql->convert('CardNo','CHAR'),"' '",'LastName',"' Coup('",
         $sql->convert('memCoupons','CHAR'),"')'",'');
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 $sql->query($blueLineQ);
 
 // if ($blR == false)

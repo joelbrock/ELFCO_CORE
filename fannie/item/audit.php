@@ -31,22 +31,6 @@
 */
 
 function audit($dept_sub,$uid,$upc,$desc,$price,$tax,$fs,$scale,$discount,$likecode=False){
-<<<<<<< HEAD
-	global $FANNIE_URL;
-	$hostname = "key";
-	$tos = array(	0=>"andy",
-			1=>"jim, lisa",
-			2=>"jesse, lisa",
-			3=>"debbie, eric, justin, vicky",
-			4=>"joeu, lisa",
-			5=>"jillhall, lisa",
-			6=>"michael",
-			7=>"shannon",
-			8=>"jesse, lisa",
-			9=>"raelynn, lisa"
-	);	
-	$taxes = array("NoTax","Reg","Deli");
-=======
     global $FANNIE_URL;
     $hostname = "key";
     $tos = array(   0=>"andy",
@@ -61,7 +45,6 @@ function audit($dept_sub,$uid,$upc,$desc,$price,$tax,$fs,$scale,$discount,$likec
             9=>"meales, lisa"
     );  
     $taxes = array("NoTax","Reg","Deli");
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 
     $subject = "Item Update notification: ".$upc;
     $message = "Item $upc ($desc) has been changed\n";  

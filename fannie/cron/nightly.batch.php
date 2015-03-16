@@ -54,94 +54,16 @@ set_time_limit(0);
 $sql = new SQLManager($FANNIE_SERVER,$FANNIE_SERVER_DBMS,$FANNIE_OP_DB,
         $FANNIE_SERVER_USER,$FANNIE_SERVER_PW);
 
+$b_def = $sql->tableDefinition('batches');
+$p_def = $sql->tableDefinition('products');
+$has_limit = (isset($b_def['transLimit']) && isset($p_def['special_limit'])) ? true : false;
 // unsale everything  
 $sql->query("UPDATE products SET
-<<<<<<< HEAD
-		special_price=0,
-		specialpricemethod=0,
-		specialquantity=0,
-		specialgroupprice=0,
-		discounttype=0,
-		numflag=numflag & ( ((1<<32)-1) ^ ((1<<10)-1) ),
-		start_date='1900-01-01',
-		end_date='1900-01-01'");
-
-/* hooray! bit-math! everyone loves bit-math!
-   the first 5 bits of products.numflag contain the batch type
-   the next 5 bits contain the batch priority
-   the remaining 22 bits aren't spoken for (yet)
-
-   priorities:
-   15	=> HQ High Priority
-	   (applies to all product records)
-   10	=> Store High Priority
-	   (applies to store records w/o HQ high priority)
-   5	=> HQ Normal Priority
-	   (applies to all records except store high priority)
-   0	=> Store Normal Priority
-	   (applies to store records not already on sale)
-*/
-$priority_clause = "";
-if ($FANNIE_STORE_ID==0){
-	$priority_clause = "(b.priority=15 
-		OR (b.priority >= ((p.numflag>>5)&0x1f) < 10))";
-}
-else {
-	$priority_clause = "(p.store_id=$FANNIE_STORE_ID
-		AND (b.priority >= ((p.numflag>>5)&0x1f) < 10))";
-}
-
-// resale things that should be on sale 
-if (strstr($FANNIE_SERVER_DBMS,"MYSQL")){
-	$sql->query("UPDATE products AS p
-		INNER JOIN upcLike AS u ON p.upc=u.upc
-		SET p.mixmatchcode=convert(u.likeCode+500,char)");
-
-	$sql->query("UPDATE products AS p
-		LEFT JOIN batchList AS l ON p.upc=l.upc
-		LEFT JOIN batches AS b ON l.batchID=b.batchID
-		SET
-		p.special_price = l.salePrice,
-		p.specialpricemethod = l.pricemethod,
-		p.specialgroupprice=CASE WHEN l.salePrice < 0 THEN -1*l.salePrice ELSE l.salePrice END,
-		p.specialquantity = l.quantity,
-		p.start_date = b.startDate,
-		p.end_date = b.endDate,
-		p.discounttype = b.discounttype,
-		p.numflag=p.numflag | ((b.priority & 0x1f)<<5) | (b.batchType & 0x1f),
-		p.mixmatchcode = CASE 
-			WHEN l.pricemethod IN (3,4) AND l.salePrice >= 0 THEN convert(l.batchID,char)
-			WHEN l.pricemethod IN (3,4) AND l.salePrice < 0 THEN convert(-1*l.batchID,char)
-			ELSE p.mixmatchcode 
-		END	
-		WHERE l.upc NOT LIKE 'LC%'
-		AND CURDATE() >= b.startDate AND CURDATE() <= b.endDate
-		AND b.discounttype <> 0");
-
-	$sql->query("UPDATE products AS p LEFT JOIN
-		likeCodeView AS v ON v.upc=p.upc LEFT JOIN
-		batchList AS l ON l.upc=concat('LC',convert(v.likeCode,char))
-		LEFT JOIN batches AS b ON l.batchID=b.batchID
-		SET p.special_price = l.salePrice,
-		p.end_date = b.endDate,p.start_date=b.startDate,
-		p.specialgroupprice=CASE WHEN l.salePrice < 0 THEN -1*l.salePrice ELSE l.salePrice END,
-		p.specialquantity=l.quantity,
-		p.specialpricemethod=l.pricemethod,
-		p.discounttype = b.discounttype,
-		p.numflag=p.numflag | ((b.priority & 0x1f)<<5) | (b.batchType & 0x1f),
-		p.mixmatchcode = CASE 
-			WHEN l.pricemethod IN (3,4) AND l.salePrice >= 0 THEN convert(l.batchID,char)
-			WHEN l.pricemethod IN (3,4) AND l.salePrice < 0 THEN convert(-1*l.batchID,char)
-			ELSE p.mixmatchcode 
-		END	
-		WHERE l.upc LIKE 'LC%'
-		AND CURDATE() >= b.startDate AND CURDATE() <= b.endDate
-		AND b.discounttype <> 0");
-=======
         special_price=0,
         specialpricemethod=0,
         specialquantity=0,
         specialgroupprice=0,
+        " . ($has_limit ? 'special_limit=0,' : '') . "
         discounttype=0,
         start_date='1900-01-01',
         end_date='1900-01-01'");
@@ -160,6 +82,7 @@ if (strstr($FANNIE_SERVER_DBMS,"MYSQL")){
         p.specialpricemethod = l.pricemethod,
         p.specialgroupprice=CASE WHEN l.salePrice < 0 THEN -1*l.salePrice ELSE l.salePrice END,
         p.specialquantity = l.quantity,
+        " . ($has_limit ? 'p.special_limit=b.transLimit,' : '') . "
         p.start_date = b.startDate,
         p.end_date = b.endDate,
         p.discounttype = b.discounttype,
@@ -181,6 +104,7 @@ if (strstr($FANNIE_SERVER_DBMS,"MYSQL")){
         p.specialgroupprice=CASE WHEN l.salePrice < 0 THEN -1*l.salePrice ELSE l.salePrice END,
         p.specialquantity=l.quantity,
         p.specialpricemethod=l.pricemethod,
+        " . ($has_limit ? 'p.special_limit=b.transLimit,' : '') . "
         p.discounttype = b.discounttype,
         p.mixmatchcode = CASE 
             WHEN l.pricemethod IN (3,4) AND l.salePrice >= 0 THEN convert(l.batchID,char)
@@ -190,7 +114,6 @@ if (strstr($FANNIE_SERVER_DBMS,"MYSQL")){
         WHERE l.upc LIKE 'LC%'
         AND CURDATE() >= b.startDate AND CURDATE() <= b.endDate
         AND b.discounttype <> 0");
->>>>>>> df8b0cc72594d5f680991ca82124b29d3130232d
 }
 else {
     $sql->query("UPDATE products
@@ -205,6 +128,7 @@ else {
         specialpricemethod = l.pricemethod,
         specialgroupprice=CASE WHEN l.salePrice < 0 THEN -1*l.salePrice ELSE l.salePrice END,
         specialquantity = l.quantity,
+        " . ($has_limit ? 'special_limit=b.transLimit,' : '') . "
         start_date = b.startDate,
         end_date = b.endDate,
         discounttype = b.discountType,
@@ -224,6 +148,7 @@ else {
         specialgroupprice=CASE WHEN l.salePrice < 0 THEN -1*l.salePrice ELSE l.salePrice END,
         specialquantity=l.quantity,
         specialpricemethod=l.pricemethod,
+        " . ($has_limit ? 'special_limit=b.transLimit,' : '') . "
         discounttype = b.discounttype,
         mixmatchcode = CASE 
             WHEN l.pricemethod IN (3,4) AND l.salePrice >= 0 THEN convert(varchar,b.batchID)

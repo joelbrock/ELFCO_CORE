@@ -33,20 +33,6 @@ if (isset($_POST["submit"])){
 		$ppo = '';
 		if (isset($_POST["ppo"][$i])) $ppo = $_POST["ppo"][$i];
 
-<<<<<<< HEAD
-		$queries[$i] = "UPDATE shelftags SET description=\"$desc\",
-				normal_price=$price,
-				brand='$brand',
-				sku='$sku',
-				size='$size',
-				units='$units',
-				vendor='$vendor',
-				pricePerUnit='$ppo'
-				WHERE upc='$upc' and id=$id";
-	}
-	foreach ($queries as $q){
-		$r = $sql->query($q);
-=======
         $tag->id($id);
         $tag->upc($upc);
         $tag->description($desc);
@@ -58,7 +44,6 @@ if (isset($_POST["submit"])){
         $tag->vendor($vendor);
         $tag->pricePerUnit($ppo);
         $tag->save();
->>>>>>> c56c8c3f1e6c02209000a882ee7864f39eb942b4
 	}
 	header("Location: index.php");
 	return;
