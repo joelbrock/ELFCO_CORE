@@ -1,16 +1,16 @@
 <?php
 /*******************************************************************************
 
-    Copyright 2009 Whole Foods Co-op
-  
-    This file is part of Fannie.
-  
-    Fannie is free software; you can redistribute it and/or modify
+    Copyright 2012 Whole Foods Co-op
+
+    This file is part of CORE-POS.
+
+    CORE-POS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    Fannie is distributed in the hope that it will be useful,
+    CORE-POS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -48,6 +48,6 @@ else {
     $obj = new $class();
 }
 
-echo "<li>customReceipt table synched</li>";
 
+include($FANNIE_ROOT.'src/footer.html');
 ?>
