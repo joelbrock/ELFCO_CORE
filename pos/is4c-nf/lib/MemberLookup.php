@@ -69,6 +69,7 @@ class MemberLookup {
 	*/
 	public function lookup_by_number($num){
 		$dbc = Database::pDataConnect();
+		$dbb = Database::mDataConnect();
 		$query = $dbc->prepare_statement('SELECT CardNo, personNum,
 			LastName, FirstName FROM custdata
 			WHERE CardNo=? 
@@ -78,8 +79,16 @@ class MemberLookup {
 
 		$ret = $this->default_value();
 		while($w = $dbc->fetch_row($result)){
+			$equityQ = $dbb->prepare_statement('SELECT totPayments FROM stockSum_purch WHERE card_no=?');
+			$equityR = $dbb->exec_statement($equityQ, array($w['CardNo']));
+			$e = $dbb->fetch_row($equityR);
+                        $eqDateQ = $dbb->prepare_statement('SELECT DATE_ADD(MAX(DATE(tdate)), INTERVAL 1 YEAR) AS eqDue 
+				FROM stockpurchases WHERE card_no=?');
+                        $eqDateR = $dbb->exec_statement($eqDateQ, array($w['CardNo']));
+                        $t = $dbb->fetch_row($eqDateR);
 			$key = $w['CardNo'].'::'.$w['personNum'];
-			$val = $w['CardNo'].' '.$w['LastName'].', '.$w['FirstName'];
+                       $val = $w['CardNo'].' '.$w['LastName'].', '.$w['FirstName'].
+                                ' :: EQ: $'.$e['totPayments'].' | DUE: '.$t['eqDue'];
 			$ret['results'][$key] = $val;
 		}
 		return $ret;
@@ -92,6 +101,7 @@ class MemberLookup {
 	*/
 	public function lookup_by_text($text){
 		$dbc = Database::pDataConnect();
+		$dbb = Database::mDataConnect();
 		$query = $dbc->prepare_statement('SELECT CardNo, personNum,
 			LastName, FirstName FROM custdata
 			WHERE LastName LIKE ? 
@@ -100,8 +110,16 @@ class MemberLookup {
 		$result = $dbc->exec_statement($query, array($text.'%'));	
 		$ret = $this->default_value();
 		while($w = $dbc->fetch_row($result)){
+			$equityQ = $dbb->prepare_statement('SELECT totPayments FROM stockSum_purch WHERE card_no=?');
+			$equityR = $dbb->exec_statement($equityQ, array($w['CardNo']));
+			$e = $dbb->fetch_row($equityR);
+			$eqDateQ = $dbb->prepare_statement('SELECT DATE_ADD(MAX(DATE(tdate)), INTERVAL 1 YEAR) AS eqDue 
+				FROM stockpurchases WHERE card_no=?');
+			$eqDateR = $dbb->exec_statement($eqDateQ, array($w['CardNo']));
+			$t = $dbb->fetch_row($eqDateR);
 			$key = $w['CardNo'].'::'.$w['personNum'];
-			$val = $w['CardNo'].' '.$w['LastName'].', '.$w['FirstName'];
+			$val = $w['CardNo'].' '.$w['LastName'].', '.$w['FirstName'].
+				' :: EQ: $'.$e['totPayments'].' | DUE: '.$t['eqDue'];
 			$ret['results'][$key] = $val;
 		}
 		return $ret;
