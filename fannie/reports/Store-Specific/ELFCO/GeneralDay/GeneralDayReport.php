@@ -68,12 +68,30 @@ class GeneralDayReport extends FannieReportPage
         );
 
         $dlog = DTransactionsModel::selectDlog($d1);
+        $deptSalesQ = $dbc->prepare_statement("SELECT t.dept_name,SUM(d.quantity) AS qty,
+                SUM(CASE WHEN d.department IN(50,51) THEN (d.regPrice * d.quantity) ELSE d.total END) AS total
+                FROM $dlog AS d LEFT JOIN
+                {$FANNIE_OP_DB}.departments AS t ON d.department = t.dept_no
+                WHERE d.tdate BETWEEN ? AND ? AND d.department <> 0 AND d.department NOT IN (87,89)
+		AND d.trans_subtype NOT IN('MC','CP','IC')
+                GROUP BY d.department ORDER BY t.dept_no");
+        $deptSalesR = $dbc->exec_statement($deptSalesQ,$dates);
+        $report = array();
+        while($deptSalesW = $dbc->fetch_row($deptSalesR)) {
+                $record = array($deptSalesW['dept_name'],
+                        sprintf('%.2f',$deptSalesW['qty']),
+                        sprintf('%.2f',$deptSalesW['total']));
+                $report[] = $record;
+        }
+        $data[] = $report;
+
         $tenderQ = $dbc->prepare_statement("SELECT 
             TenderName,count(d.total),sum(d.total) as total
             FROM $dlog as d,
                 {$FANNIE_OP_DB}.tenders as t 
             WHERE d.tdate BETWEEN ? AND ?
                 AND d.trans_subtype = t.TenderCode
+				AND d.trans_subtype NOT IN('IC','MC','CP')
                 AND d.total <> 0{$shrinkageUsers}
             GROUP BY t.TenderName ORDER BY TenderName");
         $tenderR = $dbc->exec_statement($tenderQ,$dates);
@@ -86,41 +104,40 @@ class GeneralDayReport extends FannieReportPage
         }
         $data[] = $report;
 
-        $salesQ = $dbc->prepare_statement("SELECT m.super_name,sum(d.quantity) as qty,
-                sum(d.total) as total
-                FROM $dlog AS d LEFT JOIN
-                {$FANNIE_OP_DB}.MasterSuperDepts AS m ON d.department=m.dept_ID
-                WHERE d.tdate BETWEEN ? AND ?
-                    AND d.department <> 0 AND d.trans_type <> 'T'{$shrinkageUsers}
-                GROUP BY m.super_name ORDER BY m.super_name");
-        $salesR = $dbc->exec_statement($salesQ,$dates);
         $report = array();
-        while($salesW = $dbc->fetch_row($salesR)){
-            $record = array($salesW['super_name'],
-                    sprintf('%.2f',$salesW['qty']),
-                    sprintf('%.2f',$salesW['total']));
+        $discountAQ = $dbc->prepare_statement("SELECT 
+            TenderName,count(d.total),sum(d.total) as total
+            FROM $dlog as d,
+                {$FANNIE_OP_DB}.tenders as t 
+            WHERE d.tdate BETWEEN ? AND ?
+                AND d.trans_subtype = t.TenderCode
+                AND d.trans_subtype IN('IC','MC','CP')
+				AND d.total <> 0{$shrinkageUsers}
+            GROUP BY t.TenderName ORDER BY TenderName");
+        $discountAR = $dbc->exec_statement($discountAQ,$dates);
+        $report = array();
+        while($discountAW = $dbc->fetch_row($discountAR)){
+            $record = array($discountAW['TenderName'],$discountAW[1],
+                    sprintf('%.2f',$discountAW['total']));
             $report[] = $record;
-            $reconciliation['Sales'] += $salesW['total'];
+            $reconciliation['Tenders'] += $discountAW['total'];
         }
+        $discountA2Q = $dbc->prepare_statement("SELECT t.dept_name,SUM(d.quantity) AS qty,
+                SUM(CASE WHEN (d.department IN (50,51)) THEN -d.discount ELSE d.total END) AS total
+                FROM $dlog AS d LEFT JOIN
+                {$FANNIE_OP_DB}.departments AS t ON d.department = t.dept_no
+                WHERE d.tdate BETWEEN ? AND ? AND d.department <> 0 AND d.department IN (50,51,87,89)
+                GROUP BY d.department ORDER BY t.dept_no");
+        $discountA2R = $dbc->exec_statement($discountA2Q,$dates);
+        while($discountA2W = $dbc->fetch_row($discountA2R)) {
+                $record = array($discountA2W['dept_name'],
+                        sprintf('%.2f',$discountA2W['qty']),
+                        sprintf('%.2f',$discountA2W['total']));
+                $report[] = $record;
+        }		
         $data[] = $report;
-
-	$deptSalesQ = $dbc->prepare_statement("SELECT t.dept_name,SUM(d.quantity) AS qty, 
-		SUM(d.total) AS total
-		FROM $dlog AS d LEFT JOIN
-		{$FANNIE_OP_DB}.departments AS t ON d.department = t.dept_no
-		WHERE d.tdate BETWEEN ? AND ? AND d.department <> 0
-		GROUP BY d.department ORDER BY t.dept_no");
-	$deptSalesR = $dbc->exec_statement($deptSalesQ,$dates);
-	$report = array();
-	while($deptSalesW = $dbc->fetch_row($deptSalesR)) {
-		$record = array($deptSalesW['dept_name'],
-			sprintf('%.2f',$deptSalesW['qty']),
-			sprintf('%.2f',$deptSalesW['total']));
-		$report[] = $record;
-	}
-	$data[] = $report;
-
-        $discQ = $dbc->prepare_statement("SELECT m.memDesc, SUM(d.total) AS Discount,count(*)
+		
+		$discQ = $dbc->prepare_statement("SELECT m.memDesc, SUM(d.total) AS Discount,count(*)
                 FROM $dlog d 
                     INNER JOIN memtype m ON d.memType = m.memtype
                 WHERE d.tdate BETWEEN ? AND ?
@@ -135,7 +152,7 @@ class GeneralDayReport extends FannieReportPage
             $reconciliation['Discounts'] += $discW['Discount'];
         }
         $data[] = $report;
-
+		
         $report = array();
         $trans = DTransactionsModel::selectDTrans($d1);
         $lineItemQ = $dbc->prepare("
@@ -165,6 +182,27 @@ class GeneralDayReport extends FannieReportPage
             $reconciliation['Tax'] = $taxW['tax_collected'];
         }
         $data[] = $report;
+
+        $report = array();		
+        $salesQ = $dbc->prepare_statement("SELECT m.super_name,sum(d.quantity) as qty,
+                sum(d.total) as total
+                FROM $dlog AS d LEFT JOIN
+                {$FANNIE_OP_DB}.MasterSuperDepts AS m ON d.department=m.dept_ID
+                WHERE d.tdate BETWEEN ? AND ?
+                    AND d.department <> 0 AND d.trans_type <> 'T'{$shrinkageUsers}
+                GROUP BY m.super_name ORDER BY m.super_name");
+        $salesR = $dbc->exec_statement($salesQ,$dates);
+        $report = array();
+        while($salesW = $dbc->fetch_row($salesR)){
+            $record = array($salesW['super_name'],
+                    sprintf('%.2f',$salesW['qty']),
+                    sprintf('%.2f',$salesW['total']));
+            $report[] = $record;
+            $reconciliation['Sales'] += $salesW['total'];
+        }
+        $data[] = $report;
+
+
 
         $report = array();
         foreach ($reconciliation as $type => $amt) {
@@ -246,17 +284,17 @@ class GeneralDayReport extends FannieReportPage
     {
         switch($this->multi_counter){
         case 1:
-            $this->report_headers[0] = 'Tenders';
+            $this->report_headers[0] = 'Departments';
             break;
         case 2:
-            $this->report_headers[0] = 'Sales';
+            $this->report_headers[0] = 'Tenders';
             break;
-	case 3:
-	    $this->report_headers[0] = 'Departments';
-	    break;
-        case 4:
-            $this->report_headers[0] = 'Discounts';
-            break;
+		case 3:
+			$this->report_headers[0] = 'Discounts A';
+	    	break;
+		case 4:
+	    	$this->report_headers[0] = 'Discounts B';
+		    break;
         case 5:
             $this->report_headers = array('Tax', 'Amount');
             $sumTax = 0.0;
@@ -266,13 +304,16 @@ class GeneralDayReport extends FannieReportPage
             return array('Total Sales Tax', sprintf('%.2f', $sumTax));
             break;
         case 6:
+            $this->report_headers[0] = array('Sales','Qty','Amount');
+            break;
+        case 7:
             $this->report_headers = array('Reconcile Totals', 'Amount');
             $ttl = 0.0;
             foreach ($data as $row) {
                 $ttl += $row[1];
             }
             return array('Net', sprintf('%.2f', $ttl));
-        case 7:
+        case 8:
             $this->report_headers = array('Type','Trans','Items','Avg. Items','Amount','Avg. Amount');
             $trans = 0.0;
             $items = 0.0;
@@ -284,7 +325,7 @@ class GeneralDayReport extends FannieReportPage
             }
             return array('Totals', $trans, sprintf('%.2f', $items), sprintf('%.2f', $items/$trans), sprintf('%.2f', $amount), sprintf('%.2f', $amount/$trans));
             break;
-        case 8:
+        case 9:
             $this->report_headers = array('Mem#','Equity Type', 'Amount');
             $sumSales = 0.0;
             foreach ($data as $row) {

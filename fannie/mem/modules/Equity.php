@@ -49,7 +49,7 @@ class Equity extends \COREPOS\Fannie\API\member\MemberModule {
             <div class=\"panel-body\">";
 
         $ret .= '<div class="form-group">';
-        $ret .= '<span class="label primaryBackground">Stock Purchased</span> ';
+        $ret .= '<span class="label primaryBackground">Equity</span> ';
         $ret .= sprintf('%.2f',$equity);
         $ret .= " <a href=\"{$FANNIE_URL}reports/Equity/index.php?memNum=$memNum\">History</a>";
         $ret .= '</div>';
