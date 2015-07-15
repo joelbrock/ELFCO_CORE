@@ -121,6 +121,7 @@ class XlsBatchPage extends FannieUploadPage {
 
             $model->upc($upc);
             $model->salePrice($price);
+            $model->groupSalePrice($price);
             $model->save();
         }
 
