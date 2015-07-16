@@ -3,14 +3,14 @@
 
     Copyright 2014 Whole Foods Co-op
 
-    This file is part of Fannie.
+    This file is part of CORE-POS.
 
-    Fannie is free software; you can redistribute it and/or modify
+    CORE-POS is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
 
-    Fannie is distributed in the hope that it will be useful,
+    CORE-POS is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -72,6 +72,7 @@ class SalesBatchTask extends FannieTask
                     l.batchID, 
                     l.pricemethod, 
                     l.salePrice, 
+                    l.groupSalePrice,
                     l.quantity,
                     b.startDate, 
                     b.endDate, 
@@ -84,6 +85,10 @@ class SalesBatchTask extends FannieTask
                     AND b.endDate >= ?
                   ORDER BY l.upc,
                     l.salePrice DESC';
+        $t_def = $dbc->tableDefinition('batchList');
+        if (!isset($t_def['groupSalePrice'])) {
+            $query = str_replace('l.groupSalePrice', 'NULL AS groupSalePrice', $query);
+        }
         $prep = $dbc->prepare($query);
         $result = $dbc->execute($prep, array($now, $now));
         while ($row = $dbc->fetch_row($result)) {
@@ -94,7 +99,11 @@ class SalesBatchTask extends FannieTask
             // use products column names for readability below
             $special_price = $row['salePrice'];
             $specialpricemethod = $row['pricemethod'];
-            $specialgroupprice = abs($row['salePrice']);
+            if ($row['groupSalePrice'] != null) {
+                $specialgroupprice = $row['groupSalePrice'];
+            } else {
+                $specialgroupprice = abs($row['salePrice']);
+            }
             $specialquantity = $row['quantity'];
             $special_limit = $row['transLimit'];
             $start_date = $row['startDate'];
