@@ -48,7 +48,7 @@ class GeneralDayReport extends FannieReportPage
     function fetch_report_data()
     {
         global $FANNIE_OP_DB, $FANNIE_ARCHIVE_DB, $FANNIE_EQUITY_DEPARTMENTS,
-            $FANNIE_COOP_ID;
+            $FANNIE_COOP_ID, $FANNIE_REGISTER_NO;
         $dbc = FannieDB::get($FANNIE_OP_DB);
         $d1 = FormLib::get_form_value('date1',date('Y-m-d'));
         $d2 = FormLib::get_form_value('date2',$d1);
@@ -112,7 +112,7 @@ class GeneralDayReport extends FannieReportPage
             WHERE d.tdate BETWEEN ? AND ?
                 AND d.trans_subtype = t.TenderCode
                 AND d.trans_subtype IN('IC','MC','CP')
-				AND d.total <> 0{$shrinkageUsers}
+		AND d.total <> 0{$shrinkageUsers}
             GROUP BY t.TenderName ORDER BY TenderName");
         $discountAR = $dbc->exec_statement($discountAQ,$dates);
         $report = array();
@@ -127,6 +127,7 @@ class GeneralDayReport extends FannieReportPage
                 FROM $dlog AS d LEFT JOIN
                 {$FANNIE_OP_DB}.departments AS t ON d.department = t.dept_no
                 WHERE d.tdate BETWEEN ? AND ? AND d.department <> 0 AND d.department IN (50,51,87,89)
+		AND d.discounttype = 0
                 GROUP BY d.department ORDER BY t.dept_no");
         $discountA2R = $dbc->exec_statement($discountA2Q,$dates);
         while($discountA2W = $dbc->fetch_row($discountA2R)) {
@@ -266,6 +267,7 @@ class GeneralDayReport extends FannieReportPage
                 LEFT JOIN {$FANNIE_OP_DB}.departments as t ON d.department = t.dept_no
                 WHERE d.tdate BETWEEN ? AND ?
                     AND d.department IN $dlist{$shrinkageUsers}
+		    AND d.register_no <> $FANNIE_REGISTER_NO 
                 GROUP BY d.card_no, t.dept_name ORDER BY d.card_no, t.dept_name");
             $equityR = $dbc->exec_statement($equityQ,$dates);
             $report = array();
@@ -289,12 +291,12 @@ class GeneralDayReport extends FannieReportPage
         case 2:
             $this->report_headers[0] = 'Tenders';
             break;
-		case 3:
-			$this->report_headers[0] = 'Discounts A';
-	    	break;
-		case 4:
-	    	$this->report_headers[0] = 'Discounts B';
-		    break;
+	case 3:
+	     $this->report_headers[0] = 'Discounts A';
+	     break;
+	case 4:
+	    $this->report_headers[0] = 'Discounts B';
+	    break;
         case 5:
             $this->report_headers = array('Tax', 'Amount');
             $sumTax = 0.0;
