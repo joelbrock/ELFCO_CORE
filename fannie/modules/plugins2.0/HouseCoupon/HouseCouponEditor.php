@@ -32,18 +32,11 @@ if (!class_exists('FannieAPI')) {
 class HouseCouponEditor extends FanniePage 
 {
 
-<<<<<<< HEAD
-    public $description = "
-    Module for managing in store coupons
-    ";
-    public $themed = true;
-=======
     public $description = "[Module] for managing in store coupons";
     public $themed = true;
 
     protected $must_authenticate = true;
     protected $auth_classes = array('tenders');
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
 
     protected $header = "Fannie :: House Coupons";
     protected $title = "House Coupons";
@@ -71,7 +64,6 @@ class HouseCouponEditor extends FanniePage
                 echo $this->couponItemTable($id);
                 return false;
             }
-<<<<<<< HEAD
 
             $item = new HouseCouponItemsModel($dbc);
             if ($hc->minType() == 'MX') {
@@ -110,46 +102,6 @@ class HouseCouponEditor extends FanniePage
 
             return false;
 
-=======
-
-            $item = new HouseCouponItemsModel($dbc);
-            if ($hc->minType() == 'MX') {
-                if (!empty($upc)) {
-                    $item->reset();
-                    $item->coupID($id);
-                    $item->upc(BarcodeLib::padUPC($upc));
-                    $item->type('DISCOUNT');
-                    $item->save();
-                }
-                if (!empty($dept)) {
-                    $item->reset();
-                    $item->coupID($id);
-                    $item->upc($dept);
-                    $item->type('QUALIFIER');
-                    $item->save();
-                }
-            } else {
-                if (!empty($upc)) {
-                    $item->reset();
-                    $item->coupID($id);
-                    $item->upc(BarcodeLib::padUPC($upc));
-                    $item->type($type);
-                    $item->save();
-                }
-                if (!empty($dept)) {
-                    $item->reset();
-                    $item->coupID($id);
-                    $item->upc($dept);
-                    $item->type($type);
-                    $item->save();
-                }
-            }
-
-            echo $this->couponItemTable($id);
-
-            return false;
-
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
         } elseif (FormLib::get_form_value('edit_id','') !== '') {
             $this->coupon_id = (int)FormLib::get_form_value('edit_id',0);
             $this->display_function = 'editCoupon';
@@ -253,10 +205,6 @@ class HouseCouponEditor extends FanniePage
     private function listHouseCoupons()
     {
         $FANNIE_URL = $this->config->get('URL');
-<<<<<<< HEAD
-=======
-
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
         $this->add_script($FANNIE_URL . 'src/javascript/fancybox/jquery.fancybox-1.3.4.js?v=1');
         $this->add_css_file($FANNIE_URL . 'src/javascript/fancybox/jquery.fancybox-1.3.4.css');
         $dbc = FannieDB::get($this->config->get('OP_DB'));
@@ -297,11 +245,8 @@ class HouseCouponEditor extends FanniePage
                         class="btn btn-default">Print Barcode</a>
                         <a href="%sreports/ProductMovement/ProductMovementModular.php?upc=%s&date1=%s&date2=%s"
                         class="btn btn-default">Usage Report</a>
-<<<<<<< HEAD
-=======
                         <a href="%smodules/plugins2.0/CoreWarehouse/reports/CWCouponReport.php?coupon-id=%d&date1=%s&date2=%s"
                         class="btn btn-default %s">Member Baskets</a>
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
                     </tr>',
                     $obj->coupID(),$obj->coupID(),$obj->description(),
                     $obj->discountValue(), $obj->discountType(), $obj->endDate(),
@@ -311,16 +256,12 @@ class HouseCouponEditor extends FanniePage
                     $FANNIE_URL,
                     ('499999' . str_pad($obj->coupID(), 5, '0', STR_PAD_LEFT)),
                     $report_dates[0],
-<<<<<<< HEAD
-                    $report_dates[1]
-=======
                     $report_dates[1],
                     $FANNIE_URL,
                     $obj->coupID(),
                     $report_dates[0],
                     $report_dates[1],
                     (\COREPOS\Fannie\API\FanniePlugin::isEnabled('CoreWarehouse') ? '' : 'collapse')
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
                 );
         }
         $ret .= '</table>';
@@ -479,16 +420,10 @@ class HouseCouponEditor extends FanniePage
             class=\"form-control\" /></div>
             </div>";
 
-<<<<<<< HEAD
-        $ret .= "<br /><button type=submit name=submit_save value=Save class=\"btn btn-default\">Save</button>";
-        $ret .= ' | <button type="button" value="Back" class="btn btn-default" 
-            onclick="location=\'HouseCouponEditor.php\';return false;">Back</button>';
-=======
         $ret .= "<br /><button type=submit name=submit_save value=Save class=\"btn btn-default btn-core\">
             Save Settings</button>";
         $ret .= ' <button type="button" value="Back" class="btn btn-default btn-reset" 
             onclick="location=\'HouseCouponEditor.php\';return false;">Back to List of Coupons</button>';
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
 
         $ret .= "<hr />";
         $ret .= '<div class="container-fluid">';
@@ -497,11 +432,7 @@ class HouseCouponEditor extends FanniePage
             $ret .= '<label class="control-label">Add UPC</label>
                 <input type=text class="form-control add-item-field" name=new_upc /> ';
         } 
-<<<<<<< HEAD
-        if ($mType == "D" || $mType == "D+" || $dType == '%D' || $mType == 'MX') {
-=======
         if ($mType == "D" || $mType == "D+" || $mType == 'C' || $mType == 'C+' || $dType == '%D' || $mType == 'MX') {
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
             $ret .= '
                 <label class="control-label">Add Dept</label>
                 <select class="form-control add-item-field" name=new_dept>
@@ -529,7 +460,6 @@ class HouseCouponEditor extends FanniePage
         $ret .= '</table>';
         $ret .= "<p><button type=submit name=submit_delete_dept value=\"1\"
             class=\"btn btn-default\">Delete Selected Departments</button></p>";
-<<<<<<< HEAD
 
         return $ret;
     }
@@ -555,33 +485,6 @@ class HouseCouponEditor extends FanniePage
         return ob_get_clean();
     }
 
-=======
-
-        return $ret;
-    }
-
-    public function javascriptContent()
-    {
-        ob_start();
-        ?>
-        function addItemToCoupon()
-        {
-            var dataStr = $('#add-item-form :input').serialize();
-            dataStr += '&ajax-add=1';
-            $.ajax({
-                type: 'post',
-                data: dataStr,
-                success: function(resp) {
-                    $('#coupon-item-table').html(resp);
-                    $('.add-item-field').val('');
-                }
-            });
-        }
-        <?php
-        return ob_get_clean();
-    }
-
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
     private function couponItemTable($id)
     {
         $dbc = FannieDB::get($this->config->get('OP_DB'));
@@ -604,11 +507,7 @@ class HouseCouponEditor extends FanniePage
                     LEFT JOIN products AS p ON p.upc=h.upc AND h.type='DISCOUNT'
                     LEFT JOIN departments AS d ON h.upc=d.dept_no AND h.type='QUALIFIER'
                 WHERE h.coupID=?";
-<<<<<<< HEAD
-        } elseif ($hc->minType() == "D" || $hc->minType() == "D+" || $hc->discountType() == '%D') {
-=======
         } elseif ($hc->minType() == "D" || $hc->minType() == "D+" || $hc->minType() == 'C' || $hc->minType() == 'C+' || $hc->discountType() == '%D') {
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
             $query = '
                 SELECT h.upc,
                     d.dept_name AS description,
@@ -638,11 +537,7 @@ class HouseCouponEditor extends FanniePage
 
     public function helpContent()
     {
-<<<<<<< HEAD
-        $help = file_get_contents('explainify.html');
-=======
         $help = file_get_contents(dirname(__FILE__) . '/explainify.html');
->>>>>>> 42948eac724cb38509e6f9f81022a8fd92db42c8
         $extract = preg_match('/<body>(.*)<\/body>/ms', $help, $matches);
         if ($extract) {
             return $matches[1];
