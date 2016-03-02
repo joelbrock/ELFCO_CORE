@@ -136,6 +136,17 @@ class GeneralDayReport extends FannieReportPage
                         sprintf('%.2f',$discountA2W['total']));
                 $report[] = $record;
         }		
+	// added 2016-03-02 to support new 5% register discount for memtypes 1 and 2  ~jb
+	$discountA3Q = $dbc->prepare_statement("SELECT 'Owner 5% Discount' as label, count(*), SUM(total) as Discount
+		FROM $dlog WHERE tdate BETWEEN ? AND ? AND upc = 'DISCOUNT' AND memtype IN(1,2)
+		AND total <> 0");
+	$discountA3R = $dbc->exec_statement($discountA3Q,$dates);
+	while($discountA3W = $dbc->fetch_row($discountA3R)) {
+		$record = array($discountA3W[0],
+			sprintf('%.2f',$discountA3W[1]),
+			sprintf('%.2f',$discountA3W[2]));
+		$report[] = $record;
+	}
         $data[] = $report;
 		
 		$discQ = $dbc->prepare_statement("SELECT m.memDesc, SUM(d.total) AS Discount,count(*)
