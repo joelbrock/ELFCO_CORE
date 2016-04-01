@@ -146,6 +146,7 @@ class GeneralDayReport extends FannieReportPage
 			sprintf('%.2f',$discountA3W[1]),
 			sprintf('%.2f',$discountA3W[2]));
 		$report[] = $record;
+		$reconciliation['Discounts'] += $discountA3W['Discount'];
 	}
         $data[] = $report;
 		
@@ -154,7 +155,7 @@ class GeneralDayReport extends FannieReportPage
                     INNER JOIN memtype m ON d.memType = m.memtype
                 WHERE d.tdate BETWEEN ? AND ?
                    AND d.upc = 'DISCOUNT'{$shrinkageUsers}
-                AND total <> 0
+                AND total <> 0 AND d.memType NOT IN (1,2) 
                 GROUP BY m.memDesc ORDER BY m.memDesc");
         $discR = $dbc->exec_statement($discQ,$dates);
         $report = array();
@@ -237,7 +238,7 @@ class GeneralDayReport extends FannieReportPage
             ) as q 
             group by q.trans_num,q.transaction_type");
         $transR = $dbc->exec_statement($transQ,$dates);
-        $trans_info = array();
+        $transinfo = array();
         while($row = $dbc->fetch_array($transR)){
             if (!isset($transinfo[$row[2]]))
                 $transinfo[$row[2]] = array(0,0.0,0.0,0.0,0.0);
@@ -261,7 +262,6 @@ class GeneralDayReport extends FannieReportPage
             $report[] = $info;
         }
         $data[] = $report;
-
         $ret = preg_match_all("/[0-9]+/",$FANNIE_EQUITY_DEPARTMENTS,$depts);
         if ($ret != 0){
             /* equity departments exist */
